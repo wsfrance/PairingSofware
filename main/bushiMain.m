@@ -19,6 +19,7 @@ function [ tablePlayers_forTournament ] = bushiMain( tablePlayers_fromDB, tableP
 %--------------------------------------------------------------------------
 
 verbose = 1;
+no_maxRound = 3;
 
 %--------------------------------------------------------------------------
 % Check nargin
@@ -51,7 +52,7 @@ end
 
 % Generate sub-Tables
 nb_players = size(tablePlayers_fromDB,1);
-[rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players);
+[rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players, no_maxRound);
 
 % Players for Tournament
 tablePlayers_forTournament = [playerIdTable tablePlayers_fromDB rankTable];
@@ -61,7 +62,6 @@ mat_HistoryMatch = zeros(nb_players,nb_players);
 
 %% 3 - Start Tournament
 
-no_maxRound = 3;
 % option.col_classement_init  = 7;
 % option.col_winNumber        = 8;
 % option.col_playersID        = 1;
@@ -72,8 +72,8 @@ option.winningPoint = 1;
 option.losePoint    = 0;
 option.tiePoint     = 0.5;
 
-for j = 1:no_maxRound
-    option.no_round = j;
+for current_round = 1:no_maxRound
+    option.no_round = current_round;
     %% 3.1 - Make a pairing players
     if verbose
         disp(['Round number : ' num2str(option.no_round)])
@@ -102,7 +102,7 @@ for j = 1:no_maxRound
        % Store
        historyMatch_tmp.Player1(i,1) = cellstr(player1);
        historyMatch_tmp.Player2(i,1) = cellstr(player2);
-       historyMatch_tmp.Round(i,1) = j;
+       historyMatch_tmp.Round(i,1) = current_round;
        historyMatch_tmp.winner(i,1) = match_record(i,1);
        
        % Assign scores
@@ -117,6 +117,10 @@ for j = 1:no_maxRound
     
     % Determine if 1st Loss and store it
     tablePlayers_forTournament = firstLoss(tablePlayers_forTournament, historyMatch_tmp);
+    
+    % Store cumulative score
+    tablePlayers_forTournament = Cumulative_Tie_break (tablePlayers_forTournament, current_round);
+    
     
     %% 3.4- Make the ranking
     if verbose
@@ -155,10 +159,11 @@ end
 % ADDED FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players)
+function [rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players, no_maxRound)
 
 zerosMat = zeros(nb_players,1);
 indexMat = [1:nb_players]';
+cell_zerosMat = {zeros(1,no_maxRound)};
 
 rankTable = table(...
     zerosMat,...
@@ -171,7 +176,8 @@ rankTable = table(...
     zerosMat,...
     zerosMat,...
     zerosMat,...
-    'VariableName', {'Points', 'Ranking', 'winNumber', 'tieNumber', 'lossNumber', 'Modified_Median', 'Solkoff' , 'Cumulative_Score', 'first_Loss', 'Buchholz'});
+    repmat(cell_zerosMat,nb_players,1),...
+    'VariableName', {'Points', 'Ranking', 'winNumber', 'tieNumber', 'lossNumber', 'Modified_Median', 'Solkoff' , 'Cumulative_Score', 'first_Loss', 'Buchholz', 'historyPoints'});
 
 playerIdTable = table(...
     indexMat, ...
@@ -446,6 +452,16 @@ end
 end
 
 % The Cumulative Tie-break System
+function tablePlayers_forTournament = Cumulative_Tie_break (tablePlayers_forTournament, current_round)
 
+nb_player = size(tablePlayers_forTournament,1);
 
+for i = 1:nb_player
+    data = tablePlayers_forTournament.historyPoints(i);
+    data{1}(current_round) = tablePlayers_forTournament.Points(i);
+    tablePlayers_forTournament.historyPoints(i) = data;
+    tablePlayers_forTournament.Cumulative_Score(i) = sum(data{1});
+end
+
+end
 
