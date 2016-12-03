@@ -1,4 +1,4 @@
-function [ tablePlayers_forTournament ] = bushiMain( tablePlayers_fromDB, tablePlayers_forTournament )
+function [ tablePlayers_forTournament, historyMatch ] = bushiMain( tablePlayers_fromDB, tablePlayers_forTournament )
 %bushiMain Summary of this function goes here
 %   Detailed explanation goes here
 %--------------------------------------------------------------------------
@@ -111,6 +111,12 @@ for current_round = 1:no_maxRound
 
     historyMatch = [historyMatch; historyMatch_tmp];
     
+    % Sort the data : 1st time
+    column2sort = {'Points', 'Modified_Median', 'Solkoff', 'first_Loss', 'name'};
+    sortType = {'descend', 'descend', 'descend', 'descend', 'ascend'};
+    tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sortType);
+    
+    
     % Compute Solkoff or Buchholz points
     typeSolkoff_buchholz = 'median';
     tablePlayers_forTournament = Solkoff_buchholz_Compute (historyMatch, tablePlayers_forTournament, typeSolkoff_buchholz, no_maxRound);
@@ -128,9 +134,7 @@ for current_round = 1:no_maxRound
         disp('** Making the ranking');
     end
     
-    % Sort the data
-    column2sort = {'Points', 'Modified_Median', 'Solkoff', 'first_Loss', 'name'};
-    sortType = {'descend', 'descend', 'descend', 'descend', 'ascend'};
+    % Sort the data : 2nd time
     tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sortType);
     
     % old code

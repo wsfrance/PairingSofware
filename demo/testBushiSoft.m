@@ -14,4 +14,4 @@ pathstr = addPath_bushisoft ();
 [ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
 
 %% Main core
-FinalRanking = bushiMain( tablePlayers_fromDB, tablePlayers_forTournament );
+[FinalRanking, historyMatch] = bushiMain( tablePlayers_fromDB, tablePlayers_forTournament );
