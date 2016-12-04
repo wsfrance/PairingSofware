@@ -61,7 +61,22 @@ guidata(hObject, handles);
 % UIWAIT makes BushiSoftGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+%--------------------------------------------------------------------------
+% User Personal Code
+
+global tablePlayers_fromDB tablePlayers_forTournament columnTable
+
+% Set title
 set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
+
+% Create Data
+[ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
+
+column = {'name', 'familyName', 'pseudo'};
+[ tablePlayers_fromDB ] = Capital_FirstLetter( tablePlayers_fromDB, column );
+
+
+columnTable = {'WSCode', 'name', 'familyName', 'pseudo'};
 
 
 % --- Outputs from this function are returned to the command line.
@@ -81,17 +96,15 @@ function BUT_refresh_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Create Data
-[ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
+global tablePlayers_fromDB columnTable
 
 % Select Data to vizualize
-column2check = {'WSCode', 'name', 'familyName'};
-data = table2cell(tablePlayers_fromDB(:,column2check));
-set(handles.TAB_players, 'data', data, 'ColumnName', column2check)
 
-column2check = {'WSCode', 'name', 'familyName'};  
-column2check = ['Sort By'; column2check'];
-set(handles.POP_sortBy,'String', column2check)  ;
+data = table2cell(tablePlayers_fromDB(:,columnTable));
+set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+
+sortBy_option = ['Sort By'; columnTable'];
+set(handles.POP_sortBy,'String', sortBy_option)  ;
 
 
 
@@ -104,26 +117,35 @@ function POP_sortBy_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_sortBy
 
+global columnTable
+
+
 data = handles.TAB_players.Data;
 
 contents = get(handles.POP_sortBy,'String'); 
 value = contents{get(handles.POP_sortBy,'Value')};
 
-switch value
-    case 'Sort By'
-        % do nothing
-    case 'WSCode'
-        data = sortrows(data,1);
-    case 'name'
-        data = sortrows(data,2);
-    case 'familyName'
-        data = sortrows(data,3);
-    otherwise
-        error('case value not known')
+IndexC = strfind(columnTable,value);
+Index = find(not(cellfun('isempty', IndexC)));
+if Index>0
+    data = sortrows(data,Index);
 end
 
-column2check = {'WSCode', 'name', 'familyName'};
-set(handles.TAB_players, 'data', data, 'ColumnName', column2check)
+% switch value
+%     case 'Sort By'
+%         % do nothing
+%     case 'WSCode'
+%         data = sortrows(data,1);
+%     case 'name'
+%         data = sortrows(data,2);
+%     case 'familyName'
+%         data = sortrows(data,3);
+%     otherwise
+%         error('case value not known')
+% end
+
+% column2check = {'WSCode', 'name', 'familyName'};
+set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
 
 
 
