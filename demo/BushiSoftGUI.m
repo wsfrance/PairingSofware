@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Dec-2016 18:57:35
+% Last Modified by GUIDE v2.5 04-Dec-2016 21:58:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -71,12 +71,26 @@ set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)'
 
 % Create Data
 [ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
+tablePlayers_forTournament(:,:) = [];
 
 column = {'name', 'familyName', 'pseudo'};
 [ tablePlayers_fromDB ] = Capital_FirstLetter( tablePlayers_fromDB, column );
 
 
 columnTable = {'WSCode', 'name', 'familyName', 'pseudo'};
+
+% Initialize functions to Tables
+set(handles.TAB_players, 'CellSelectionCallback',@cellSelect);
+set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
+
+% Logo
+axes(handles.PLOT_logo)
+matlabImage = imread('bushiroadLogo.jpg');
+% matlabImage = imread('ws_logo.png');
+matlabImage = imresize(matlabImage, 1.5);
+image(matlabImage)
+axis off
+axis image
 
 
 % --- Outputs from this function are returned to the command line.
@@ -108,6 +122,7 @@ set(handles.POP_sortBy,'String', sortBy_option)  ;
 
 
 
+
 % --- Executes on selection change in POP_sortBy.
 function POP_sortBy_Callback(hObject, eventdata, handles)
 % hObject    handle to POP_sortBy (see GCBO)
@@ -124,9 +139,8 @@ data = handles.TAB_players.Data;
 
 contents = get(handles.POP_sortBy,'String'); 
 value = contents{get(handles.POP_sortBy,'Value')};
+Index = strfind_idx( columnTable',value );
 
-IndexC = strfind(columnTable,value);
-Index = find(not(cellfun('isempty', IndexC)));
 if Index>0
     data = sortrows(data,Index);
 end
@@ -164,6 +178,107 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+
+% --- Executes on button press in BUT_addPlayer.
+function BUT_addPlayer_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addPlayer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global tablePlayers_forTournament tablePlayers_fromDB columnTable
+
+UITable = 'TAB_players';
+[ data, rows] = getCellSelect( UITable );
+if isempty(data)~=1
+    list_data = data(rows,1);
+    for i = 1:length(rows)
+        WSCode_i = list_data(i,1);
+        [ Index ] = strfind_idx( tablePlayers_fromDB.WSCode, WSCode_i );
+
+        selected_data = tablePlayers_fromDB(Index,:);
+        % % create mask containing rows to keep
+        % mask = (1:size(data,1))';
+        % mask(rows) = [];
+        % % delete selected rows and re-write data
+        % data = data(mask,:);
+
+        tablePlayers_fromDB (Index,:) = [];
+
+        tablePlayers_forTournament = [tablePlayers_forTournament; selected_data];
+
+        data = table2cell(tablePlayers_fromDB(:,columnTable));
+        set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+        data2 = table2cell(tablePlayers_forTournament(:,columnTable));
+        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', columnTable)
+    end
+else
+    disp('There is no player in the DB')
+end
+    
+    
+% --- Executes on button press in BUT_removePlayer.
+function BUT_removePlayer_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_removePlayer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global tablePlayers_forTournament tablePlayers_fromDB columnTable
+
+UITable = 'TAB_players_Tournament';
+[ data, rows] = getCellSelect( UITable );
+if isempty(data)~=1
+    list_data = data(rows,1);
+    for i = 1:length(rows)
+        WSCode_i = list_data(i,1);
+        [ Index ] = strfind_idx( tablePlayers_forTournament.WSCode, WSCode_i );
+
+        selected_data = tablePlayers_forTournament(Index,:);
+        % % create mask containing rows to keep
+        % mask = (1:size(data,1))';
+        % mask(rows) = [];
+        % % delete selected rows and re-write data
+        % data = data(mask,:);
+        tablePlayers_forTournament (Index,:) = [];
+
+        tablePlayers_fromDB = [tablePlayers_fromDB; selected_data];
+
+        data = table2cell(tablePlayers_forTournament(:,columnTable));
+        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', columnTable)
+        data2 = table2cell(tablePlayers_fromDB(:,columnTable));
+        set(handles.TAB_players, 'data', data2, 'ColumnName', columnTable)
+    end
+else
+    disp('There is no player in the tournament')
+end
+
+
+
+
+
+function TXT_tournamentName_Callback(hObject, eventdata, handles)
+% hObject    handle to TXT_tournamentName (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of TXT_tournamentName as text
+%        str2double(get(hObject,'String')) returns contents of TXT_tournamentName as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function TXT_tournamentName_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TXT_tournamentName (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % MENU EDITOR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,5 +300,145 @@ function MENU_Player_Callback(hObject, eventdata, handles)
 % --------------------------------------------------------------------
 function MENU_Tournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_Tournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_newPlayer_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_newPlayer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_editPlayerInfo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_loadFromDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_loadFromDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_versionInfo_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_versionInfo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_quit_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_quit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+close
+
+% --------------------------------------------------------------------
+function MENU_openTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_openTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_createNewTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_createNewTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_3_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_printPlayerList_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_printPlayerList (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_beginTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_beginTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_statistics_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_statistics (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_help_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_help (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_contactUs_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_contactUs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+email = 'caotri.do88@gmail.com';
+url = ['mailto:',email];
+web(url)
+
+
+% --------------------------------------------------------------------
+function MENU_wsfrance_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_wsfrance (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+url = 'http://www.ws-france.fr';
+web(url,'-browser')
+
+
+
+function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
+% hObject    handle to EDIT_searchPlayer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EDIT_searchPlayer as text
+%        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayer as a double
+disp('Hello')
+
+% --- Executes during object creation, after setting all properties.
+function EDIT_searchPlayer_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EDIT_searchPlayer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --------------------------------------------------------------------
+function MENU_saveDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_saveDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_configSQLServer_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_configSQLServer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
