@@ -64,26 +64,46 @@ guidata(hObject, handles);
 %--------------------------------------------------------------------------
 % User Personal Code
 
+% Clean up console
+clc
+disp('Cleaning up console')
+
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('Bushiroad Pairing Software')
+disp('Author: malganis35')
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
 global tablePlayers_fromDB tablePlayers_forTournament columnTable
+% User Define
+column = {'name', 'familyName', 'pseudo'};
+columnTable = ['WSCode', column];
 
 % Set title
 set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
+disp('Generate Tables: tablePlayers_fromDB and tablePlayers_forTournament')
 [ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
 tablePlayers_forTournament(:,:) = [];
 
-column = {'name', 'familyName', 'pseudo'};
+% Remove spaces at the begining and at the end
+% tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
+% tablePlayers_fromDB_tmp = strtrim(tablePlayers_fromDB_tmp);
+% tablePlayers_fromDB = tablePlayers_fromDB_tmp;
+
+
+% Capital Letters
+disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
 [ tablePlayers_fromDB ] = Capital_FirstLetter( tablePlayers_fromDB, column );
 
 
-columnTable = {'WSCode', 'name', 'familyName', 'pseudo'};
-
 % Initialize functions to Tables
+disp('Initialize functions (@cellSelect) to Tables')
 set(handles.TAB_players, 'CellSelectionCallback',@cellSelect);
 set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
 
 % Logo
+disp('Display Logo on the Software')
 axes(handles.PLOT_logo)
 matlabImage = imread('bushiroadLogo.jpg');
 % matlabImage = imread('ws_logo.png');
@@ -415,7 +435,21 @@ function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of EDIT_searchPlayer as text
 %        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayer as a double
-disp('Hello')
+disp('Select subplayers')
+
+global columnTable tablePlayers_fromDB
+
+name = handles.EDIT_searchPlayer.String;
+if isempty(name)~=1
+    data = handles.TAB_players.Data;
+    [ Index ] = strfind_idx( data, name );
+    Index = unique(Index);
+    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', columnTable)
+else
+    data = table2cell(tablePlayers_fromDB(:,columnTable));
+    set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+end
+
 
 % --- Executes during object creation, after setting all properties.
 function EDIT_searchPlayer_CreateFcn(hObject, eventdata, handles)
