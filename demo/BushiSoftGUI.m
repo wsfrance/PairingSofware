@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Dec-2016 18:47:15
+% Last Modified by GUIDE v2.5 04-Dec-2016 18:57:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,6 +61,8 @@ guidata(hObject, handles);
 % UIWAIT makes BushiSoftGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = BushiSoftGUI_OutputFcn(hObject, eventdata, handles) 
@@ -87,8 +89,57 @@ column2check = {'WSCode', 'name', 'familyName'};
 data = table2cell(tablePlayers_fromDB(:,column2check));
 set(handles.TAB_players, 'data', data, 'ColumnName', column2check)
 
+column2check = {'WSCode', 'name', 'familyName'};  
+column2check = ['Sort By'; column2check'];
+set(handles.POP_sortBy,'String', column2check)  ;
 
 
+
+% --- Executes on selection change in POP_sortBy.
+function POP_sortBy_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortBy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortBy
+
+data = handles.TAB_players.Data;
+
+contents = get(handles.POP_sortBy,'String'); 
+value = contents{get(handles.POP_sortBy,'Value')};
+
+switch value
+    case 'Sort By'
+        % do nothing
+    case 'WSCode'
+        data = sortrows(data,1);
+    case 'name'
+        data = sortrows(data,2);
+    case 'familyName'
+        data = sortrows(data,3);
+    otherwise
+        error('case value not known')
+end
+
+column2check = {'WSCode', 'name', 'familyName'};
+set(handles.TAB_players, 'data', data, 'ColumnName', column2check)
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function POP_sortBy_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortBy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');  
+    
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
