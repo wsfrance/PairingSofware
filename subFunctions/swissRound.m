@@ -1,4 +1,4 @@
-function [pairingID, mat_HistoryMatch] = swissRound (tablePlayers, mat_HistoryMatch, option)
+function [pairingID, pairingWSCode, mat_HistoryMatch] = swissRound (tablePlayers, mat_HistoryMatch, option)
 % Function to make the pairing between players
 % Input : 
 %   * tablePlayers      : initial record of the players
@@ -96,6 +96,9 @@ else
     
 end
 
+% Convert pairingID to WSCode
+pairingWSCode = id2WSCode(tablePlayers, pairingID);
+
 % Update mat_HistoryMatch
 mat_HistoryMatch = updateHistoryMatch (mat_HistoryMatch,pairingID);
 
@@ -142,5 +145,15 @@ function mat_HistoryMatch = updateHistoryMatch (mat_HistoryMatch,pairingID)
     end
 end
 
+function pairingWSCode = id2WSCode(tablePlayers, pairingID)
 
+[m,n] = size(pairingID);
+for i = 1:m
+    for j = 1:n
+        pairingWSCode(i,j) = tablePlayers.WSCode(pairingID(i,j));
+    end
+end
+
+
+end
 
