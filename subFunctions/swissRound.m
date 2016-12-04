@@ -10,6 +10,8 @@ function [pairingID, pairingWSCode, mat_HistoryMatch] = swissRound (tablePlayers
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+verbose = 0;
+
 % Allocate/Extract informations
 classement_init = tablePlayers.Ranking;
 winNumber       = tablePlayers.winNumber;
@@ -76,17 +78,21 @@ else
                 pairingID_tmp = reshape(currentPlayersID,2, size(currentPlayersID,1)/2); 
                 pairingID_tmp = pairingID_tmp';
                 % For each pairing generated, check if it has already be done
-                bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch);
+                bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, verbose);
                 
                 id_test = find(bool_mat==1);
                 if isempty (id_test) == 0
                     bool = 1;
                     counter = counter+1;
-                    disp('le match a déjà eu lieu. Re-pairing by re-shuffle')
+                    if verbose
+                        disp('le match a déjà eu lieu. Re-pairing by re-shuffle')
+                    end
                     currentPlayersID=currentPlayersID(randperm(length(currentPlayersID)));
                 else
                     bool = 0;
-                    disp(['Tout le pairing est ok pour le score win = ' num2str(score_tmp) '. Continuing'])
+                    if verbose
+                        disp(['Tout le pairing est ok pour le score win = ' num2str(score_tmp) '. Continuing'])
+                    end
                 end
             end
             
@@ -120,17 +126,21 @@ function [currentPlayersID, rest_tmp] = separate_OddEven_case(currentPlayersID)
     end
 end
 
-function bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch)
+function bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, verbose)
     % For each pairing generated, check if it has already be done
     bool_mat = zeros(size(pairingID_tmp,1),1)+Inf;
     for j = 1:size(pairingID_tmp,1)
         extract_match_index = pairingID_tmp(j,:);
         warning ('TO CHANGE CODE')
         if mat_HistoryMatch(extract_match_index) == 0
-            disp('le match n a pas encore eu lieu : ok')
+            if verbose
+                disp('le match n a pas encore eu lieu : ok')
+            end
             bool_mat(j) = 0;
         else
-            disp('le match a déjà eu lieu. Re-pairing')
+            if verbose
+                disp('le match a déjà eu lieu. Re-pairing')
+            end
             bool_mat(j) = 1;
         end
     end

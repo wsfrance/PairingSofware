@@ -118,7 +118,7 @@ for current_round = 1:no_maxRound
     
     % Sort the data : 1st time
     column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss', 'name'};
-    sortType = {'descend', 'descend', 'descend', 'descend', 'ascend'};
+    sortType = {'descend', 'descend', 'descend', 'descend', 'descend', 'ascend'};
     tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sortType);
     
     
