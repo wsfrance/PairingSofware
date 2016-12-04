@@ -80,7 +80,8 @@ for current_round = 1:no_maxRound
         disp('-------------------------------------------------------------------')
         disp('** Making a pairing players');  
     end
-    [matchID, mat_HistoryMatch] = swissRound (tablePlayers_forTournament, mat_HistoryMatch, option);
+    
+    [matchID, pairingWSCode, mat_HistoryMatch] = swissRound (tablePlayers_forTournament, mat_HistoryMatch, option);
 
     %% 3.2- Report the results +  Compute the new points
     if verbose
@@ -94,14 +95,18 @@ for current_round = 1:no_maxRound
        lin1 = find(tablePlayers_forTournament.playerId == matchID(i,1));
        lin2 = find(tablePlayers_forTournament.playerId == matchID(i,2));
        player1 = tablePlayers_forTournament.name(lin1);
-       player2 = tablePlayers_forTournament.name(lin2);       
-       message = strjoin([ 'match no ' num2str(i) ' : ' player1 ' vs ' player2 ' : winner? (1/2 or 3 for tie) : ']);
+       player2 = tablePlayers_forTournament.name(lin2);  
+       WSCode1 = tablePlayers_forTournament.WSCode(matchID(i,1));
+       WSCode2 = tablePlayers_forTournament.WSCode(matchID(i,2));
+       message = strjoin([ 'match no ' num2str(i) ' : ' player1 ' (' WSCode1 ') vs ' player2 ' (' WSCode2 ') : winner? (1/2 or 3 for tie) : ']);
        disp(message)
        match_record(i,1) = str2double(input('Result:', 's'));
        
        % Store
        historyMatch_tmp.Player1(i,1) = cellstr(player1);
        historyMatch_tmp.Player2(i,1) = cellstr(player2);
+       historyMatch_tmp.WSCode1(i,1) = cellstr(WSCode1);
+       historyMatch_tmp.WSCode2(i,1) = cellstr(WSCode2);
        historyMatch_tmp.Round(i,1) = current_round;
        historyMatch_tmp.winner(i,1) = match_record(i,1);
        
@@ -112,7 +117,7 @@ for current_round = 1:no_maxRound
     historyMatch = [historyMatch; historyMatch_tmp];
     
     % Sort the data : 1st time
-    column2sort = {'Points', 'Modified_Median', 'Solkoff', 'first_Loss', 'name'};
+    column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss', 'name'};
     sortType = {'descend', 'descend', 'descend', 'descend', 'ascend'};
     tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sortType);
     
@@ -138,10 +143,10 @@ for current_round = 1:no_maxRound
     tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sortType);
     
     % old code
-    % [~, index_tmp] = sort(tablePlayers_forTournament.Points,'descend');
-    % tablePlayers_forTournament = tablePlayers_forTournament(index_tmp,:);
-    tablePlayers_forTournament.Ranking = indexMat;
-    
+    % tablePlayers_forTournament.Ranking = indexMat;
+    % Assign ranking
+    column2check = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
+    tablePlayers_forTournament = assignRanking(tablePlayers_forTournament,column2check);
     
     tablePlayers_forTournament
     pause
@@ -190,16 +195,20 @@ playerIdTable = table(...
 historyMatch = table(...
                {'temp'},...
                {'temp'},...
+               {'temp'},...
+               {'temp'},...
                1,...
                1,...
-               'VariableName', {'Player1', 'Player2', 'Round', 'winner'});
+               'VariableName', {'Player1', 'Player2', 'WSCode1', 'WSCode2', 'Round', 'winner'});
 
 historyMatch_tmp = table(...
                {'temp'},...
                {'temp'},...
+               {'temp'},...
+               {'temp'},...
                1,...
                1,...
-               'VariableName', {'Player1', 'Player2', 'Round', 'winner'});            
+               'VariableName', {'Player1', 'Player2', 'WSCode1', 'WSCode2', 'Round', 'winner'});            
 
 historyMatch(1,:) = [];           
 % historyMatch_tmp(1,:) = [];    
@@ -469,3 +478,28 @@ end
 
 end
 
+
+
+function tablePlayers_forTournament = assignRanking(tablePlayers_forTournament,column2check)
+
+nb_players = size(tablePlayers_forTournament,1);
+rank_i = 1;
+
+rank_tmp = zeros(nb_players,1);
+tablePlayers_forTournament.Ranking = rank_tmp;
+
+for i = 1:nb_players
+    if tablePlayers_forTournament.Ranking(i) == 0
+        tablePlayers_forTournament.Ranking(i) = rank_i;
+        total = tablePlayers_forTournament(:,column2check);
+        T2 = tablePlayers_forTournament(i,column2check);
+        idx_i = ismember(total(i+1:end,:),T2);
+        logical2id = find(idx_i==1);
+        tablePlayers_forTournament.Ranking(i+logical2id) = rank_i;
+
+        rank_i = rank_i+1+size(logical2id,1);
+    end
+end
+
+
+end
