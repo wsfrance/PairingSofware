@@ -1,0 +1,5 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tie-breaks
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% source 1 : https://theicca.wikispaces.com/file/view/Understanding+Tie-breaks.pdf
+% source 2 : http://vtchess.info/Results/Tie_break_rules.htm#Modified Median
