@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Dec-2016 21:58:02
+% Last Modified by GUIDE v2.5 04-Dec-2016 23:00:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -73,6 +73,9 @@ disp('Bushiroad Pairing Software')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
+disp('Add paths')
+[ pathstr ] = addPath_bushisoft( );
+
 global tablePlayers_fromDB tablePlayers_forTournament columnTable
 % User Define
 column = {'name', 'familyName', 'pseudo'};
@@ -99,8 +102,10 @@ disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
 
 % Initialize functions to Tables
 disp('Initialize functions (@cellSelect) to Tables')
-set(handles.TAB_players, 'CellSelectionCallback',@cellSelect);
+set(handles.TAB_players, 'CellSelectionCallback',@cellSelect); 
+% set(handles.TAB_players,'CellSelectionCallback',@MouseClickHandler); % for single and double click
 set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
+
 
 % Logo
 disp('Display Logo on the Software')
@@ -392,7 +397,7 @@ function MENU_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+beginTournament
 
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
@@ -476,3 +481,18 @@ function MENU_configSQLServer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_configSQLServer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_postFacebook_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_postFacebook (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
+thingSpeakWriteURL = thingSpeakURL;
+writeApiKey = '145634995501895';
+fieldName = 'field1';
+fieldValue = 42;
+response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+
