@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Dec-2016 23:00:58
+% Last Modified by GUIDE v2.5 05-Dec-2016 17:30:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,7 +76,7 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Add paths')
 [ pathstr ] = addPath_bushisoft( );
 
-global tablePlayers_fromDB tablePlayers_forTournament columnTable
+global tablePlayers_fromDB tablePlayers_forTournament columnTable 
 % User Define
 column = {'name', 'familyName', 'pseudo'};
 columnTable = ['WSCode', column];
@@ -114,8 +114,9 @@ matlabImage = imread('bushiroadLogo.jpg');
 % matlabImage = imread('ws_logo.png');
 matlabImage = imresize(matlabImage, 1.5);
 image(matlabImage)
+% axes('position',[0.57,0.15,0.25,0.25]);
 axis off
-axis image
+% axis image
 
 
 % --- Outputs from this function are returned to the command line.
@@ -302,6 +303,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+% --- Executes on button press in BUT_beginTournament.
+function BUT_beginTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_beginTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+MENU_beginTournament_Callback(hObject, eventdata, handles)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -397,8 +404,15 @@ function MENU_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-beginTournament
+global tablePlayers_fromDB tablePlayers_forTournament columnTable
 
+if size(tablePlayers_forTournament,1)>1
+    close
+    beginTournament
+else
+    disp('Not enough players in the tournament')  
+    msgbox('There is not enough players in the tournament. Add some players first (at least 2)', 'Error','error');
+end
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
@@ -495,4 +509,3 @@ writeApiKey = '145634995501895';
 fieldName = 'field1';
 fieldValue = 42;
 response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
-
