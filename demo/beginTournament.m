@@ -61,25 +61,27 @@ guidata(hObject, handles);
 % UIWAIT makes beginTournament wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-global tablePlayers_forTournament columnTable round mat_HistoryMatch historyMatch historyMatch_tmp pairingTable columnTablePairing boolean_Round no_maxRound option
+global tablePlayers_forTournament columnTable mat_HistoryMatch historyMatch historyMatch_tmp pairingTable columnTablePairing option
 
 % User define
-no_maxRound = 3;
-boolean_Round = 1;
+option.boolean_Round = 1;
 option.winningPoint = 1;
 option.losePoint    = 0;
 option.tiePoint     = 0.5;
+option.column2displayStanding = true(size(columnTable,2),1);
+option.no_maxRound = 3;
+option.no_round = 0;
 
 % Set title
 set(handles.figure1, 'Name', 'Tournament (by malganis35)');
 
-round = 0;
+
 updateListPlayers(hObject, eventdata, handles);
 
 % Make a cross-table of already done match (such that a match cannot be 'redone')
 nb_players = size(tablePlayers_forTournament,1);
 mat_HistoryMatch = zeros(nb_players,nb_players);
-[rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players, no_maxRound);
+[rankTable, playerIdTable, historyMatch, historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
 
 % Players for Tournament
 tablePlayers_forTournament = [playerIdTable tablePlayers_forTournament rankTable];
@@ -168,18 +170,18 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global tablePlayers_forTournament columnTable round mat_HistoryMatch pairingTable columnTablePairing boolean_Round option pairingWSCode matchID match_record
+global tablePlayers_forTournament columnTable mat_HistoryMatch pairingTable columnTablePairing option pairingWSCode matchID match_record
 
-if boolean_Round
-    boolean_Round = 0;
-    round = round+1;
-    disp(['Create Pairing for Round no.' num2str(round)])
-    option.no_round = round;
+if option.boolean_Round
+    option.boolean_Round = 0;
+    option.no_round = option.no_round+1;
+    disp(['Create Pairing for Round no.' num2str(option.no_round)])
+    % option.no_round = round;
 
     [matchID, pairingWSCode, mat_HistoryMatch] = swissRound (tablePlayers_forTournament, mat_HistoryMatch, option);
 
     disp('Display Pairing in UITable')
-    pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round);
+    pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, option.no_round);
     data = table2cell(pairingTable(:,:));
     set(handles.TAB_pairing, 'data',data, 'ColumnName', columnTablePairing); 
     updateListPlayers(hObject, eventdata, handles); 
@@ -278,11 +280,12 @@ function CHECK_dropPlayer2_Callback(hObject, eventdata, handles)
 
 function varargout = updateListPlayers(hObject, eventdata, handles) 
 
-global tablePlayers_forTournament round
+global tablePlayers_forTournament option
 % Set list
 firstnames = table2cell(tablePlayers_forTournament(:,'name'));
 lastnames = table2cell(tablePlayers_forTournament(:,'familyName'));
-names = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(round), ')');
+names = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
+names = sort(names);
 set(handles.LIST_listPlayer, 'String', names)
 
 
@@ -428,7 +431,7 @@ function BUT_saveScore_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global tablePlayers_forTournament historyMatch_tmp match_record matchID round boolean_Round
+global tablePlayers_forTournament historyMatch_tmp match_record matchID option
 
 table = str2num(handles.EDIT_table.String);
 
@@ -460,13 +463,13 @@ historyMatch_tmp.Player1(table,1) = cellstr(player1);
 historyMatch_tmp.Player2(table,1) = cellstr(player2);
 historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
 historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
-historyMatch_tmp.Round(table,1) = round;
+historyMatch_tmp.Round(table,1) = option.no_round;
 historyMatch_tmp.winner(table,1) = match_record(table,1);
 
 % Check if all results have been given
 
 if isempty(find(isinf(match_record)==1)) == 1
-    boolean_Round = 1;
+    option.boolean_Round = 1;
     computeScore();
 end
 
@@ -482,7 +485,7 @@ standingGUI
 
 
 function computeScore(hObject, eventdata, handles)
-global tablePlayers_forTournament historyMatch_tmp historyMatch matchID option match_record round no_maxRound
+global tablePlayers_forTournament historyMatch_tmp historyMatch matchID option match_record round
 
 % Assign scores
 for i = 1:size(historyMatch_tmp,1)    
@@ -499,7 +502,7 @@ tablePlayers_forTournament = sortrows(tablePlayers_forTournament,column2sort,sor
 
 % Compute Solkoff or Buchholz points
 typeSolkoff_buchholz = 'median';
-tablePlayers_forTournament = Solkoff_buchholz_Compute (historyMatch, tablePlayers_forTournament, typeSolkoff_buchholz, no_maxRound);
+tablePlayers_forTournament = Solkoff_buchholz_Compute (historyMatch, tablePlayers_forTournament, typeSolkoff_buchholz, option.no_maxRound);
 
 % Determine if 1st Loss and store it
 tablePlayers_forTournament = firstLoss(tablePlayers_forTournament, historyMatch_tmp);
