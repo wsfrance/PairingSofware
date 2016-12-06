@@ -73,13 +73,25 @@ disp('Bushiroad Pairing Software')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-disp('Add paths')
-[ pathstr ] = addPath_bushisoft( );
-
 global TABLE option 
+
 % User Define
-column = {'name', 'familyName', 'pseudo'};
-option.columnTable = ['WSCode', column];
+column                  = {'name', 'familyName', 'pseudo'};
+option.columnTable      = ['WSCode', column];
+option.verbose          = 1;
+option.boolean_Round    = 1;
+option.winningPoint     = 1;
+option.losePoint        = 0;
+option.tiePoint         = 0.5;
+option.no_maxRound      = 3;
+option.no_round         = 0;
+option.column2displayStanding = true(size(option.columnTable,2),1);
+option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
+
+
+% Add path, subfunctions, etc.
+disp('Add paths : subfunctions, externalLibs, etc.')
+addPath_bushisoft( option.verbose );
 
 % Set title
 set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
@@ -94,11 +106,9 @@ TABLE.tablePlayers_forTournament(:,:) = [];
 % tablePlayers_fromDB_tmp = strtrim(tablePlayers_fromDB_tmp);
 % tablePlayers_fromDB = tablePlayers_fromDB_tmp;
 
-
 % Capital Letters
 disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
 [ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
-
 
 % Initialize functions to Tables
 disp('Initialize functions (@cellSelect) to Tables')
@@ -106,17 +116,9 @@ set(handles.TAB_players, 'CellSelectionCallback',@cellSelect);
 % set(handles.TAB_players,'CellSelectionCallback',@MouseClickHandler); % for single and double click
 set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
 
-
 % Logo
-disp('Display Logo on the Software')
-axes(handles.PLOT_logo)
-matlabImage = imread('bushiroadLogo.jpg');
-% matlabImage = imread('ws_logo.png');
-matlabImage = imresize(matlabImage, 1.5);
-image(matlabImage)
-% axes('position',[0.57,0.15,0.25,0.25]);
-axis off
-% axis image
+displayLogo(hObject, eventdata, handles) 
+
 
 
 % --- Outputs from this function are returned to the command line.
@@ -139,10 +141,9 @@ function BUT_refresh_Callback(hObject, eventdata, handles)
 global TABLE option
 
 % Select Data to vizualize
-
 data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
 set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
-
+% List of sortBy possibilities and display it into handles.POP_sortBy
 sortBy_option = ['Sort By'; option.columnTable'];
 set(handles.POP_sortBy,'String', sortBy_option)  ;
 
@@ -160,31 +161,17 @@ function POP_sortBy_Callback(hObject, eventdata, handles)
 
 global option
 
-
 data = handles.TAB_players.Data;
 
+% get selection of handles.POP_sortBy menu
 contents = get(handles.POP_sortBy,'String'); 
-value = contents{get(handles.POP_sortBy,'Value')};
-Index = strfind_idx( option.columnTable',value );
+value    = contents{get(handles.POP_sortBy,'Value')};
+Index    = strfind_idx( option.columnTable',value );
 
+% Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
 if Index>0
     data = sortrows(data,Index);
 end
-
-% switch value
-%     case 'Sort By'
-%         % do nothing
-%     case 'WSCode'
-%         data = sortrows(data,1);
-%     case 'name'
-%         data = sortrows(data,2);
-%     case 'familyName'
-%         data = sortrows(data,3);
-%     otherwise
-%         error('case value not known')
-% end
-
-% column2check = {'WSCode', 'name', 'familyName'};
 set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
 
 
@@ -213,32 +200,36 @@ function BUT_addPlayer_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
+% Get the cells selected in 'TAB_players'
 UITable = 'TAB_players';
 [ data, rows] = getCellSelect( UITable );
+
+% If the selection is not empty, transfer player from
+% TABLE.tablePlayers_fromDB to TABLE.tablePlayers_forTournament
 if isempty(data)~=1
     list_data = data(rows,1);
+    % Loop if multiple players are selected
     for i = 1:length(rows)
+        % Rely on WSCode that is unique for players
         WSCode_i = list_data(i,1);
-        [ Index ] = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i );
-
+        Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i );
         selected_data = TABLE.tablePlayers_fromDB(Index,:);
-        % % create mask containing rows to keep
-        % mask = (1:size(data,1))';
-        % mask(rows) = [];
-        % % delete selected rows and re-write data
-        % data = data(mask,:);
-
-        TABLE.tablePlayers_fromDB (Index,:) = [];
-
+        % delete selected players from tablePlayers_fromDB
+        TABLE.tablePlayers_fromDB (Index,:) = []; 
+        % add selected players to tablePlayers_forTournament
         TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
-
+        
+        % display the data
         data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
         set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
         data2 = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
         set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', option.columnTable)
     end
 else
-    disp('There is no player in the DB')
+    % If no player in the DB, it is an error
+    msg = 'There is no player in the DB !!';
+    disp(msg)
+    msgbox(msg,'Error','error')
 end
     
     
@@ -256,25 +247,24 @@ if isempty(data)~=1
     list_data = data(rows,1);
     for i = 1:length(rows)
         WSCode_i = list_data(i,1);
-        [ Index ] = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i );
-
+        Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i );
         selected_data = TABLE.tablePlayers_forTournament(Index,:);
-        % % create mask containing rows to keep
-        % mask = (1:size(data,1))';
-        % mask(rows) = [];
-        % % delete selected rows and re-write data
-        % data = data(mask,:);
+        % delete selected players
         TABLE.tablePlayers_forTournament (Index,:) = [];
-
+        % add selected players
         TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
-
+        
+        % display the data
         data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
         set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTable)
         data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
         set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTable)
     end
 else
-    disp('There is no player in the tournament')
+    % If no player in the tournament list, it is an error
+    msg = 'There is no player in the tournament';
+    disp(msg)
+    msgbox(msg,'Error','error')
 end
 
 
@@ -310,10 +300,6 @@ function BUT_beginTournament_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 MENU_beginTournament_Callback(hObject, eventdata, handles)
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MENU EDITOR
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % --------------------------------------------------------------------
 function MENU_File_Callback(hObject, eventdata, handles)
@@ -404,15 +390,19 @@ function MENU_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global tablePlayers_fromDB tablePlayers_forTournament option
 
-if size(tablePlayers_forTournament,1)>1
+global TABLE
+
+% For a valid tournament, there must be at least 2 players
+if size(TABLE.tablePlayers_forTournament,1)>1
     close
     beginTournament
 else
-    disp('Not enough players in the tournament')  
-    msgbox('There is not enough players in the tournament. Add some players first (at least 2)', 'Error','error');
+    msg = 'There is not enough players in the tournament. Add some players first (at least 2)';
+    disp(msg)  
+    msgbox(msg, 'Error','error');
 end
+
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
@@ -454,17 +444,23 @@ function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of EDIT_searchPlayer as text
 %        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayer as a double
-disp('Select subplayers')
+
 
 global option TABLE
 
+% String in the EDIT_searchPlayer box
 name = handles.EDIT_searchPlayer.String;
+
+disp(['Select subplayers containing: ' name])
 if isempty(name)~=1
-    data = handles.TAB_players.Data;
-    [ Index ] = strfind_idx( data, name );
+    % If not empty, select all player containing the string (case sensitive)
+    data  = handles.TAB_players.Data;
+    Index = strfind_idx( data, name );
     Index = unique(Index);
     set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTable)
 else
+    % If it is empty, show all players
+    disp('Text edit box is empty. Show all players')
     data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
     set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
 end
@@ -509,3 +505,19 @@ writeApiKey = '145634995501895';
 fieldName = 'field1';
 fieldValue = 42;
 response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PERSONNAL FUNCTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function displayLogo(hObject, eventdata, handles) 
+disp('Display Logo on the Software')
+axes(handles.PLOT_logo)
+matlabImage = imread('bushiroadLogo.jpg');
+% matlabImage = imread('ws_logo.png');
+matlabImage = imresize(matlabImage, 1.5);
+image(matlabImage)
+% axes('position',[0.57,0.15,0.25,0.25]);
+axis off
+% axis image
