@@ -76,18 +76,18 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Add paths')
 [ pathstr ] = addPath_bushisoft( );
 
-global tablePlayers_fromDB tablePlayers_forTournament columnTable 
+global TABLE option 
 % User Define
 column = {'name', 'familyName', 'pseudo'};
-columnTable = ['WSCode', column];
+option.columnTable = ['WSCode', column];
 
 % Set title
 set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
 disp('Generate Tables: tablePlayers_fromDB and tablePlayers_forTournament')
-[ tablePlayers_fromDB, tablePlayers_forTournament ] = generateTable();
-tablePlayers_forTournament(:,:) = [];
+[ TABLE.tablePlayers_fromDB, TABLE.tablePlayers_forTournament ] = generateTable();
+TABLE.tablePlayers_forTournament(:,:) = [];
 
 % Remove spaces at the begining and at the end
 % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
@@ -97,7 +97,7 @@ tablePlayers_forTournament(:,:) = [];
 
 % Capital Letters
 disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
-[ tablePlayers_fromDB ] = Capital_FirstLetter( tablePlayers_fromDB, column );
+[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
 
 
 % Initialize functions to Tables
@@ -136,14 +136,14 @@ function BUT_refresh_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global tablePlayers_fromDB columnTable
+global TABLE option
 
 % Select Data to vizualize
 
-data = table2cell(tablePlayers_fromDB(:,columnTable));
-set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
+set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
 
-sortBy_option = ['Sort By'; columnTable'];
+sortBy_option = ['Sort By'; option.columnTable'];
 set(handles.POP_sortBy,'String', sortBy_option)  ;
 
 
@@ -158,14 +158,14 @@ function POP_sortBy_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_sortBy
 
-global columnTable
+global option
 
 
 data = handles.TAB_players.Data;
 
 contents = get(handles.POP_sortBy,'String'); 
 value = contents{get(handles.POP_sortBy,'Value')};
-Index = strfind_idx( columnTable',value );
+Index = strfind_idx( option.columnTable',value );
 
 if Index>0
     data = sortrows(data,Index);
@@ -185,7 +185,7 @@ end
 % end
 
 % column2check = {'WSCode', 'name', 'familyName'};
-set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
 
 
 
@@ -211,7 +211,7 @@ function BUT_addPlayer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global tablePlayers_forTournament tablePlayers_fromDB columnTable
+global TABLE option
 
 UITable = 'TAB_players';
 [ data, rows] = getCellSelect( UITable );
@@ -219,23 +219,23 @@ if isempty(data)~=1
     list_data = data(rows,1);
     for i = 1:length(rows)
         WSCode_i = list_data(i,1);
-        [ Index ] = strfind_idx( tablePlayers_fromDB.WSCode, WSCode_i );
+        [ Index ] = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i );
 
-        selected_data = tablePlayers_fromDB(Index,:);
+        selected_data = TABLE.tablePlayers_fromDB(Index,:);
         % % create mask containing rows to keep
         % mask = (1:size(data,1))';
         % mask(rows) = [];
         % % delete selected rows and re-write data
         % data = data(mask,:);
 
-        tablePlayers_fromDB (Index,:) = [];
+        TABLE.tablePlayers_fromDB (Index,:) = [];
 
-        tablePlayers_forTournament = [tablePlayers_forTournament; selected_data];
+        TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
 
-        data = table2cell(tablePlayers_fromDB(:,columnTable));
-        set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
-        data2 = table2cell(tablePlayers_forTournament(:,columnTable));
-        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', columnTable)
+        data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
+        set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
+        data2 = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
+        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', option.columnTable)
     end
 else
     disp('There is no player in the DB')
@@ -248,7 +248,7 @@ function BUT_removePlayer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global tablePlayers_forTournament tablePlayers_fromDB columnTable
+global TABLE option
 
 UITable = 'TAB_players_Tournament';
 [ data, rows ] = getCellSelect( UITable );
@@ -256,22 +256,22 @@ if isempty(data)~=1
     list_data = data(rows,1);
     for i = 1:length(rows)
         WSCode_i = list_data(i,1);
-        [ Index ] = strfind_idx( tablePlayers_forTournament.WSCode, WSCode_i );
+        [ Index ] = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i );
 
-        selected_data = tablePlayers_forTournament(Index,:);
+        selected_data = TABLE.tablePlayers_forTournament(Index,:);
         % % create mask containing rows to keep
         % mask = (1:size(data,1))';
         % mask(rows) = [];
         % % delete selected rows and re-write data
         % data = data(mask,:);
-        tablePlayers_forTournament (Index,:) = [];
+        TABLE.tablePlayers_forTournament (Index,:) = [];
 
-        tablePlayers_fromDB = [tablePlayers_fromDB; selected_data];
+        TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
 
-        data = table2cell(tablePlayers_forTournament(:,columnTable));
-        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', columnTable)
-        data2 = table2cell(tablePlayers_fromDB(:,columnTable));
-        set(handles.TAB_players, 'data', data2, 'ColumnName', columnTable)
+        data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
+        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTable)
+        data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
+        set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTable)
     end
 else
     disp('There is no player in the tournament')
@@ -404,7 +404,7 @@ function MENU_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global tablePlayers_fromDB tablePlayers_forTournament columnTable
+global tablePlayers_fromDB tablePlayers_forTournament option
 
 if size(tablePlayers_forTournament,1)>1
     close
@@ -456,17 +456,17 @@ function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
 %        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayer as a double
 disp('Select subplayers')
 
-global columnTable tablePlayers_fromDB
+global option TABLE
 
 name = handles.EDIT_searchPlayer.String;
 if isempty(name)~=1
     data = handles.TAB_players.Data;
     [ Index ] = strfind_idx( data, name );
     Index = unique(Index);
-    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', columnTable)
+    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTable)
 else
-    data = table2cell(tablePlayers_fromDB(:,columnTable));
-    set(handles.TAB_players, 'data', data, 'ColumnName', columnTable)
+    data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
+    set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
 end
 
 
