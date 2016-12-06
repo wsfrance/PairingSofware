@@ -72,12 +72,11 @@ function varargout = column2displayGUI_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-global tablePlayers_forTournament columnTable
+global tablePlayers_forTournament columnTable option
 
 columnTable = tablePlayers_forTournament.Properties.VariableNames;
 
-tmp = true(size(columnTable,2),1);
-set(handles.TAB_columns, 'data', tmp, 'RowName', columnTable', 'ColumnName', 'Check', 'ColumnEditable', [true])
+set(handles.TAB_columns, 'data', option.column2displayStanding, 'RowName', columnTable', 'ColumnName', 'Check', 'ColumnEditable', [true])
 % set(handles.TAB_columns, 'CellEditCallback', @check_checked);
 
 
