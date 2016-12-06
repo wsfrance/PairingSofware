@@ -251,7 +251,7 @@ function BUT_removePlayer_Callback(hObject, eventdata, handles)
 global tablePlayers_forTournament tablePlayers_fromDB columnTable
 
 UITable = 'TAB_players_Tournament';
-[ data, rows] = getCellSelect( UITable );
+[ data, rows ] = getCellSelect( UITable );
 if isempty(data)~=1
     list_data = data(rows,1);
     for i = 1:length(rows)
