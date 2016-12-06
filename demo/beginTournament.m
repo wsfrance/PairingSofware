@@ -61,25 +61,22 @@ guidata(hObject, handles);
 % UIWAIT makes beginTournament wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-global TABLE MATRICE option
 
-% User define
-option.boolean_Round = 1;
-option.winningPoint = 1;
-option.losePoint    = 0;
-option.tiePoint     = 0.5;
-option.column2displayStanding = true(size(option.columnTable,2),1);
-option.no_maxRound = 3;
-option.no_round = 0;
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+disp('Tournament Run')
+disp('Author: malganis35')
+disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+
+global TABLE MATRICE option
 
 % Set title
 set(handles.figure1, 'Name', 'Tournament (by malganis35)');
 
-
+% Update the list of players in handles.LIST_listPlayer
 updateListPlayers(hObject, eventdata, handles);
 
 % Make a cross-table of already done match (such that a match cannot be 'redone')
-nb_players = size(TABLE.tablePlayers_forTournament,1);
+nb_players               = size(TABLE.tablePlayers_forTournament,1);
 MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
 [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
 
@@ -87,23 +84,22 @@ MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
 TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
 
 % Initialize pairingTable
-option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
-TABLE.pairingTable = table(...
-               1,...
-               1,...
-               1,...
-               {'temp'},...
-               1,...
-               {'temp'},...
-               1,...
-               {'temp'},...
-               'VariableName', option.columnTablePairing);    
+TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
+                            'VariableName', option.columnTablePairing);    
 TABLE.pairingTable(:,:) = [];
 
 % Set functions for Table
 set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
 % set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
 % set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback); 
+
+% % Center alignment
+% Table = findjobj(handles.TAB_pairing); %findjobj is in the file exchange
+% table1 = get(Table,'Viewport');
+% jtable = get(table1,'View');
+% renderer = jtable.getCellRenderer(2,2);
+% renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+% renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 
 
 
@@ -151,7 +147,7 @@ function CHECK_showPendingResult_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
-
+% Check is box of CHECK_showPendingResult is checked or not
 bool_check = handles.CHECK_showPendingResult.Value;
 if bool_check
     % Checkbox is checked
@@ -164,6 +160,7 @@ else
     data = table2cell(TABLE.pairingTable(:,:)); 
 end
 set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
+
 
 % --- Executes on button press in BUT_printMenu.
 function BUT_printMenu_Callback(hObject, eventdata, handles)
@@ -187,12 +184,11 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option 
 
+% Pairing of players
 if option.boolean_Round
-    option.boolean_Round = 0;
-    option.no_round = option.no_round+1;
+    option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
+    option.no_round         = option.no_round+1; % Incremente number of rounds
     disp(['Create Pairing for Round no.' num2str(option.no_round)])
-    % option.no_round = round;
-
     [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
 
     disp('Display Pairing in UITable')
@@ -200,7 +196,8 @@ if option.boolean_Round
     data = table2cell(TABLE.pairingTable(:,:));
     set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing); 
     updateListPlayers(hObject, eventdata, handles); 
-       
+    
+    % Create matrice match_record to store results
     nb_match = length(MATRICE.matchID);
     MATRICE.match_record = zeros(nb_match,1)+Inf;
 
@@ -297,29 +294,34 @@ function varargout = updateListPlayers(hObject, eventdata, handles)
 
 global TABLE option
 % Set list
-firstnames = table2cell(TABLE.tablePlayers_forTournament(:,'name'));
-lastnames = table2cell(TABLE.tablePlayers_forTournament(:,'familyName'));
-names = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
-names = sort(names);
+firstnames  = table2cell(TABLE.tablePlayers_forTournament(:,'name'));
+lastnames   = table2cell(TABLE.tablePlayers_forTournament(:,'familyName'));
+names       = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
+names       = sort(names); % Sort name by alphabetical order
 set(handles.LIST_listPlayer, 'String', names)
 
 
 function pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round)
 
+% Convert matchID to Pairing Table containing the name of players
 list_WSCode = tablePlayers_forTournament.WSCode;
 [m,n] = size(pairingWSCode);
 
+% Loop for all pairings
 for i = 1:m
     for j = 1:n
-        code_i = pairingWSCode{i,j};
-        id = strfind_idx( list_WSCode, code_i );
-        firstnames = tablePlayers_forTournament.name(id);
-        lastnames = tablePlayers_forTournament.familyName(id);
-        names = strcat(lastnames, {', '}, firstnames);
+        % Search names
+        code_i      = pairingWSCode{i,j};
+        id          = strfind_idx( list_WSCode, code_i );
+        firstnames  = tablePlayers_forTournament.name(id);
+        lastnames   = tablePlayers_forTournament.familyName(id);
+        names       = strcat(lastnames, {', '}, firstnames);
         if j == 1
+            % Player 1
             pairingTable.Player1(i,1) = names;
             pairingTable.Points_P1(i,1) = tablePlayers_forTournament.Points(id);
         elseif j == 2
+            % Player 2
             pairingTable.Player2(i,1) = names;
             pairingTable.Points_P2(i,1) = tablePlayers_forTournament.Points(id);
         else
@@ -328,6 +330,7 @@ for i = 1:m
     end
 end
 
+% Set default options of pairingTable
 pairingTable.Table = [1:m]';
 pairingTable.Round = repmat(round,m,1);
 pairingTable.Result = repmat({'<pending>'}, m, 1);
@@ -422,17 +425,32 @@ function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
 
 global MATRICE TABLE
 
+% Return selection of a cell in the Table in a callback
 cellSelect(hObject, eventdata)
 
 UITable = 'TAB_pairing';
 [ data, rows] = getCellSelect( UITable );
 
+switch MATRICE.match_record(rows,1)
+    case 1
+        set(handles.RADIO_player1,'Value', 1);
+    case 2
+        set(handles.RADIO_player2,'Value', 1);
+    case 3
+        set(handles.RADIO_draw,'Value', 1);
+    case Inf
+        set(handles.RADIO_unenteredResult,'Value', 1);
+    otherwise
+        error('MATRICE.match_record(rows,1) not known')
+end    
+
+% Determine player 1, player 2 and their table
 player1 = MATRICE.pairingWSCode(rows,1);
 namePlayer1 = data{rows,4};
 player2 = MATRICE.pairingWSCode(rows,2);
 namePlayer2 = data{rows,6};
 table = TABLE.pairingTable.Table(rows);
-
+% Display in the TEXT boxes
 set(handles.EDIT_table, 'String', table)
 set(handles.TEXT_player1, 'String', namePlayer1)
 set(handles.TEXT_player2, 'String', namePlayer2)
@@ -448,6 +466,7 @@ function BUT_saveScore_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 
+% Save records of the match
 table = str2num(handles.EDIT_table.String);
 
 % Store in match_record

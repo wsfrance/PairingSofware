@@ -1,6 +1,10 @@
-function [ pathstr ] = addPath_bushisoft( )
+function [ pathstr ] = addPath_bushisoft( verbose )
 %ADDPATH_M2TML Summary of this function goes here
 %   Detailed explanation goes here
+
+if nargin < 3
+    verbose = 1;
+end
 
 % [pathstr,name,ext] = fileparts(pwd); 
 [pathstr,tmpname] = fileparts(pwd);

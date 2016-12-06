@@ -22,7 +22,7 @@ function varargout = standingGUI(varargin)
 
 % Edit the above text to modify the response to help standingGUI
 
-% Last Modified by GUIDE v2.5 06-Dec-2016 11:16:54
+% Last Modified by GUIDE v2.5 06-Dec-2016 22:41:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -111,3 +111,11 @@ function MENU_print_Callback(hObject, eventdata, handles)
 printpreview
 
 
+% --- Executes on key press with focus on TAB_standing and none of its controls.
+function TAB_standing_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to TAB_standing (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
