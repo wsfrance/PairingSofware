@@ -61,9 +61,9 @@ guidata(hObject, handles);
 % UIWAIT makes standingGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-global tablePlayers_forTournament
+global TABLE
 
-subtable = tablePlayers_forTournament;
+subtable = TABLE.tablePlayers_forTournament;
 % Delete historyPoints that is not of size 1 x 1
 subtable.historyPoints = [];
 subtable.playerId = [];
