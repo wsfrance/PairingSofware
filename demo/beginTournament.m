@@ -449,7 +449,8 @@ player1 = MATRICE.pairingWSCode(rows,1);
 namePlayer1 = data{rows,4};
 player2 = MATRICE.pairingWSCode(rows,2);
 namePlayer2 = data{rows,6};
-table = TABLE.pairingTable.Table(rows);
+% table = TABLE.pairingTable.Table(rows);
+table = handles.TAB_pairing.Data(rows,3);
 % Display in the TEXT boxes
 set(handles.EDIT_table, 'String', table)
 set(handles.TEXT_player1, 'String', namePlayer1)
@@ -467,7 +468,7 @@ function BUT_saveScore_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option
 
 % Save records of the match
-table = str2num(handles.EDIT_table.String);
+table = str2num(handles.EDIT_table.String{1});
 
 % Store in match_record
 if handles.RADIO_unenteredResult.Value == 1
