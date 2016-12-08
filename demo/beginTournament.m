@@ -80,6 +80,9 @@ nb_players               = size(TABLE.tablePlayers_forTournament,1);
 MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
 [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
 
+MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
+
+
 % Players for Tournament
 TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
 
@@ -423,7 +426,7 @@ function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
 
-global MATRICE TABLE
+global MATRICE 
 
 % Return selection of a cell in the Table in a callback
 cellSelect(hObject, eventdata)
@@ -467,53 +470,69 @@ function BUT_saveScore_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 
-% Save records of the match
-table = str2num(handles.EDIT_table.String{1});
+if option.boolean_Round == 0
+    % all scores has not been added
+    % Save records of the match
+    table = str2num(handles.EDIT_table.String{1});
 
-% Store in match_record
-if handles.RADIO_unenteredResult.Value == 1
-    % do nothing
-    score = '<pending>';
-elseif handles.RADIO_draw.Value == 1
-    % draw
-    MATRICE.match_record(table,1) = 3;
-    score = '0-0';
-elseif handles.RADIO_player1.Value == 1
-    % Player 1 win
-    MATRICE.match_record(table,1) = 1;
-    score = '1-0';
-elseif handles.RADIO_player2.Value == 1
-    % Player 2 win
-    MATRICE.match_record(table,1) = 2;
-    score = '0-1';
+    % Store in match_record
+    if handles.RADIO_unenteredResult.Value == 1
+        % do nothing
+        score = '<pending>';
+    elseif handles.RADIO_draw.Value == 1
+        % draw
+        MATRICE.match_record(table,1) = 3;
+        score = '0-0';
+    elseif handles.RADIO_player1.Value == 1
+        % Player 1 win
+        MATRICE.match_record(table,1) = 1;
+        score = '1-0';
+    elseif handles.RADIO_player2.Value == 1
+        % Player 2 win
+        MATRICE.match_record(table,1) = 2;
+        score = '0-1';
+    else
+        error('Problem. There is no 1 in any boutton radio')
+    end
+
+    TABLE.pairingTable.Result(table) = {score};
+    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
+
+
+    % Store in historyMatch_tmp
+    lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
+    lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
+    player1 = TABLE.tablePlayers_forTournament.name(lin1);
+    player2 = TABLE.tablePlayers_forTournament.name(lin2);
+    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,1));
+    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,2));
+
+    TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
+    TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
+    TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
+    TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
+    TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
+    TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
+
+    % Check if all results have been given
+
+    if isempty(find(isinf(MATRICE.match_record)==1)) == 1
+        option.boolean_Round = 1;
+        if option.no_round == 1
+            MATRICE.HistoryTABLE{1,1} = 0;
+            MATRICE.HistoryTABLE{1,2} = TABLE.tablePlayers_forTournament;
+        end
+        computeScore();
+        MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
+        MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;
+    end
 else
-    error('Problem. There is no 1 in any boutton radio')
-end
-
-TABLE.pairingTable.Result(table) = {score};
-CHECK_showPendingResult_Callback(hObject, eventdata, handles);
-
-
-% Store in historyMatch_tmp
-lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
-lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
-player1 = TABLE.tablePlayers_forTournament.name(lin1);
-player2 = TABLE.tablePlayers_forTournament.name(lin2);
-WSCode1 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,1));
-WSCode2 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,2));
-
-TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
-TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
-TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
-TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
-TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
-TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
-
-% Check if all results have been given
-
-if isempty(find(isinf(MATRICE.match_record)==1)) == 1
-    option.boolean_Round = 1;
-    computeScore();
+    % msg = 'You have already entered all the scores. Go to next round !!';
+    % disp(msg)
+    % msgbox(msg,'Error','error')
+    option.boolean_Round = 0;
+    TABLE.tablePlayers_forTournament = MATRICE.HistoryTABLE{option.no_round,2}; % reload previous TABLE in the data
+    BUT_saveScore_Callback(hObject, eventdata, handles)
 end
 
 
