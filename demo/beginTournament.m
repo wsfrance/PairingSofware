@@ -479,6 +479,7 @@ if option.boolean_Round == 0
     if handles.RADIO_unenteredResult.Value == 1
         % do nothing
         score = '<pending>';
+        MATRICE.match_record(table,1) = Inf;
     elseif handles.RADIO_draw.Value == 1
         % draw
         MATRICE.match_record(table,1) = 3;
