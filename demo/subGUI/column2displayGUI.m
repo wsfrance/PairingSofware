@@ -22,7 +22,7 @@ function varargout = column2displayGUI(varargin)
 
 % Edit the above text to modify the response to help column2displayGUI
 
-% Last Modified by GUIDE v2.5 05-Dec-2016 21:24:04
+% Last Modified by GUIDE v2.5 09-Dec-2016 14:29:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -72,11 +72,9 @@ function varargout = column2displayGUI_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-global TABLE columnTable option
+global option
 
-columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
-
-set(handles.TAB_columns, 'data', option.column2displayStanding, 'RowName', columnTable', 'ColumnName', 'Check', 'ColumnEditable', [true])
+set(handles.TAB_columns, 'data', option.Bool_column2displayStanding, 'RowName', option.column2displayStandingALL', 'ColumnName', 'Check', 'ColumnEditable', [true])
 % set(handles.TAB_columns, 'CellEditCallback', @check_checked);
 
 
@@ -87,3 +85,21 @@ set(handles.TAB_columns, 'data', option.column2displayStanding, 'RowName', colum
 %   id_affected = cur_data{row_changed, 1};
 %   dist_affected = cur_data(row_changed, 2);
 %   ... now do something with the information ...
+
+
+% --- Executes when entered data in editable cell(s) in TAB_columns.
+function TAB_columns_CellEditCallback(hObject, eventdata, handles)
+% hObject    handle to TAB_columns (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+option.Bool_column2displayStanding = handles.TAB_columns.Data;
+option.column2displayStanding = option.column2displayStandingALL(option.Bool_column2displayStanding);
+standingGUI

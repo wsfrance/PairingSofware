@@ -8,6 +8,11 @@ end
 
 % [pathstr,name,ext] = fileparts(pwd); 
 [pathstr,tmpname] = fileparts(pwd);
+
+addpath(genpath('subGUI'))
+addpath(genpath('submain'))
+addpath(genpath('export'))
+
 if strcmp(tmpname,'demo')==0
     error('Please launch this program in the demo folder !!')
 end
@@ -17,6 +22,10 @@ end
 
 if max(ismember(strsplit(path,';'), [pathstr,'/data'])) == 0
     addpath(genpath([pathstr,'/data']));
+end
+
+if max(ismember(strsplit(path,';'), [pathstr,'/data'])) == 0
+    addpath(genpath([pathstr,'/images']));
 end
 
 if max(ismember(strsplit(path,';'), [pathstr,'/classes'])) == 0

@@ -22,7 +22,7 @@ function varargout = standingGUI(varargin)
 
 % Edit the above text to modify the response to help standingGUI
 
-% Last Modified by GUIDE v2.5 06-Dec-2016 22:41:08
+% Last Modified by GUIDE v2.5 09-Dec-2016 14:52:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -61,22 +61,31 @@ guidata(hObject, handles);
 % UIWAIT makes standingGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-global TABLE
+global TABLE option
 
 subtable = TABLE.tablePlayers_forTournament;
-% Delete historyPoints that is not of size 1 x 1
-subtable.historyPoints = [];
-subtable.playerId = [];
 
-varnames = subtable.Properties.VariableNames;
+% columnTable = subtable.Properties.VariableNames;
+columnTable = option.column2displayStanding;
+id = strfind_idx(columnTable','historyPoint');
+columnTable(id)=[];
+id = strfind_idx(columnTable','playerId');
+columnTable(id)=[];
+% Delete historyPoints that is not of size 1 x 1
+% subtable.historyPoints = [];
+% subtable.playerId = [];
+
+% varnames = subtable.Properties.VariableNames;
+% others = ~strcmp('Ranking',varnames);
+% varnames = ['Ranking' varnames(others) ];
+% subtable = subtable(:,varnames);
+varnames = columnTable;
 others = ~strcmp('Ranking',varnames);
 varnames = ['Ranking' varnames(others) ];
-subtable = subtable(:,varnames);
+option.column2displayStanding = varnames;
 
-
-columnTable = subtable.Properties.VariableNames;
-data = table2cell(subtable(:,columnTable));
-set(handles.TAB_standing, 'data', data, 'ColumnName', columnTable)
+data = table2cell(subtable(:,option.column2displayStanding));
+set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStanding)
 
 % Maybe to put in code
 % source : http://undocumentedmatlab.com/blog/uitable-cell-colors/
@@ -119,3 +128,29 @@ function TAB_standing_KeyPressFcn(hObject, eventdata, handles)
 %	Character: character interpretation of the key(s) that was pressed
 %	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_export.
+function BUT_export_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_export (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE option
+
+% Export to XLS
+path = pwd;
+filename = [path '/export/Standings_Round_' num2str(option.no_round) '.xls'];
+T = TABLE.tablePlayers_forTournament;
+exportTable2CSV( T, filename, option.column2displayStanding )
+
+% T = TABLE.tablePlayers_forTournament;
+% 
+% T_reordered = T(:,option.column2displayStanding);
+% 
+% if exist(filename, 'file') == 2
+%     disp('File already exists. Deleting it')
+%     delete(filename);
+% end
+% writetable(T_reordered,filename)
+% disp(['Save into the file :' filename])

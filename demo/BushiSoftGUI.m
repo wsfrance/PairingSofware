@@ -77,7 +77,7 @@ global TABLE option
 
 % User Define
 column                  = {'name', 'familyName', 'pseudo'};
-option.columnTable      = ['WSCode', column];
+option.columnTableDB    = ['WSCode', column];
 option.verbose          = 1;
 option.boolean_Round    = 1;
 option.winningPoint     = 1;
@@ -85,7 +85,6 @@ option.losePoint        = 0;
 option.tiePoint         = 0.5;
 option.no_maxRound      = 3;
 option.no_round         = 0;
-option.column2displayStanding = true(size(option.columnTable,2),1);
 option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
 
 
@@ -141,10 +140,10 @@ function BUT_refresh_Callback(hObject, eventdata, handles)
 global TABLE option
 
 % Select Data to vizualize
-data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
-set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
+data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
 % List of sortBy possibilities and display it into handles.POP_sortBy
-sortBy_option = ['Sort By'; option.columnTable'];
+sortBy_option = ['Sort By'; option.columnTableDB'];
 set(handles.POP_sortBy,'String', sortBy_option)  ;
 
 
@@ -166,13 +165,13 @@ data = handles.TAB_players.Data;
 % get selection of handles.POP_sortBy menu
 contents = get(handles.POP_sortBy,'String'); 
 value    = contents{get(handles.POP_sortBy,'Value')};
-Index    = strfind_idx( option.columnTable',value );
+Index    = strfind_idx( option.columnTableDB',value );
 
 % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
 if Index>0
     data = sortrows(data,Index);
 end
-set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
+set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
 
 
 
@@ -220,10 +219,10 @@ if isempty(data)~=1
         TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
         
         % display the data
-        data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
-        set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
-        data2 = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
-        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', option.columnTable)
+        data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+        set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+        data2 = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', option.columnTableDB)
     end
 else
     % If no player in the DB, it is an error
@@ -255,10 +254,10 @@ if isempty(data)~=1
         TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
         
         % display the data
-        data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTable));
-        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTable)
-        data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
-        set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTable)
+        data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+        data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+        set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
     end
 else
     % If no player in the tournament list, it is an error
@@ -457,12 +456,12 @@ if isempty(name)~=1
     data  = handles.TAB_players.Data;
     Index = strfind_idx( data, name );
     Index = unique(Index);
-    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTable)
+    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTableDB)
 else
     % If it is empty, show all players
     disp('Text edit box is empty. Show all players')
-    data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTable));
-    set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTable)
+    data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+    set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
 end
 
 
