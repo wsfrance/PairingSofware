@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 05-Dec-2016 18:18:24
+% Last Modified by GUIDE v2.5 09-Dec-2016 15:42:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,6 +85,13 @@ MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
 
 % Players for Tournament
 TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
+
+% Show in Standing GUI
+columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+option.Bool_column2displayStanding = true(size(columnTable,2),1);
+option.column2displayStandingALL = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+option.column2displayStanding = option.column2displayStandingALL;
+
 
 % Initialize pairingTable
 TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
@@ -170,7 +177,15 @@ function BUT_printMenu_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_printMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-printpreview
+% printpreview
+
+global TABLE option
+
+% Export to XLS
+path = pwd;
+filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
+T = TABLE.pairingTable;
+exportTable2CSV( T, filename, option.columnTablePairing )
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)
@@ -586,3 +601,11 @@ TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,col
 % Assign ranking
 column2check = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
 TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,column2check);
+
+
+% --- Executes on button press in BUT_startTimer.
+function BUT_startTimer_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_startTimer (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+stopwatch;
