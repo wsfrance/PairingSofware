@@ -574,6 +574,9 @@ TABLE.tablePlayers_forTournament = firstLoss(TABLE.tablePlayers_forTournament, T
 % Store cumulative score
 TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forTournament, option.no_round);
 
+% Compute Bushi Points
+[ TABLE.tablePlayers_forTournament ] = bushi_points( MATRICE.mat_HistoryMatch, TABLE.tablePlayers_forTournament, option.no_round, option.no_maxRound );
+
 % 3.4- Make the ranking
 disp('** Making the ranking');
 
