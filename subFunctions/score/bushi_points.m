@@ -12,15 +12,15 @@ for i = 1:size(tablePlayers_forTournament,1)
     % At the end of the tournament, calculate each fighter's match win %
     % using the following formula :
     % (the fighter’s point total) / (number of rounds ×3).
-    tablePlayers_forTournament.MWP(i,1) = tablePlayers_forTournament.Points(i,1)/(3*no_maxRound);
+    tablePlayers_forTournament.MWP(i,1) = tablePlayers_forTournament.Points(i,1)/(3*no_current_round);
     
     % Round down the results to two decimal places. If the result is lower than 0.33, it is calculated as 0.33.
     tmp = round((tablePlayers_forTournament.MWP(i,1)*100))/100;
-    if tmp < 0.33
-        tablePlayers_forTournament.MWP(i,1) = 0.33;
-    else
+%     if tmp < 0.33
+%         tablePlayers_forTournament.MWP(i,1) = 0.33;
+%     else
         tablePlayers_forTournament.MWP(i,1) = tmp;
-    end      
+%     end      
 end
 
 for i = 1:size(tablePlayers_forTournament,1)
