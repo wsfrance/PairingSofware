@@ -46,60 +46,99 @@ if option.no_round == 1
 
 
 else
-    % Allocate
-%     pairingID = zeros(middle_nbPlayers,2);
-    % Players play against of same number of wins
-    pairingID = []; % Allocation to change
-    
-    totalCurrentWins = unique(winNumber);                 % Extract total of unique wins 
-    totalCurrentWins = sort(totalCurrentWins,'descend');  % sort the numbers of win
-    rest_tmp = [];                                        % allocate 1st iteration
-    
-    % For each same number of wins
-    for id = 1:length(totalCurrentWins)         
-        score_tmp = totalCurrentWins(id);       % extract current number of wins from index
-        id_tmp = find(winNumber==score_tmp);    % find all wins in table equal to currect extract wins
-        currentPlayersID = [rest_tmp; playersID(id_tmp)]; % extract the players and add from last
-        
-        if size(currentPlayersID,1)==1
-            % If I have only one player, put it into the next group of players
-            rest_tmp = currentPlayersID;
-        else
-            % Otherwise (several players), separate Odd and even cases of number of players
-            [currentPlayersID, rest_tmp] = separate_OddEven_case(currentPlayersID);
-            
-            % Check if a player hasn't already played against a player
-            bool = 1;
-            counter = 1;
-            counter_maxShuffle = 10;
-            
-            while bool == 1 && counter<=counter_maxShuffle                
-                % Make the pairing from same number of wins
-                pairingID_tmp = reshape(currentPlayersID,2, size(currentPlayersID,1)/2); 
-                pairingID_tmp = pairingID_tmp';
-                % For each pairing generated, check if it has already be done
-                bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, verbose);
-                
-                id_test = find(bool_mat==1);
-                if isempty (id_test) == 0
-                    bool = 1;
-                    counter = counter+1;
-                    if verbose
-                        disp('le match a déjà eu lieu. Re-pairing by re-shuffle')
-                    end
-                    currentPlayersID=currentPlayersID(randperm(length(currentPlayersID)));
+    switch option.swissRoundType
+        case 'By_Points'
+            % Allocate
+            %     pairingID = zeros(middle_nbPlayers,2);
+            % Players play against of same number of wins
+            pairingID = []; % Allocation to change
+
+            totalCurrentWins = unique(winNumber);                 % Extract total of unique wins 
+            totalCurrentWins = sort(totalCurrentWins,'descend');  % sort the numbers of win
+            rest_tmp = [];                                        % allocate 1st iteration
+
+            % For each same number of wins
+            for id = 1:length(totalCurrentWins)         
+                score_tmp = totalCurrentWins(id);       % extract current number of wins from index
+                id_tmp = find(winNumber==score_tmp);    % find all wins in table equal to currect extract wins
+                currentPlayersID = [rest_tmp; playersID(id_tmp)]; % extract the players and add from last
+
+                if size(currentPlayersID,1)==1
+                    % If I have only one player, put it into the next group of players
+                    rest_tmp = currentPlayersID;
                 else
-                    bool = 0;
-                    if verbose
-                        disp(['Tout le pairing est ok pour le score win = ' num2str(score_tmp) '. Continuing'])
+                    % Otherwise (several players), separate Odd and even cases of number of players
+                    [currentPlayersID, rest_tmp] = separate_OddEven_case(currentPlayersID);
+
+                    % Check if a player hasn't already played against a player
+                    bool = 1;
+                    counter = 1;
+                    counter_maxShuffle = 10;
+
+                    while bool == 1 && counter<=counter_maxShuffle                
+                        % Make the pairing from same number of wins
+                        pairingID_tmp = reshape(currentPlayersID,2, size(currentPlayersID,1)/2); 
+                        pairingID_tmp = pairingID_tmp';
+                        % For each pairing generated, check if it has already be done
+                        bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, verbose);
+
+                        id_test = find(bool_mat==1);
+                        if isempty (id_test) == 0
+                            bool = 1;
+                            counter = counter+1;
+                            if verbose
+                                disp('le match a déjà eu lieu. Re-pairing by re-shuffle')
+                            end
+                            currentPlayersID=currentPlayersID(randperm(length(currentPlayersID)));
+                        else
+                            bool = 0;
+                            if verbose
+                                disp(['Tout le pairing est ok pour le score win = ' num2str(score_tmp) '. Continuing'])
+                            end
+                        end
                     end
+
+                    pairingID = [pairingID; pairingID_tmp]; % Add to already done pairing
                 end
             end
             
-            pairingID = [pairingID; pairingID_tmp]; % Add to already done pairing
-        end
+        case 'Recursive'
+            boolPlayer = false(nb_players,1);
+            counter = 1;
+            pairingID = []; % Allocation to change
+            for i = 1:nb_players
+                if boolPlayer(i)==0
+                    pairingID(counter,1) = playersID(i);
+                    boolPlayer(i)=true;
+                    bool_opponent=false;
+                    % find opponent
+                    j = i+1;
+                    while bool_opponent==false;
+                        if boolPlayer(j)==0
+                            % check if the players have already played
+                            % against each other. If not paired them
+                            mini = min(mat_HistoryMatch(playersID(i),:));
+                            if mat_HistoryMatch(playersID(i), playersID(j)) == mini                         
+                                pairingID(counter,2) = playersID(j);
+                                boolPlayer(j)=true;
+                                bool_opponent=true;
+                            else
+                                disp('le match a déjà eu lieu. Continue')
+                            end
+                        else
+                            j = j+1;
+                        end
+                    end
+                    counter = counter+1;
+                else
+                    disp('Player is already paired. Continue')
+                end
+            end
+            
+        otherwise
+            error('Case not known')
     end
-    
+            
 end
 
 % Convert pairingID to WSCode

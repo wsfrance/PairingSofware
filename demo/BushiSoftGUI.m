@@ -73,6 +73,10 @@ disp('Bushiroad Pairing Software')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
+disp('Change automatically the directory')
+currentpath = fileparts(mfilename('fullpath'));
+cd(currentpath)
+
 global TABLE option 
 
 % User Define
@@ -93,6 +97,7 @@ option.bool_Tournamentstarted = 0;
 % option.sortType = {'descend', 'descend', 'descend', 'descend', 'descend'};
 option.column2sort = {'Points', 'Opp_MW'};
 option.sortType = {'descend', 'descend'};
+option.swissRoundType = 'Recursive';
 
 % Add path, subfunctions, etc.
 disp('Add paths : subfunctions, externalLibs, etc.')
