@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 09-Dec-2016 15:42:00
+% Last Modified by GUIDE v2.5 09-Dec-2016 16:14:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -185,7 +185,8 @@ global TABLE option
 path = pwd;
 filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
 T = TABLE.pairingTable;
-exportTable2CSV( T, filename, option.columnTablePairing )
+column = option.columnTablePairing;
+exportTable2CSV( T, filename, column)
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)
@@ -574,9 +575,7 @@ end
 TABLE.historyMatch = [TABLE.historyMatch; TABLE.historyMatch_tmp];
 
 % Sort the data : 1st time
-column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss', 'name'};
-sortType = {'descend', 'descend', 'descend', 'descend', 'descend', 'ascend'};
-TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,column2sort,sortType);
+TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
 
 
 % Compute Solkoff or Buchholz points
@@ -596,11 +595,10 @@ TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forT
 disp('** Making the ranking');
 
 % Sort the data : 2nd time
-TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,column2sort,sortType);
+TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
 
 % Assign ranking
-column2check = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
-TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,column2check);
+TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
 
 
 % --- Executes on button press in BUT_startTimer.

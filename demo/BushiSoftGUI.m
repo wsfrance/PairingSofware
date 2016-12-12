@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 05-Dec-2016 17:30:49
+% Last Modified by GUIDE v2.5 12-Dec-2016 10:51:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,7 +86,12 @@ option.tiePoint         = 0.5;
 option.no_maxRound      = 3;
 option.no_round         = 0;
 option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
-
+% option.column2ranking = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
+% option.column2ranking = {'Points', 'Opp_MW'};
+% option.column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
+% option.sortType = {'descend', 'descend', 'descend', 'descend', 'descend'};
+option.column2sort = {'Points', 'Opp_MW'};
+option.sortType = {'descend', 'descend'};
 
 % Add path, subfunctions, etc.
 disp('Add paths : subfunctions, externalLibs, etc.')
@@ -97,17 +102,16 @@ set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)'
 
 % Create Data
 disp('Generate Tables: tablePlayers_fromDB and tablePlayers_forTournament')
-[ TABLE.tablePlayers_fromDB, TABLE.tablePlayers_forTournament ] = generateTable();
-TABLE.tablePlayers_forTournament(:,:) = [];
+% [ TABLE.tablePlayers_fromDB, TABLE.tablePlayers_forTournament ] = generateTable();
+% TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
+% TABLE.tablePlayers_forTournament(:,:) = [];
+loadDefaultPlayer(hObject, eventdata, handles)
 
 % Remove spaces at the begining and at the end
 % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
 % tablePlayers_fromDB_tmp = strtrim(tablePlayers_fromDB_tmp);
 % tablePlayers_fromDB = tablePlayers_fromDB_tmp;
 
-% Capital Letters
-disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
-[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
 
 % Initialize functions to Tables
 disp('Initialize functions (@cellSelect) to Tables')
@@ -131,20 +135,29 @@ function varargout = BushiSoftGUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in BUT_refresh.
-function BUT_refresh_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_refresh (see GCBO)
+% --- Executes on button press in BUT_refreshDBPlayers.
+function BUT_refreshDBPlayers_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_refreshDBPlayers (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global TABLE option
+% Construct a questdlg with three options
+choice = questdlg('Refresh the Database will delete all players from the tournament?', ...
+	'Warning',...
+    'Continue', ...
+	'Cancel', 'Cancel');
+% Handle response
+switch choice
+    case 'Continue'
+        disp([choice ' coming right up.'])
+        loadDefaultPlayer(hObject, eventdata, handles);
+    case {'Cancel',''}
+        disp([choice ': choice cancelled'])
+    otherwise
+        error([choice ': Case not known.'])
+end
 
-% Select Data to vizualize
-data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
-% List of sortBy possibilities and display it into handles.POP_sortBy
-sortBy_option = ['Sort By'; option.columnTableDB'];
-set(handles.POP_sortBy,'String', sortBy_option)  ;
+
 
 
 
@@ -520,3 +533,33 @@ image(matlabImage)
 % axes('position',[0.57,0.15,0.25,0.25]);
 axis off
 % axis image
+
+function loadDefaultPlayer(hObject, eventdata, handles)
+
+global TABLE option
+
+path = pwd;
+default_DB_filename = [path '/import/Database_Players.xls'];
+
+[~,~,data] = xlsread(default_DB_filename);
+
+% option.columnTableDB = data(1,:);
+column_tmp = data(1,:);
+TABLE.tablePlayers_fromDB = array2table(data(2:end,:), 'VariableNames', column_tmp);
+TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
+TABLE.tablePlayers_forTournament(:,:) = [];
+
+% Capital Letters
+column = {'name', 'familyName', 'pseudo'};
+disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
+[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
+
+% Select Data to vizualize
+data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+
+% List of sortBy possibilities and display it into handles.POP_sortBy
+sortBy_option = ['Sort By'; option.columnTableDB'];
+set(handles.POP_sortBy,'String', sortBy_option)  ;
