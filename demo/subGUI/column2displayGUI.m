@@ -22,7 +22,7 @@ function varargout = column2displayGUI(varargin)
 
 % Edit the above text to modify the response to help column2displayGUI
 
-% Last Modified by GUIDE v2.5 09-Dec-2016 14:29:27
+% Last Modified by GUIDE v2.5 12-Dec-2016 11:07:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -101,5 +101,69 @@ function TAB_columns_CellEditCallback(hObject, eventdata, handles)
 global option
 
 option.Bool_column2displayStanding = handles.TAB_columns.Data;
+% option.column2displayStanding = option.column2displayStandingALL(option.Bool_column2displayStanding);
+% standingGUI
+apply2Standing(hObject, eventdata, handles)
+
+% --- Executes on button press in BUT_all.
+function BUT_all_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_all (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE option
+
+columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+option.Bool_column2displayStanding = true(size(columnTable,2),1);
+apply2Standing(hObject, eventdata, handles)
+
+% --- Executes on button press in BUT_none.
+function BUT_none_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_none (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE option
+
+columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+option.Bool_column2displayStanding = false(size(columnTable,2),1);
+apply2Standing(hObject, eventdata, handles)
+
+% --- Executes on button press in BUT_bushiroadRecommended.
+function BUT_bushiroadRecommended_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_bushiroadRecommended (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global TABLE option
+
+columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+columns = {'WSCode', 'name', 'familyName', 'pseudo', 'Ranking', 'Points', 'Opp_MW'};
+id = ismember(columnTable, columns);
+option.Bool_column2displayStanding = id';
+apply2Standing(hObject, eventdata, handles)
+
+% --- Executes on button press in BUT_uscfRecommended.
+function BUT_uscfRecommended_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_uscfRecommended (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global TABLE option
+
+columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+columns = {'WSCode', 'name', 'familyName', 'pseudo', 'Ranking', 'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
+id = ismember(columnTable, columns);
+option.Bool_column2displayStanding = id';
+apply2Standing(hObject, eventdata, handles)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PERSONNAL FUNCTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function apply2Standing(hObject, eventdata, handles)
+
+global option 
+
 option.column2displayStanding = option.column2displayStandingALL(option.Bool_column2displayStanding);
-standingGUI
+set(handles.TAB_columns,'Data', option.Bool_column2displayStanding)
+standingGUI 

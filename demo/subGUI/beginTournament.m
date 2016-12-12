@@ -72,45 +72,46 @@ global TABLE MATRICE option
 % Set title
 set(handles.figure1, 'Name', 'Tournament (by malganis35)');
 
-% Update the list of players in handles.LIST_listPlayer
-updateListPlayers(hObject, eventdata, handles);
+if option.bool_Tournamentstarted == 0
+    % Update the list of players in handles.LIST_listPlayer
+    updateListPlayers(hObject, eventdata, handles);
 
-% Make a cross-table of already done match (such that a match cannot be 'redone')
-nb_players               = size(TABLE.tablePlayers_forTournament,1);
-MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
-[rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
+    % Make a cross-table of already done match (such that a match cannot be 'redone')
+    nb_players               = size(TABLE.tablePlayers_forTournament,1);
+    MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
+    [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
 
-MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
+    MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
 
+    % Players for Tournament
+    TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
 
-% Players for Tournament
-TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
+    % Show in Standing GUI
+    columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+    option.Bool_column2displayStanding = true(size(columnTable,2),1);
+    option.column2displayStandingALL = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+    option.column2displayStanding = option.column2displayStandingALL;
+    
+    % Initialize pairingTable
+    TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
+                                'VariableName', option.columnTablePairing);    
+    TABLE.pairingTable(:,:) = [];
 
-% Show in Standing GUI
-columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
-option.Bool_column2displayStanding = true(size(columnTable,2),1);
-option.column2displayStandingALL = TABLE.tablePlayers_forTournament.Properties.VariableNames;
-option.column2displayStanding = option.column2displayStandingALL;
+    % Set functions for Table
+    set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
+    % set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
+    % set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback); 
 
+    % % Center alignment
+    % Table = findjobj(handles.TAB_pairing); %findjobj is in the file exchange
+    % table1 = get(Table,'Viewport');
+    % jtable = get(table1,'View');
+    % renderer = jtable.getCellRenderer(2,2);
+    % renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    % renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+end
 
-% Initialize pairingTable
-TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
-                            'VariableName', option.columnTablePairing);    
-TABLE.pairingTable(:,:) = [];
-
-% Set functions for Table
-set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
-% set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
-% set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback); 
-
-% % Center alignment
-% Table = findjobj(handles.TAB_pairing); %findjobj is in the file exchange
-% table1 = get(Table,'Viewport');
-% jtable = get(table1,'View');
-% renderer = jtable.getCellRenderer(2,2);
-% renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-% renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-
+option.bool_Tournamentstarted = 1;
 
 
 % --- Outputs from this function are returned to the command line.

@@ -86,6 +86,7 @@ option.tiePoint         = 0.5;
 option.no_maxRound      = 3;
 option.no_round         = 0;
 option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
+option.bool_Tournamentstarted = 0;
 % option.column2ranking = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
 % option.column2ranking = {'Points', 'Opp_MW'};
 % option.column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
