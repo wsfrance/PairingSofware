@@ -305,61 +305,6 @@ function CHECK_dropPlayer2_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of CHECK_dropPlayer2
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% PERSONAL ADDED FUNCTIONS
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function varargout = updateListPlayers(hObject, eventdata, handles) 
-
-global TABLE option
-% Set list
-firstnames  = table2cell(TABLE.tablePlayers_forTournament(:,'name'));
-lastnames   = table2cell(TABLE.tablePlayers_forTournament(:,'familyName'));
-names       = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
-names       = sort(names); % Sort name by alphabetical order
-set(handles.LIST_listPlayer, 'String', names)
-
-
-function pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round)
-
-% Convert matchID to Pairing Table containing the name of players
-list_WSCode = tablePlayers_forTournament.WSCode;
-[m,n] = size(pairingWSCode);
-
-% Loop for all pairings
-for i = 1:m
-    for j = 1:n
-        % Search names
-        code_i      = pairingWSCode{i,j};
-        id          = strfind_idx( list_WSCode, code_i );
-        firstnames  = tablePlayers_forTournament.name(id);
-        lastnames   = tablePlayers_forTournament.familyName(id);
-        names       = strcat(lastnames, {', '}, firstnames);
-        if j == 1
-            % Player 1
-            pairingTable.Player1(i,1) = names;
-            pairingTable.Points_P1(i,1) = tablePlayers_forTournament.Points(id);
-        elseif j == 2
-            % Player 2
-            pairingTable.Player2(i,1) = names;
-            pairingTable.Points_P2(i,1) = tablePlayers_forTournament.Points(id);
-        else
-            error('Problem in pairingWSCode. Not of size 2')
-        end
-    end
-end
-
-% Set default options of pairingTable
-pairingTable.Table = [1:m]';
-pairingTable.Round = repmat(round,m,1);
-pairingTable.Result = repmat({'<pending>'}, m, 1);
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 % --------------------------------------------------------------------
 function MENU_tournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_tournament (see GCBO)
@@ -452,7 +397,10 @@ cellSelect(hObject, eventdata)
 UITable = 'TAB_pairing';
 [ data, rows] = getCellSelect( UITable );
 
-switch MATRICE.match_record(rows,1)
+% Convert rows to Table (if pending)
+no_table = data{rows, 3};
+
+switch MATRICE.match_record(no_table,1)
     case 1
         set(handles.RADIO_player1,'Value', 1);
     case 2
@@ -609,3 +557,59 @@ function BUT_startTimer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 stopwatch;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PERSONAL ADDED FUNCTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function varargout = updateListPlayers(hObject, eventdata, handles) 
+
+global TABLE option
+% Set list
+firstnames  = table2cell(TABLE.tablePlayers_forTournament(:,'name'));
+lastnames   = table2cell(TABLE.tablePlayers_forTournament(:,'familyName'));
+names       = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
+names       = sort(names); % Sort name by alphabetical order
+set(handles.LIST_listPlayer, 'String', names)
+
+
+function pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round)
+
+% Convert matchID to Pairing Table containing the name of players
+list_WSCode = tablePlayers_forTournament.WSCode;
+[m,n] = size(pairingWSCode);
+
+% Loop for all pairings
+for i = 1:m
+    for j = 1:n
+        % Search names
+        code_i      = pairingWSCode{i,j};
+        id          = strfind_idx( list_WSCode, code_i );
+        firstnames  = tablePlayers_forTournament.name(id);
+        lastnames   = tablePlayers_forTournament.familyName(id);
+        names       = strcat(lastnames, {', '}, firstnames);
+        if j == 1
+            % Player 1
+            pairingTable.Player1(i,1) = names;
+            pairingTable.Points_P1(i,1) = tablePlayers_forTournament.Points(id);
+        elseif j == 2
+            % Player 2
+            pairingTable.Player2(i,1) = names;
+            pairingTable.Points_P2(i,1) = tablePlayers_forTournament.Points(id);
+        else
+            error('Problem in pairingWSCode. Not of size 2')
+        end
+    end
+end
+
+% Set default options of pairingTable
+pairingTable.Table = [1:m]';
+pairingTable.Round = repmat(round,m,1);
+pairingTable.Result = repmat({'<pending>'}, m, 1);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
