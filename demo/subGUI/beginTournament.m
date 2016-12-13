@@ -206,7 +206,6 @@ global TABLE MATRICE option
 
 % Pairing of players
 if option.boolean_Round
-    option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
     option.no_round         = option.no_round+1; % Incremente number of rounds
     disp(['Create Pairing for Round no.' num2str(option.no_round)])
     [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
@@ -220,7 +219,8 @@ if option.boolean_Round
     % Create matrice match_record to store results
     nb_match = length(MATRICE.matchID);
     MATRICE.match_record = zeros(nb_match,1)+Inf;
-
+    
+    option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
 else
     disp('You need to resolve all current matches first before starting a new round !!!')
     msgbox('You need to resolve all current matches first before starting a new round !!!', 'Error','error');
@@ -257,7 +257,7 @@ function RADIO_unenteredResult_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of RADIO_unenteredResult
-
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in RADIO_player1.
 function RADIO_player1_Callback(hObject, eventdata, handles)
@@ -266,6 +266,7 @@ function RADIO_player1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of RADIO_player1
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on button press in RADIO_player2.
@@ -275,7 +276,7 @@ function RADIO_player2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of RADIO_player2
-
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in RADIO_draw.
 function RADIO_draw_Callback(hObject, eventdata, handles)
@@ -284,7 +285,7 @@ function RADIO_draw_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of RADIO_draw
-
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in CHECK_dropPlayer1.
 function CHECK_dropPlayer1_Callback(hObject, eventdata, handles)
