@@ -97,7 +97,7 @@ option.bool_Tournamentstarted = 0;
 % option.sortType = {'descend', 'descend', 'descend', 'descend', 'descend'};
 option.column2sort = {'Points', 'Opp_MW'};
 option.sortType = {'descend', 'descend'};
-option.swissRoundType = 'Recursive';
+option.swissRoundType = 'Monrad';
 
 % Add path, subfunctions, etc.
 disp('Add paths : subfunctions, externalLibs, etc.')
@@ -413,6 +413,21 @@ global TABLE
 
 % For a valid tournament, there must be at least 2 players
 if size(TABLE.tablePlayers_forTournament,1)>1
+    % Construct a questdlg with three options
+    choice = questdlg('Would you like to shuffle the player seed?', ...
+        'Shuffle Player Seed?', ...
+        'Yes','No', 'No');
+    % Handle response
+    switch choice
+        case 'Yes'
+            disp([choice ' coming right up. Shuffling player seed'])           
+            ordering = randperm(size(TABLE.tablePlayers_forTournament,1));
+            TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(ordering, :);        
+        case {'No',''}
+            disp([choice ' coming right up.'])
+        otherwise
+            error('option not known')
+    end
     close
     beginTournament
 else
@@ -420,6 +435,11 @@ else
     disp(msg)  
     msgbox(msg, 'Error','error');
 end
+
+
+
+
+
 
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)

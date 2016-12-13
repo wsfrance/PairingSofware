@@ -47,7 +47,7 @@ if option.no_round == 1
 
 else
     switch option.swissRoundType
-        case 'By_Points'
+        case 'Score_Group'
             % Allocate
             %     pairingID = zeros(middle_nbPlayers,2);
             % Players play against of same number of wins
@@ -102,7 +102,7 @@ else
                 end
             end
             
-        case 'Recursive'
+        case 'Monrad'
             boolPlayer = false(nb_players,1);
             counter = 1;
             pairingID = []; % Allocation to change
@@ -112,18 +112,19 @@ else
                     boolPlayer(i)=true;
                     bool_opponent=false;
                     % find opponent
-                    j = i+1;
-                    while bool_opponent==false;
+                    j = 1;
+                    while bool_opponent==false
                         if boolPlayer(j)==0
                             % check if the players have already played
                             % against each other. If not paired them
                             mini = min(mat_HistoryMatch(playersID(i),:));
-                            if mat_HistoryMatch(playersID(i), playersID(j)) == mini                         
+                            if mat_HistoryMatch(playersID(i), playersID(j)) == mini || j==nb_players                      
                                 pairingID(counter,2) = playersID(j);
                                 boolPlayer(j)=true;
                                 bool_opponent=true;
                             else
                                 disp('le match a déjà eu lieu. Continue')
+                                j = j+1;
                             end
                         else
                             j = j+1;
