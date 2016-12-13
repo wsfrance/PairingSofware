@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 12-Dec-2016 10:51:18
+% Last Modified by GUIDE v2.5 13-Dec-2016 15:31:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -73,7 +73,9 @@ disp('Bushiroad Pairing Software')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-disp('Change automatically the directory')
+disp('Opening of the software')
+
+disp('- Change automatically the directory')
 currentpath = fileparts(mfilename('fullpath'));
 cd(currentpath)
 
@@ -98,16 +100,24 @@ option.bool_Tournamentstarted = 0;
 option.column2sort = {'Points', 'Opp_MW'};
 option.sortType = {'descend', 'descend'};
 option.swissRoundType = 'Monrad';
+option.caseInsensitiveOption = true;
+option.searchPlayer = [];
+
+% Visibility off for tournament
+disp('- Visibility off for tournament elements of GUI')
+mode = 'off';
+showHandlesTournament(handles, mode);
+
 
 % Add path, subfunctions, etc.
-disp('Add paths : subfunctions, externalLibs, etc.')
+disp('- Add paths : subfunctions, externalLibs, etc.')
 addPath_bushisoft( option.verbose );
 
 % Set title
 set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
-disp('Generate Tables: tablePlayers_fromDB and tablePlayers_forTournament')
+disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
 % [ TABLE.tablePlayers_fromDB, TABLE.tablePlayers_forTournament ] = generateTable();
 % TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
 % TABLE.tablePlayers_forTournament(:,:) = [];
@@ -120,13 +130,15 @@ loadDefaultPlayer(hObject, eventdata, handles)
 
 
 % Initialize functions to Tables
-disp('Initialize functions (@cellSelect) to Tables')
+disp('- Initialize functions (@cellSelect) to Tables')
 set(handles.TAB_players, 'CellSelectionCallback',@cellSelect); 
 % set(handles.TAB_players,'CellSelectionCallback',@MouseClickHandler); % for single and double click
 set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
 
 % Logo
+disp('- Display Logo on the Software')
 displayLogo(hObject, eventdata, handles) 
+
 
 
 
@@ -177,20 +189,41 @@ function POP_sortBy_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_sortBy
 
+% global option
+% 
+% data = handles.TAB_players.Data;
+% 
+% % get selection of handles.POP_sortBy menu
+% contents = get(handles.POP_sortBy,'String'); 
+% value    = contents{get(handles.POP_sortBy,'Value')};
+% Index    = strfind_idx( option.columnTableDB',value );
+% 
+% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
+% if Index>0
+%     data = sortrows(data,Index);
+% end
+% set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+
+handleTable = handles.TAB_players;
+handleSortBy = handles.POP_sortBy;
+sortBy(handleTable, handleSortBy, handles);
+
+function data = sortBy(handleTable, handleSortBy, handles)
 global option
 
-data = handles.TAB_players.Data;
+data = handleTable.Data;
 
 % get selection of handles.POP_sortBy menu
-contents = get(handles.POP_sortBy,'String'); 
-value    = contents{get(handles.POP_sortBy,'Value')};
+contents = get(handleSortBy,'String'); 
+value    = contents{get(handleSortBy,'Value')};
 Index    = strfind_idx( option.columnTableDB',value );
 
 % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
 if Index>0
     data = sortrows(data,Index);
 end
-set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
+
 
 
 
@@ -207,6 +240,36 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');  
     
 end
+
+
+
+
+% --- Executes on selection change in POP_sortByTournament.
+function POP_sortByTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortByTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortByTournament contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortByTournament
+
+handleTable = handles.TAB_players_Tournament ;
+handleSortBy = handles.POP_sortByTournament;
+sortBy(handleTable, handleSortBy, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function POP_sortByTournament_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortByTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 
 
@@ -289,18 +352,18 @@ end
 
 
 
-function TXT_tournamentName_Callback(hObject, eventdata, handles)
-% hObject    handle to TXT_tournamentName (see GCBO)
+function EDIT_tournamentName_Callback(hObject, eventdata, handles)
+% hObject    handle to EDIT_tournamentName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of TXT_tournamentName as text
-%        str2double(get(hObject,'String')) returns contents of TXT_tournamentName as a double
+% Hints: get(hObject,'String') returns contents of EDIT_tournamentName as text
+%        str2double(get(hObject,'String')) returns contents of EDIT_tournamentName as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function TXT_tournamentName_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to TXT_tournamentName (see GCBO)
+function EDIT_tournamentName_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EDIT_tournamentName (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -483,24 +546,49 @@ function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of EDIT_searchPlayer as text
 %        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayer as a double
 
+% global TABLE option
+% disp(['Select subplayers containing: ' name])
+% if isempty(name)~=1
+%     % If not empty, select all player containing the string (case sensitive)
+% %     data  = handles.TAB_players.Data;
+%     data = TABLE.tablePlayers_fromDB(:,option.columnTableDB);
+%     data = table2cell(data);
+%     Index = strfind_idx( data, name, option.caseInsensitiveOption );
+%     Index = unique(Index);
+%     set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTableDB)
+% else
+%     % If it is empty, show all players
+%     disp('Text edit box is empty. Show all players')
+%     data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+%     set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+% end
 
-global option TABLE
+global TABLE
 
 % String in the EDIT_searchPlayer box
 name = handles.EDIT_searchPlayer.String;
+% name = TABLE.tablePlayers_fromDB;
+handlesTAB = handles.TAB_players; 
+tablePlayer = TABLE.tablePlayers_fromDB;
+selectName(name, handlesTAB, tablePlayer);
 
+
+function selectName(name, handlesTAB, tablePlayer)
+global option
 disp(['Select subplayers containing: ' name])
 if isempty(name)~=1
     % If not empty, select all player containing the string (case sensitive)
-    data  = handles.TAB_players.Data;
-    Index = strfind_idx( data, name );
+%     data  = handles.TAB_players.Data;
+    data = tablePlayer(:,option.columnTableDB);
+    data = table2cell(data);
+    Index = strfind_idx( data, name, option.caseInsensitiveOption );
     Index = unique(Index);
-    set(handles.TAB_players, 'data', data(Index,:), 'ColumnName', option.columnTableDB)
+    set(handlesTAB, 'data', data(Index,:), 'ColumnName', option.columnTableDB)
 else
     % If it is empty, show all players
     disp('Text edit box is empty. Show all players')
-    data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-    set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+    data = table2cell(tablePlayer(:,option.columnTableDB));
+    set(handlesTAB, 'data', data, 'ColumnName', option.columnTableDB)
 end
 
 
@@ -515,6 +603,41 @@ function EDIT_searchPlayer_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+function EDIT_searchPlayerTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to EDIT_searchPlayerTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of EDIT_searchPlayerTournament as text
+%        str2double(get(hObject,'String')) returns contents of EDIT_searchPlayerTournament as a double
+
+global TABLE
+
+% String in the EDIT_searchPlayer box
+name = handles.EDIT_searchPlayerTournament.String;
+% name = TABLE.tablePlayers_fromDB;
+handlesTAB = handles.TAB_players_Tournament; 
+tablePlayer = TABLE.tablePlayers_forTournament;
+selectName(name, handlesTAB, tablePlayer);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function EDIT_searchPlayerTournament_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to EDIT_searchPlayerTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
 
 
 % --------------------------------------------------------------------
@@ -550,7 +673,6 @@ response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValu
 % PERSONNAL FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function displayLogo(hObject, eventdata, handles) 
-disp('Display Logo on the Software')
 axes(handles.PLOT_logo)
 matlabImage = imread('bushiroadLogo.jpg');
 % matlabImage = imread('ws_logo.png');
@@ -577,7 +699,7 @@ TABLE.tablePlayers_forTournament(:,:) = [];
 
 % Capital Letters
 column = {'name', 'familyName', 'pseudo'};
-disp(['Set Capital Letters to selected columns : ' strjoin(column,', ')])
+disp(['- Set Capital Letters to selected columns : ' strjoin(column,', ')])
 [ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
 
 % Select Data to vizualize
@@ -589,3 +711,61 @@ set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTab
 % List of sortBy possibilities and display it into handles.POP_sortBy
 sortBy_option = ['Sort By'; option.columnTableDB'];
 set(handles.POP_sortBy,'String', sortBy_option)  ;
+
+
+% --- Executes on key press with focus on EDIT_searchPlayer and none of its controls.
+function EDIT_searchPlayer_KeyPressFcn(hObject,eventdata,handles)
+% hObject    handle to EDIT_searchPlayer (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.UICONTROL)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+% global option
+% 
+% eventdata.Character
+% 
+% if strcmp(eventdata.Key,'backspace')
+%     disp('case 1: Delete character')
+%     option.searchPlayer = option.searchPlayer(1:end-1);
+%     bool = true;
+% elseif isempty(eventdata.Character)
+%     disp('case 2: other control (CTRL, ALT, etc.)')
+%     bool = false;
+%     % return
+% else
+%     disp('case 3: Add characters')
+%     option.searchPlayer = [option.searchPlayer eventdata.Character];
+%     bool = true;
+% end
+% 
+% if bool
+%     selectName(option.searchPlayer, handles)
+% end
+
+
+
+
+
+% --- Executes on button press in BUT_createTournament.
+function BUT_createTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_createTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+mode = 'on';
+showHandlesTournament(handles, mode);
+
+function showHandlesTournament(handles, mode)
+set(handles.BUT_addPlayer, 'Visible', mode)
+set(handles.BUT_removePlayer, 'Visible', mode)
+set(handles.TEXT_playerForTournament, 'Visible', mode)
+set(handles.TAB_players_Tournament, 'Visible', mode)
+set(handles.POP_sortByTournament, 'Visible', mode)
+set(handles.TEXT_search, 'Visible', mode)
+set(handles.EDIT_searchPlayerTournament, 'Visible', mode)
+set(handles.BUT_beginTournament, 'Visible', mode)
+set(handles.TEXT_tournamentName, 'Visible', mode)
+set(handles.EDIT_tournamentName, 'Visible', mode)
+set(handles.TEXT_tournamentInformation, 'Visible', mode)
