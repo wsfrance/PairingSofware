@@ -463,9 +463,7 @@ if option.boolean_Round == 0
     end
 
     TABLE.pairingTable.Result(table) = {score};
-    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
-
-
+    
     % Store in historyMatch_tmp
     lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
     lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
@@ -481,8 +479,10 @@ if option.boolean_Round == 0
     TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
     TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
 
+    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
+    
+    
     % Check if all results have been given
-
     if isempty(find(isinf(MATRICE.match_record)==1)) == 1
         option.boolean_Round = 1;
         if option.no_round == 1

@@ -510,6 +510,35 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+disp('doing some statistics')
+
+global TABLE
+path = pwd;
+DB_Town_filename = [path '/import/Localization.xls'];
+[~,~,data] = xlsread(DB_Town_filename);
+column_tmp = data(1,:);
+TABLE.LocalizationReference = array2table(data(2:end,:), 'VariableNames', column_tmp);
+
+% Look for the data in the reference
+bool_country = ismember(TABLE.LocalizationReference.country, TABLE.tablePlayers_fromDB.country);
+
+list_coordinate = TABLE.LocalizationReference(bool_country,:);
+lat = cell2mat(list_coordinate.latitude);
+lon = cell2mat(list_coordinate.longitude);
+
+% Plot the data
+figure(1)
+plot(lon,lat,'.r','MarkerSize',40)
+plot_google_map
+xlabel('longitude')
+ylabel('latitude')
+title('Country origin of the players')
+
+TABLE.tablePlayers_fromDB.country = categorical(TABLE.tablePlayers_fromDB.country);
+TABLE.tablePlayers_fromDB.town = categorical(TABLE.tablePlayers_fromDB.town);
+TABLE.tablePlayers_fromDB.serie = categorical(TABLE.tablePlayers_fromDB.serie);
+summary(TABLE.tablePlayers_fromDB)
+% statarray = grpstats(TABLE.tablePlayers_fromDB,'age')
 
 % --------------------------------------------------------------------
 function MENU_help_Callback(hObject, eventdata, handles)
