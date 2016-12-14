@@ -534,9 +534,6 @@ xlabel('longitude')
 ylabel('latitude')
 title('Country origin of the players')
 
-TABLE.tablePlayers_fromDB.country = categorical(TABLE.tablePlayers_fromDB.country);
-TABLE.tablePlayers_fromDB.town = categorical(TABLE.tablePlayers_fromDB.town);
-TABLE.tablePlayers_fromDB.serie = categorical(TABLE.tablePlayers_fromDB.serie);
 summary(TABLE.tablePlayers_fromDB)
 % statarray = grpstats(TABLE.tablePlayers_fromDB,'age')
 
@@ -723,6 +720,16 @@ default_DB_filename = [path '/import/Database_Players.xls'];
 % option.columnTableDB = data(1,:);
 column_tmp = data(1,:);
 TABLE.tablePlayers_fromDB = array2table(data(2:end,:), 'VariableNames', column_tmp);
+
+% Convert to categorical
+try
+    TABLE.tablePlayers_fromDB.country = categorical(TABLE.tablePlayers_fromDB.country);
+    TABLE.tablePlayers_fromDB.town = categorical(TABLE.tablePlayers_fromDB.town);
+    TABLE.tablePlayers_fromDB.serie = categorical(TABLE.tablePlayers_fromDB.serie);
+catch
+    warning ('there is some error in the loading')
+end
+
 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
 TABLE.tablePlayers_forTournament(:,:) = [];
 
