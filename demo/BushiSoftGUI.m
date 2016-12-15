@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 13-Dec-2016 15:31:53
+% Last Modified by GUIDE v2.5 15-Dec-2016 14:37:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -102,6 +102,9 @@ option.sortType = {'descend', 'descend'};
 option.swissRoundType = 'Monrad';
 option.caseInsensitiveOption = true;
 option.searchPlayer = [];
+option.imageLogo = 'wsi_logo.jpg';
+option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};  
+
 
 % Visibility off for tournament
 disp('- Visibility off for tournament elements of GUI')
@@ -534,7 +537,17 @@ xlabel('longitude')
 ylabel('latitude')
 title('Country origin of the players')
 
-summary(TABLE.tablePlayers_fromDB)
+% Convert to categorical
+try
+    tmp         = TABLE.tablePlayers_fromDB;
+    tmp.country = categorical(TABLE.tablePlayers_fromDB.country);
+    tmp.town    = categorical(TABLE.tablePlayers_fromDB.town);
+    tmp.serie   = categorical(TABLE.tablePlayers_fromDB.serie);
+    summary(tmp)
+catch
+    warning ('there is some error in the loading')
+end
+
 % statarray = grpstats(TABLE.tablePlayers_fromDB,'age')
 
 % --------------------------------------------------------------------
@@ -699,8 +712,11 @@ response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValu
 % PERSONNAL FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function displayLogo(hObject, eventdata, handles) 
+
+global option
+
 axes(handles.PLOT_logo)
-matlabImage = imread('bushiroadLogo.jpg');
+matlabImage = imread(option.imageLogo);
 % matlabImage = imread('ws_logo.png');
 matlabImage = imresize(matlabImage, 1.5);
 image(matlabImage)
@@ -713,30 +729,25 @@ function loadDefaultPlayer(hObject, eventdata, handles)
 global TABLE option
 
 path = pwd;
-default_DB_filename = [path '/import/Database_Players.xls'];
 
-[~,~,data] = xlsread(default_DB_filename);
+% From excel file
+% default_DB_filename = [path '/import/Database_Players.xls'];
+% [~,~,data] = xlsread(default_DB_filename);
+
+% from CSV
+default_DB_filename = [path '/import/fileforsw.csv'];
+data = csvimport(default_DB_filename,'delimiter',';');
 
 % option.columnTableDB = data(1,:);
 column_tmp = data(1,:);
 TABLE.tablePlayers_fromDB = array2table(data(2:end,:), 'VariableNames', column_tmp);
 
-% Convert to categorical
-try
-    TABLE.tablePlayers_fromDB.country = categorical(TABLE.tablePlayers_fromDB.country);
-    TABLE.tablePlayers_fromDB.town = categorical(TABLE.tablePlayers_fromDB.town);
-    TABLE.tablePlayers_fromDB.serie = categorical(TABLE.tablePlayers_fromDB.serie);
-catch
-    warning ('there is some error in the loading')
-end
-
 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
 TABLE.tablePlayers_forTournament(:,:) = [];
 
 % Capital Letters
-column = {'name', 'familyName', 'pseudo'};
-disp(['- Set Capital Letters to selected columns : ' strjoin(column,', ')])
-[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, column );
+disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
+[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, option.columnCapitalLetters );
 
 % Select Data to vizualize
 data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
@@ -805,3 +816,25 @@ set(handles.BUT_beginTournament, 'Visible', mode)
 set(handles.TEXT_tournamentName, 'Visible', mode)
 set(handles.EDIT_tournamentName, 'Visible', mode)
 set(handles.TEXT_tournamentInformation, 'Visible', mode)
+
+
+% --------------------------------------------------------------------
+function update_dbCSV_Callback(hObject, eventdata, handles)
+% hObject    handle to update_dbCSV (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+disp('Updating the Database of player from the server')
+
+url = 'http://www.wseleague.com/download/fileforsw.csv'; % 'http://heritage.stsci.edu/2007/14/images/p0714aa.jpg';
+disp(['- START: Retrieve the file from the server: ' url])
+filename = 'fileforsw.csv';
+outfilename = websave(filename,url);
+disp(['- END: Retrieve the file from the server done: ' url])
+
+disp('- START: Move the file to the subfolder import/')
+movefile(outfilename, 'import/fileforsw.csv','f')
+disp('- END: Move the file to the subfolder import/ done')
+
+disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
+loadDefaultPlayer(hObject, eventdata, handles)
