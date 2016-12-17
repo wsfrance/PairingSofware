@@ -22,7 +22,7 @@ function varargout = standingGUI(varargin)
 
 % Edit the above text to modify the response to help standingGUI
 
-% Last Modified by GUIDE v2.5 09-Dec-2016 14:52:59
+% Last Modified by GUIDE v2.5 16-Dec-2016 22:50:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,6 +92,10 @@ set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStand
 % Re-size columns width
 % autoResizeTable( handles.TAB_standing )
 
+string = {'Select Round'; 'Round 1'; 'Round 2'};
+set(handles.POP_selectRound,'String', string)
+
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = standingGUI_OutputFcn(hObject, eventdata, handles) 
@@ -154,3 +158,30 @@ exportTable2CSV( T, filename, option.column2displayStanding )
 % end
 % writetable(T_reordered,filename)
 % disp(['Save into the file :' filename])
+
+
+% --- Executes on selection change in POP_selectRound.
+function POP_selectRound_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_selectRound (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_selectRound contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_selectRound
+
+global MATRICE option
+
+disp('Selecting Specific Round')
+round_selected = handles.POP_selectRound.Value-1;
+id = find(cell2mat(MATRICE.HistoryTABLE(:,1))==round_selected);
+
+if isempty(id) == 0
+    subtable = MATRICE.HistoryTABLE{id,2};
+    data = table2cell(subtable(:,option.column2displayStanding));
+    set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStanding)
+else
+    msg = 'Round not available';
+    disp(msg)
+    msgbox(msg,'Error','error')
+end
+
