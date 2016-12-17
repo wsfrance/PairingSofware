@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 15-Dec-2016 14:37:47
+% Last Modified by GUIDE v2.5 16-Dec-2016 22:30:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,7 +86,7 @@ column                  = {'name', 'familyName', 'pseudo'};
 option.columnTableDB    = ['WSCode', column];
 option.verbose          = 1;
 option.boolean_Round    = 1;
-option.winningPoint     = 1;
+option.winningPoint     = 3;
 option.losePoint        = 0;
 option.tiePoint         = 0.5;
 option.no_maxRound      = 3;
@@ -528,10 +528,17 @@ bool_country = ismember(TABLE.LocalizationReference.country, TABLE.tablePlayers_
 list_coordinate = TABLE.LocalizationReference(bool_country,:);
 lat = cell2mat(list_coordinate.latitude);
 lon = cell2mat(list_coordinate.longitude);
+country_list = TABLE.tablePlayers_fromDB.country(bool_country,:);
 
 % Plot the data
 figure(1)
-plot(lon,lat,'.r','MarkerSize',40)
+clf
+for i = 1:length(lon)
+    hold on
+    country_i = country_list{i};
+    warning('TO DO')
+    plot(lon(i),lat(i),'.r','MarkerSize',40)
+end
 plot_google_map
 xlabel('longitude')
 ylabel('latitude')
@@ -838,3 +845,14 @@ disp('- END: Move the file to the subfolder import/ done')
 
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
 loadDefaultPlayer(hObject, eventdata, handles)
+
+
+% --- Executes on button press in BUT_addPlayerBarcode.
+function BUT_addPlayerBarcode_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addPlayerBarcode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Please download and build the core and javase parts of zxing
+% from here - http://code.google.com/p/zxing/
+barcodeScannerGUI
