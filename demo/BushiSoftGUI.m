@@ -2,7 +2,7 @@ function varargout = BushiSoftGUI(varargin)
 % BUSHISOFTGUI MATLAB code for BushiSoftGUI.fig
 %      BUSHISOFTGUI, by itself, creates a new BUSHISOFTGUI or raises the existing
 %      singleton*.
-%
+%strrep
 %      H = BUSHISOFTGUI returns the handle to a new BUSHISOFTGUI or the handle to
 %      the existing singleton*.
 %
@@ -751,6 +751,12 @@ TABLE.tablePlayers_fromDB = array2table(data(2:end,:), 'VariableNames', column_t
 
 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
 TABLE.tablePlayers_forTournament(:,:) = [];
+
+% Delete ""
+disp('- Delete false characters (like ", etc.)')
+TABLE.tablePlayers_fromDB.name = strrep(TABLE.tablePlayers_fromDB.name,'"','');
+TABLE.tablePlayers_fromDB.familyName = strrep(TABLE.tablePlayers_fromDB.familyName,'"','');
+TABLE.tablePlayers_fromDB.pseudo = strrep(TABLE.tablePlayers_fromDB.pseudo,'"','');
 
 % Capital Letters
 disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
