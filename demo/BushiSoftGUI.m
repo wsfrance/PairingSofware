@@ -709,13 +709,25 @@ function MENU_postFacebook_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+url = 'http://www.mathworks.com';
+web(url,'-browser')
+
+
 thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
 thingSpeakWriteURL = thingSpeakURL;
-writeApiKey = '145634995501895';
+writeApiKey = '1870359846540179';
 fieldName = 'field1';
 fieldValue = 42;
 response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
 
+% test for matlab online
+thingSpeakURL = 'http://api.thingspeak.com/';
+thingSpeakWriteURL = [thingSpeakURL 'update'];
+writeApiKey = '19M8YL1FP1ADB3Q4'; % 'Your Write API Key';
+data = 42;
+data = num2str(data);
+data = ['api_key=',writeApiKey,'&field1=',data];
+response = webwrite(thingSpeakWriteURL,data)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

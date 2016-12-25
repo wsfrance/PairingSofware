@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 09-Dec-2016 16:14:02
+% Last Modified by GUIDE v2.5 25-Dec-2016 22:36:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -623,3 +623,50 @@ pairingTable.Result = repmat({'<pending>'}, m, 1);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% --- Executes on button press in BUT_sendPairing.
+function BUT_sendPairing_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_sendPairing (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE MATRICE option
+
+% For each table, find player in DB and send mail
+for i = 1:size(MATRICE.pairingWSCode,1)
+        wscode_p1 = MATRICE.pairingWSCode{i,1};
+        wscode_p2 = MATRICE.pairingWSCode{i,2};
+        % find ws code in the DB
+        Index1 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, wscode_p1, option.caseInsensitiveOption );
+        Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, wscode_p2, option.caseInsensitiveOption );
+        name1 = TABLE.tablePlayers_forTournament.name(Index1);
+        name2 = TABLE.tablePlayers_forTournament.name(Index2);
+        % recipients = {'caotri.do88@gmail.com'};
+        recipients1 = TABLE.tablePlayers_forTournament.email(Index1);
+        recipients2 = TABLE.tablePlayers_forTournament.email(Index2);
+        subject     = ['Tournament xxx Round no.' num2str(option.no_round) ' - Your Table : ' num2str(i)];
+        message1    = ['Dear ' name1{1} ',' 10 10 ...
+                        'Your new opponent (' name2{1} ') is ready' 10 ...
+                        'Go to Table no. ' num2str(i) 10 10 ...
+                        'And do not forget to have fun !!!'];      
+                    
+        message2    = ['Dear ' name2{1} ',' 10 10 ...
+                        'Your new opponent (' name1{1} ') is ready' 10 ...
+                        'Go to Table no. ' num2str(i) 10 10 ...
+                        'And do not forget to have fun !!!'];            
+        try                                
+            send_msg(recipients1, subject, message1)
+            disp(['SUCCESS: Message sent to ' recipients1{1}])
+        catch
+            disp(['FAIL: Message sent to ' recipients1{1}])
+        end
+        
+        try
+            send_msg(recipients2, subject, message2)
+            disp(['SUCCESS: Message sent to ' recipients2{1}])
+        catch
+            disp(['FAIL: Message sent to ' recipients2{1}])
+        end
+end
+
