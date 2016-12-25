@@ -163,7 +163,7 @@ bool_check = handles.CHECK_showPendingResult.Value;
 if bool_check
     % Checkbox is checked
     disp('Select and show pending results (Tables) only')
-    id = strfind_idx( TABLE.pairingTable.Result, '<pending>' );
+    id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
     data = table2cell(TABLE.pairingTable(id,:));
 else
     % Checkbox is not checked
@@ -185,9 +185,12 @@ global TABLE option
 % Export to XLS
 path = pwd;
 filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
+filename2 = [path '/export/Pairing_Round_' num2str(option.no_round) '.pdf'];
 T = TABLE.pairingTable;
 column = option.columnTablePairing;
 exportTable2CSV( T, filename, column)
+
+export_XLS2PDF(filename, filename2, option)
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)
@@ -578,6 +581,8 @@ set(handles.LIST_listPlayer, 'String', names)
 
 function pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round)
 
+global option
+
 % Convert matchID to Pairing Table containing the name of players
 list_WSCode = tablePlayers_forTournament.WSCode;
 [m,n] = size(pairingWSCode);
@@ -587,7 +592,7 @@ for i = 1:m
     for j = 1:n
         % Search names
         code_i      = pairingWSCode{i,j};
-        id          = strfind_idx( list_WSCode, code_i );
+        id          = strfind_idx( list_WSCode, code_i, option.caseInsensitiveOption );
         firstnames  = tablePlayers_forTournament.name(id);
         lastnames   = tablePlayers_forTournament.familyName(id);
         names       = strcat(lastnames, {', '}, firstnames);

@@ -2,7 +2,7 @@ function varargout = BushiSoftGUI(varargin)
 % BUSHISOFTGUI MATLAB code for BushiSoftGUI.fig
 %      BUSHISOFTGUI, by itself, creates a new BUSHISOFTGUI or raises the existing
 %      singleton*.
-%strrep
+%
 %      H = BUSHISOFTGUI returns the handle to a new BUSHISOFTGUI or the handle to
 %      the existing singleton*.
 %
@@ -104,7 +104,7 @@ option.caseInsensitiveOption = true;
 option.searchPlayer = [];
 option.imageLogo = 'wsi_logo.jpg';
 option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};  
-
+option.caseInsensitiveOption = true;
 
 % Visibility off for tournament
 disp('- Visibility off for tournament elements of GUI')
@@ -121,9 +121,6 @@ set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)'
 
 % Create Data
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
-% [ TABLE.tablePlayers_fromDB, TABLE.tablePlayers_forTournament ] = generateTable();
-% TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
-% TABLE.tablePlayers_forTournament(:,:) = [];
 loadDefaultPlayer(hObject, eventdata, handles)
 
 % Remove spaces at the begining and at the end
@@ -219,7 +216,7 @@ data = handleTable.Data;
 % get selection of handles.POP_sortBy menu
 contents = get(handleSortBy,'String'); 
 value    = contents{get(handleSortBy,'Value')};
-Index    = strfind_idx( option.columnTableDB',value );
+Index    = strfind_idx( option.columnTableDB',value,option.caseInsensitiveOption );
 
 % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
 if Index>0
@@ -296,7 +293,7 @@ if isempty(data)~=1
     for i = 1:length(rows)
         % Rely on WSCode that is unique for players
         WSCode_i = list_data(i,1);
-        Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i );
+        Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
         selected_data = TABLE.tablePlayers_fromDB(Index,:);
         % delete selected players from tablePlayers_fromDB
         TABLE.tablePlayers_fromDB (Index,:) = []; 
@@ -331,7 +328,7 @@ if isempty(data)~=1
     list_data = data(rows,1);
     for i = 1:length(rows)
         WSCode_i = list_data(i,1);
-        Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i );
+        Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
         selected_data = TABLE.tablePlayers_forTournament(Index,:);
         % delete selected players
         TABLE.tablePlayers_forTournament (Index,:) = [];
@@ -528,7 +525,7 @@ bool_country = ismember(TABLE.LocalizationReference.country, TABLE.tablePlayers_
 list_coordinate = TABLE.LocalizationReference(bool_country,:);
 lat = cell2mat(list_coordinate.latitude);
 lon = cell2mat(list_coordinate.longitude);
-country_list = TABLE.tablePlayers_fromDB.country(bool_country,:);
+country_list = TABLE.LocalizationReference.country(bool_country,:);
 
 % Plot the data
 figure(1)
@@ -536,8 +533,8 @@ clf
 for i = 1:length(lon)
     hold on
     country_i = country_list{i};
-    warning('TO DO')
-    plot(lon(i),lat(i),'.r','MarkerSize',40)
+    id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+    plot(lon(i),lat(i),'.r','MarkerSize',20*length(id))
 end
 plot_google_map
 xlabel('longitude')

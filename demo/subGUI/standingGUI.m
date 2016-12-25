@@ -145,8 +145,12 @@ global TABLE option
 % Export to XLS
 path = pwd;
 filename = [path '/export/Standings_Round_' num2str(option.no_round) '.xls'];
+filename2 = [path '/export/Standings_Round_' num2str(option.no_round) '.pdf'];
 T = TABLE.tablePlayers_forTournament;
 exportTable2CSV( T, filename, option.column2displayStanding )
+
+export_XLS2PDF(filename, filename2, option)
+
 
 % T = TABLE.tablePlayers_forTournament;
 % 

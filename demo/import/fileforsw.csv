@@ -1,7 +1,7 @@
-familyName;name;WSCode;pseudo;country
-Mario;Abronzino;GY473;;Italy
-William;Adams;OP507;;Germany
-Yacine;Adel;RK684;;France
+familyName;name;WSCode;pseudo
+Mario;Abronzino;GY473;
+William;Adams;OP507;
+Yacine;Adel;RK684;
 "Kevin MAN SANG";Akenaide;EG528;
 Luca;Albani;AM306;
 Roberto;Alfonso;DN33;
@@ -177,7 +177,7 @@ Luigi;Dimarzio;BW159;
 malvarez;Dimitri;QG510;
 Matteo;Dionisio;AV239;
 Andrea;Distefano;CD113;
-caotri;DO;QT475;
+"Cao Tri";DO;QT475;
 Irvin;Do;EG199;
 Jessica;Dolce;TH227;
 Matteo;Dominici;PT397;
@@ -212,6 +212,7 @@ Joseph;Fernihough;WK617;
 Lorenzo;Ferri;QT660;
 Ludovico;Fiandaca;OL87;
 Matteo;Fiocchetti;IG349;
+Dominik;Fischer;ED711;
 Gabriel;Fischer;LX466;
 Tiziano;Flammia;YZ12;
 Sam;Fletcher;OE613;
@@ -289,8 +290,8 @@ ken;hubbart;PU571;
 Pointdexter;Huynh;FO198;
 Alan;Ibba;XI236;
 Brandon;Ikin;KH477;
-Alessandro;Inga;TE163;
 Fabrizio;Inga;QR232;
+Alessandro;"Inga Rosario";TE163;
 Giovanni;Inglese;VK22;
 Carrasco;Irwin;XM523;
 Giacomo;Isidori;MU323;
