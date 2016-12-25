@@ -142,6 +142,7 @@ function BUT_export_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
+[ InterfaceObj, oldpointer ] = turnOffGUI( handles );
 % Export to XLS
 path = pwd;
 filename = [path '/export/Standings_Round_' num2str(option.no_round) '.xls'];
@@ -150,6 +151,7 @@ T = TABLE.tablePlayers_forTournament;
 exportTable2CSV( T, filename, option.column2displayStanding )
 
 export_XLS2PDF(filename, filename2, option)
+turnOnGUI( handles, InterfaceObj, oldpointer )
 
 
 % T = TABLE.tablePlayers_forTournament;

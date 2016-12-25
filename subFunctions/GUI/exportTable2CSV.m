@@ -2,6 +2,7 @@ function [ output_args ] = exportTable2CSV( T, filename, order_column )
 %EXPORTTABLE2CSV Summary of this function goes here
 %   Detailed explanation goes here
 
+% hWait = waitbar(0,'Please wait...');
 
 % Export to CSV
 
@@ -29,7 +30,21 @@ xlswrite(filename,B,sheet,xlRange)
 writetable(T_reordered,filename, 'Range','A4')
 msg = ['Save into the file :' filename];
 disp(msg)
-msgbox(msg)
+% msgbox(msg)
+
+% Put in bold
+h = actxserver('Excel.Application');
+hWorkbook = h.Workbooks.Open(sprintf('%s',filename));
+hWorksheet = hWorkbook.Sheets.Item(1);
+cells = hWorksheet.Range('A1:Z4');
+set(cells.Font, 'Bold', true)
+% hWorksheet.Range('A1:Z1').EntireColumn.AutoFit;
+hWorkbook.Save
+% Close object
+Quit(h)
+delete(h)
+
+% close(hWait) 
 
 fclose('all')
 

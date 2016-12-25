@@ -182,6 +182,8 @@ function BUT_printMenu_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
+[ InterfaceObj, oldpointer ] = turnOffGUI( handles, option );
+
 % Export to XLS
 path = pwd;
 filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
@@ -190,8 +192,10 @@ T = TABLE.pairingTable;
 column = option.columnTablePairing;
 exportTable2CSV( T, filename, column)
 
-disp('wait')
 export_XLS2PDF(filename, filename2, option)
+
+turnOnGUI( handles, InterfaceObj, oldpointer, option );
+
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)

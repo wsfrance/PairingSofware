@@ -104,7 +104,7 @@ option.caseInsensitiveOption = true;
 option.searchPlayer = [];
 option.imageLogo = 'wsi_logo.jpg';
 option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};  
-option.caseInsensitiveOption = true;
+option.turnOnOffGUI = true;
 
 % Visibility off for tournament
 disp('- Visibility off for tournament elements of GUI')
