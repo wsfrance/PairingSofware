@@ -11,5 +11,8 @@ hWorksheet.ExportAsFixedFormat('xlTypePDF',filename2);
 % open file externally
 open(filename2)
 
+% Close object
+Quit(hExcel)
+delete(hExcel)
 end
 

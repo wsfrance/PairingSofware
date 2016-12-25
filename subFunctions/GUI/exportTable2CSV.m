@@ -20,7 +20,7 @@ end
 A = {'Tournament name - Round no.'};
 sheet = 1;
 xlRange = 'A1';
-xlswrite(filename,A,sheet,xlRange)
+xlswrite2(filename,A,sheet,xlRange)
 
 B = {'Date:'};
 xlRange = 'A2';
@@ -30,6 +30,8 @@ writetable(T_reordered,filename, 'Range','A4')
 msg = ['Save into the file :' filename];
 disp(msg)
 msgbox(msg)
+
+fclose('all')
 
 end
 

@@ -190,6 +190,7 @@ T = TABLE.pairingTable;
 column = option.columnTablePairing;
 exportTable2CSV( T, filename, column)
 
+disp('wait')
 export_XLS2PDF(filename, filename2, option)
 
 % --- Executes on button press in BUT_playerHistory.

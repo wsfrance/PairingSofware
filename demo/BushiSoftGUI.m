@@ -139,6 +139,12 @@ set(handles.TAB_players_Tournament, 'CellSelectionCallback',@cellSelect);
 disp('- Display Logo on the Software')
 displayLogo(hObject, eventdata, handles) 
 
+% delete all files in /export
+fclose('all');
+disp('- Delete all files in /export')
+delete('export/*.xls')
+delete('export/*.xlsx')
+delete('export/*.pdf')
 
 
 
