@@ -157,9 +157,9 @@ function BUT_date_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from BUT_date
 
 global option
-option.tournamentInfo.date = uigetdate;
+option.tournamentInfo.dateSerial = uigetdate;
 formatOut = 'dd/mm/yyyy';
-option.tournamentInfo.date = datestr(option.tournamentInfo.date,formatOut);
+option.tournamentInfo.date = datestr(option.tournamentInfo.dateSerial,formatOut);
 set(handles.BUT_date, 'String', option.tournamentInfo.date)
 
 
@@ -268,9 +268,10 @@ function BUT_setDefault_Callback(hObject, eventdata, handles)
 
 global option
 
-option.tournamentInfo.date = datetime('today');
+option.tournamentInfo.dateSerial = datetime('today');
 formatOut = 'dd/mm/yyyy';
-option.tournamentInfo.date = datestr(option.tournamentInfo.date,formatOut);option.tournamentInfo.name = ['Tournament of ' option.tournamentInfo.date];
+option.tournamentInfo.date = datestr(option.tournamentInfo.dateSerial,formatOut);
+option.tournamentInfo.name = ['Tournament of ' option.tournamentInfo.date];
 option.tournamentInfo.description = 'No description';
 option.tournamentInfo.tournamentType = 'Local';
 option.tournamentInfo.pairingMethod = 'Swiss Round';

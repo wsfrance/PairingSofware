@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 28-Dec-2016 17:02:36
+% Last Modified by GUIDE v2.5 28-Dec-2016 19:51:24
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -105,23 +105,28 @@ option.searchPlayer = [];
 option.imageLogo = 'wsi_logo.jpg';
 option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};  
 option.turnOnOffGUI = true;
-
-% Visibility off for tournament
-disp('- Visibility off for tournament elements of GUI')
-mode = 'off';
-showHandlesTournament(handles, mode);
+option.tmp.createTournamentBool = false;
 
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
 addPath_bushisoft( option.verbose );
 
+% Visibility off for tournament
+disp('- Visibility off for tournament elements of GUI')
+mode = 'off';
+showHandlesTournament(handles, mode);
+
 % Set title
 set(handles.BushiSoftGUI, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
-loadDefaultPlayer(hObject, eventdata, handles)
+BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+
+
+disp('- Refresh Local Database')
+BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 
 % Remove spaces at the begining and at the end
 % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
@@ -157,31 +162,6 @@ function varargout = BushiSoftGUI_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-
-
-% --- Executes on button press in BUT_refreshDBPlayers.
-function BUT_refreshDBPlayers_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_refreshDBPlayers (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Construct a questdlg with three options
-choice = questdlg('Refresh the Database will delete all players from the tournament?', ...
-	'Warning',...
-    'Continue', ...
-	'Cancel', 'Cancel');
-% Handle response
-switch choice
-    case 'Continue'
-        disp([choice ' coming right up.'])
-        loadDefaultPlayer(hObject, eventdata, handles);
-    case {'Cancel',''}
-        disp([choice ': choice cancelled'])
-    otherwise
-        error([choice ': Case not known.'])
-end
-
-
 
 
 
@@ -796,32 +776,34 @@ function loadDefaultPlayer(hObject, eventdata, handles)
 
 global TABLE option
 
-path = pwd;
+% path = pwd;
 
 % From excel file
 % default_DB_filename = [path '/import/Database_Players.xls'];
 % [~,~,data] = xlsread(default_DB_filename);
 
+% import each csv
+disp('- Importing each database')
+dirName = '../data/playerDB';              %# folder path
+files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
+files = {files.name}';                      %'# file names
+
 % from CSV
-default_DB_filename = [path '/import/fileforsw.csv'];
-data = csvimport(default_DB_filename,'delimiter',';');
+% default_DB_filename = '../data/playerDB/fileforsw.csv';
+default_path = '../data/playerDB/';
 
-% option.columnTableDB = data(1,:);
-column_tmp = data(1,:);
-TABLE.tablePlayers_fromDB = array2table(data(2:end,:), 'VariableNames', column_tmp);
+importDB(hObject, eventdata, handles, default_path, files) 
 
-TABLE.tablePlayers_forTournament = TABLE.tablePlayers_fromDB(1,:);
-TABLE.tablePlayers_forTournament(:,:) = [];
+% Set default Database in memory
+defaultDB_name = 'fileforsw.csv';
+list = TABLE.MEGA_tablePlayers_fromDB(:,1);
+index = strfind_idx(list, defaultDB_name, option.caseInsensitiveOption);
+TABLE.tablePlayers_fromDB = TABLE.MEGA_tablePlayers_fromDB{index,2};
 
-% Delete ""
-disp('- Delete false characters (like ", etc.)')
-TABLE.tablePlayers_fromDB.name = strrep(TABLE.tablePlayers_fromDB.name,'"','');
-TABLE.tablePlayers_fromDB.familyName = strrep(TABLE.tablePlayers_fromDB.familyName,'"','');
-TABLE.tablePlayers_fromDB.pseudo = strrep(TABLE.tablePlayers_fromDB.pseudo,'"','');
-
-% Capital Letters
-disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
-[ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, option.columnCapitalLetters );
+% Set the POP menu to default database
+contents = cellstr(get(handles.POP_selectDB,'String'));
+index = strfind_idx(contents, defaultDB_name, option.caseInsensitiveOption);
+set(handles.POP_selectDB,'Value',index)
 
 % Select Data to vizualize
 % data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
@@ -834,6 +816,34 @@ refreshTables(hObject, eventdata, handles)
 sortBy_option = ['Sort By'; option.columnTableDB'];
 set(handles.POP_sortBy,'String', sortBy_option)  ;
 
+
+function importDB(hObject, eventdata, handles, default_path, files) 
+
+global TABLE option
+
+for i = 1:size(files,1)
+    file_i = [default_path files{i}];
+    data = csvimport(file_i,'delimiter',';');
+
+    column_tmp = data(1,:);
+    TABLE.MEGA_tablePlayers_fromDB{i,1} = files{i};
+    TABLE.MEGA_tablePlayers_fromDB{i,2} = array2table(data(2:end,:), 'VariableNames', column_tmp);
+
+    % Delete ""
+    disp('- Delete false characters (like ", etc.)')
+    TABLE.MEGA_tablePlayers_fromDB{i,2}.name = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.name,'"','');
+    TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName,'"','');
+    TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo,'"','');
+
+    % Capital Letters
+    disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
+    [ TABLE.MEGA_tablePlayers_fromDB{i,2} ] = Capital_FirstLetter( TABLE.MEGA_tablePlayers_fromDB{i,2}, option.columnCapitalLetters );
+end
+
+if option.tmp.createTournamentBool == false
+    TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{1,2}(1,:);
+    TABLE.tablePlayers_forTournament(:,:) = [];
+end
 
 % --- Executes on key press with focus on EDIT_searchPlayer and none of its controls.
 function EDIT_searchPlayer_KeyPressFcn(hObject,eventdata,handles)
@@ -877,8 +887,33 @@ function BUT_createTournament_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 global option
-option.tournamentInfo = [];
-tournamentInfoGUI
+
+if option.tmp.createTournamentBool
+    option.tmp.createTournamentBool = true;
+    % Construct a questdlg with three options
+    choice = questdlg('Create a new Tournament will delete all players from the current tournament?', ...
+        'Warning',...
+        'Continue', ...
+        'Cancel', 'Cancel');
+    % Handle response
+    switch choice
+        case 'Continue'
+            disp([choice ' coming right up.'])
+            option.tournamentInfo = [];
+            tournamentInfoGUI
+        case {'Cancel',''}
+            disp([choice ': choice cancelled'])
+        otherwise
+            error([choice ': Case not known.'])
+    end
+else
+    option.tmp.createTournamentBool = true;
+    option.tournamentInfo = [];
+    tournamentInfoGUI   
+end
+
+
+
 
 % mode = 'on';
 % showHandlesTournament(handles, mode);
@@ -901,7 +936,7 @@ outfilename = websave(filename,url);
 disp(['- END: Retrieve the file from the server done: ' url])
 
 disp('- START: Move the file to the subfolder import/')
-movefile(outfilename, 'import/fileforsw.csv','f')
+movefile(outfilename, '../data/playerDB/fileforsw.csv','f')
 disp('- END: Move the file to the subfolder import/ done')
 
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
@@ -966,6 +1001,15 @@ function POP_selectDB_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_selectDB contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_selectDB
 
+global TABLE option
+
+contents = cellstr(get(hObject,'String'));
+db_tmp_Name = contents{get(hObject,'Value')};
+
+index = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), db_tmp_Name, option.caseInsensitiveOption);
+TABLE.tablePlayers_fromDB = TABLE.MEGA_tablePlayers_fromDB{index,2};
+refreshTables(hObject, eventdata, handles)
+
 
 % --- Executes during object creation, after setting all properties.
 function POP_selectDB_CreateFcn(hObject, eventdata, handles)
@@ -987,9 +1031,51 @@ function BUT_saveAsLocalDB_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global TABLE option
+
+prompt = {'Enter name to save the Database'};
+dlg_title = 'Name of the database';
+date = option.tournamentInfo.dateSerial;
+formatOut = 'yyyymmdd';
+DateString = datestr(date,formatOut);
+defaultans = {[DateString '_' option.tournamentInfo.name]};
+filename = inputdlg(prompt,dlg_title,[1 50],defaultans);
+
+filename = strrep(filename,' ','');
+filename = strrep(filename,'/','');
+
+if isempty(filename) ==0
+    try
+        writetable(TABLE.tablePlayers_forTournament,['../data/playerDB/' filename{1} '.csv'],'Delimiter',';')
+        BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+    catch
+        msg = 'This is not a valid name. Do it again !!!';
+        disp(msg)
+        msgbox(msg,'Error','error')
+    end
+end
 
 % --------------------------------------------------------------------
 function MENU_update_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_update (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_refreshLocalDB.
+function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_refreshLocalDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+disp('- Refreshing the local Databases')
+dirName = '../data/playerDB';              %# folder path
+files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
+files = {files.name}';                      %'# file names
+
+disp([num2str(size(files,1)) ' file(s) were found locally: '])
+disp(files)
+files = ['Select Database'; files];
+set(handles.POP_selectDB,'String',files)
+
+loadDefaultPlayer(hObject, eventdata, handles)
