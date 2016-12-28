@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 25-Dec-2016 22:36:19
+% Last Modified by GUIDE v2.5 28-Dec-2016 17:10:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes beginTournament wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.beginTournament);
 
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
@@ -70,7 +70,7 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 global TABLE MATRICE option
 
 % Set title
-set(handles.figure1, 'Name', 'Tournament (by malganis35)');
+set(handles.beginTournament, 'Name', 'Tournament (by malganis35)');
 
 if option.bool_Tournamentstarted == 0
     % Update the list of players in handles.LIST_listPlayer
@@ -182,7 +182,8 @@ function BUT_printMenu_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
-[ InterfaceObj, oldpointer ] = turnOffGUI( handles, option );
+handlesFigure = handles.beginTournament;
+[ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
 
 % Export to XLS
 path = pwd;
@@ -194,7 +195,7 @@ exportTable2CSV( T, filename, column)
 
 export_XLS2PDF(filename, filename2, option)
 
-turnOnGUI( handles, InterfaceObj, oldpointer, option );
+turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
 
 
 % --- Executes on button press in BUT_playerHistory.

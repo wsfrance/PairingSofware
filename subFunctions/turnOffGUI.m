@@ -1,13 +1,13 @@
-function [ InterfaceObj, oldpointer ] = turnOffGUI( handles, option )
+function [ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option )
 %TURNOFFGUI Summary of this function goes here
 %   Detailed explanation goes here
 
 if option.turnOnOffGUI
     % We turn the interface off for processing.
-    InterfaceObj=findobj(handles.figure1,'Enable','on');
+    InterfaceObj=findobj(handlesFigure,'Enable','on');
     set(InterfaceObj,'Enable','off');
-    oldpointer = get(handles.figure1, 'pointer'); 
-    set(handles.figure1, 'pointer', 'watch') 
+    oldpointer = get(handlesFigure, 'pointer'); 
+    set(handlesFigure, 'pointer', 'watch') 
     drawnow;
 else
     InterfaceObj = [];

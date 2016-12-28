@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 28-Dec-2016 16:26:07
+% Last Modified by GUIDE v2.5 28-Dec-2016 17:02:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -471,6 +471,26 @@ function MENU_printPlayerList_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_printPlayerList (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('Printing Player list')
+
+global TABLE option
+
+
+handlesFigure = handles.BushiSoftGUI;
+[ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+
+% Export to XLS
+path = pwd;
+filename = [path '/export/PlayerList.xls'];
+filename2 = [path '/export/PlayerList.pdf'];
+T = TABLE.tablePlayers_forTournament;
+column = option.columnTableDB;
+exportTable2CSV( T, filename, column)
+
+export_XLS2PDF(filename, filename2, option)
+
+turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+
 
 
 % --------------------------------------------------------------------
@@ -733,6 +753,29 @@ data = ['api_key=',writeApiKey,'&field1=',data];
 response = webwrite(thingSpeakWriteURL,data)
 
 
+
+% --------------------------------------------------------------------
+function MENU_preferences_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_preferences (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_manageDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_manageDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_retrieveSpecificDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_retrieveSpecificDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PERSONNAL FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -837,21 +880,10 @@ global option
 option.tournamentInfo = [];
 tournamentInfoGUI
 
-mode = 'on';
-showHandlesTournament(handles, mode);
+% mode = 'on';
+% showHandlesTournament(handles, mode);
 
-function showHandlesTournament(handles, mode)
-set(handles.BUT_addPlayer, 'Visible', mode)
-set(handles.BUT_removePlayer, 'Visible', mode)
-set(handles.TEXT_playerForTournament, 'Visible', mode)
-set(handles.TAB_players_Tournament, 'Visible', mode)
-set(handles.POP_sortByTournament, 'Visible', mode)
-set(handles.TEXT_search, 'Visible', mode)
-set(handles.EDIT_searchPlayerTournament, 'Visible', mode)
-set(handles.BUT_beginTournament, 'Visible', mode)
-set(handles.TEXT_tournamentName, 'Visible', mode)
-set(handles.EDIT_tournamentName, 'Visible', mode)
-set(handles.TEXT_tournamentInformation, 'Visible', mode)
+
 
 
 % --------------------------------------------------------------------
@@ -948,8 +980,16 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+
+% --- Executes on button press in BUT_saveAsLocalDB.
+function BUT_saveAsLocalDB_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_saveAsLocalDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
 % --------------------------------------------------------------------
-function MENU_preferences_Callback(hObject, eventdata, handles)
-% hObject    handle to MENU_preferences (see GCBO)
+function MENU_update_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_update (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

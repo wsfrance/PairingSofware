@@ -353,4 +353,7 @@ set(GUI1_handles.TEXT_tournamentInformation, 'String', option.tournamentInfo.des
 % GUI2_handles = guidata(ObjH);  % Handles of GUI1
 % set(GUI2_handles.edittext1, ...
 %    'String', get(GUI2_handles.edittext1));
-    
+
+mode = 'on';
+showHandlesTournament(GUI1_handles, mode);
+
