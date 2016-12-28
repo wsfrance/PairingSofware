@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 16-Dec-2016 22:30:39
+% Last Modified by GUIDE v2.5 28-Dec-2016 16:26:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes BushiSoftGUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.BushiSoftGUI);
 
 %--------------------------------------------------------------------------
 % User Personal Code
@@ -117,7 +117,7 @@ disp('- Add paths : subfunctions, externalLibs, etc.')
 addPath_bushisoft( option.verbose );
 
 % Set title
-set(handles.figure1, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
+set(handles.BushiSoftGUI, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
@@ -229,7 +229,7 @@ if Index>0
     data = sortrows(data,Index);
 end
 set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
-
+warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
 
 
 
@@ -302,15 +302,19 @@ if isempty(data)~=1
         Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
         selected_data = TABLE.tablePlayers_fromDB(Index,:);
         % delete selected players from tablePlayers_fromDB
-        TABLE.tablePlayers_fromDB (Index,:) = []; 
-        % add selected players to tablePlayers_forTournament
-        TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
-        
-        % display the data
-        data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-        set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
-        data2 = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-        set(handles.TAB_players_Tournament, 'data', data2, 'ColumnName', option.columnTableDB)
+        % TABLE.tablePlayers_fromDB (Index,:) = []; 
+        % check if player is already added
+        Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
+        if isempty(Index2)==1       
+            % add selected players to tablePlayers_forTournament
+            TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
+
+            % display the data
+            refreshTables(hObject, eventdata, handles)
+            
+        else
+            disp('Player is already in the tournament')
+        end
     end
 else
     % If no player in the DB, it is an error
@@ -339,13 +343,10 @@ if isempty(data)~=1
         % delete selected players
         TABLE.tablePlayers_forTournament (Index,:) = [];
         % add selected players
-        TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
+        % TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
         
         % display the data
-        data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-        set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
-        data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-        set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
+        refreshTables(hObject, eventdata, handles)
     end
 else
     % If no player in the tournament list, it is an error
@@ -459,8 +460,8 @@ function MENU_createNewTournament_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function Untitled_3_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_3 (see GCBO)
+function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_editCurrentTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -633,11 +634,13 @@ if isempty(name)~=1
     Index = strfind_idx( data, name, option.caseInsensitiveOption );
     Index = unique(Index);
     set(handlesTAB, 'data', data(Index,:), 'ColumnName', option.columnTableDB)
+    warning('selectName : VIZU TO BE PUT IN refreshTABLE')
 else
     % If it is empty, show all players
     disp('Text edit box is empty. Show all players')
     data = table2cell(tablePlayer(:,option.columnTableDB));
     set(handlesTAB, 'data', data, 'ColumnName', option.columnTableDB)
+    warning('selectName : VIZU TO BE PUT IN refreshTABLE')
 end
 
 
@@ -778,10 +781,11 @@ disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapita
 [ TABLE.tablePlayers_fromDB ] = Capital_FirstLetter( TABLE.tablePlayers_fromDB, option.columnCapitalLetters );
 
 % Select Data to vizualize
-data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
-data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+% data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+% set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
+% data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+% set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+refreshTables(hObject, eventdata, handles)
 
 % List of sortBy possibilities and display it into handles.POP_sortBy
 sortBy_option = ['Sort By'; option.columnTableDB'];
@@ -828,6 +832,10 @@ function BUT_createTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_createTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global option
+option.tournamentInfo = [];
+tournamentInfoGUI
 
 mode = 'on';
 showHandlesTournament(handles, mode);
@@ -877,3 +885,71 @@ function BUT_addPlayerBarcode_Callback(hObject, eventdata, handles)
 % Please download and build the core and javase parts of zxing
 % from here - http://code.google.com/p/zxing/
 barcodeScannerGUI
+
+
+% --- Executes on selection change in POP_sortOrder.
+function POP_sortOrder_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortOrder (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortOrder contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortOrder
+
+global option
+
+contents = cellstr(get(hObject,'String'));
+option.sortOrderDB = contents{get(hObject,'Value')};
+
+
+% --- Executes during object creation, after setting all properties.
+function POP_sortOrder_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortOrder (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+function refreshTables(hObject, eventdata, handles)
+
+global TABLE option
+
+data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
+
+
+% --- Executes on selection change in POP_selectDB.
+function POP_selectDB_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_selectDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_selectDB contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_selectDB
+
+
+% --- Executes during object creation, after setting all properties.
+function POP_selectDB_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_selectDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --------------------------------------------------------------------
+function MENU_preferences_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_preferences (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
