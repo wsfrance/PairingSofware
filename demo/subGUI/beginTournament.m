@@ -112,7 +112,7 @@ if option.bool_Tournamentstarted == 0
 end
 
 option.bool_Tournamentstarted = 1;
-option.typeRound = 'round';
+option.typeRound = 'Round';
 
 % --- Outputs from this function are returned to the command line.
 function varargout = beginTournament_OutputFcn(hObject, eventdata, handles) 
@@ -433,7 +433,7 @@ global TABLE MATRICE option
 
 disp(['Going to Top 8 (Quarter finals)'])
 option.topX = 8;
-option.typeRound = 'top';
+option.typeRound = 'Top';
 BUT_pair_Callback(hObject, eventdata, handles)
 
 
