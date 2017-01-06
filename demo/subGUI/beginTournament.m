@@ -112,7 +112,7 @@ if option.bool_Tournamentstarted == 0
 end
 
 option.bool_Tournamentstarted = 1;
-
+option.typeRound = 'round';
 
 % --- Outputs from this function are returned to the command line.
 function varargout = beginTournament_OutputFcn(hObject, eventdata, handles) 
@@ -214,27 +214,64 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option 
 
 % Pairing of players
-if option.boolean_Round
-    option.no_round         = option.no_round+1; % Incremente number of rounds
-    disp(['Create Pairing for Round no.' num2str(option.no_round)])
-    [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
+switch option.typeRound
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    case 'Round'
+        if option.no_round < option.no_maxRound
+            if option.boolean_Round
+                option.no_round         = option.no_round+1; % Incremente number of rounds
+                disp(['Create Pairing for Round no.' num2str(option.no_round)])
+                [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
 
-    disp('Display Pairing in UITable')
-    TABLE.pairingTable = matchID_2_pairingTable(TABLE.tablePlayers_forTournament, TABLE.pairingTable, MATRICE.pairingWSCode, option.no_round);
-    data = table2cell(TABLE.pairingTable(:,:));
-    set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing); 
-    updateListPlayers(hObject, eventdata, handles); 
+                % display pairing table
+                displayPairingTable(hObject, eventdata, handles)
+
+            else
+                msg = 'You need to resolve all current matches first before starting a new round !!!';
+                disp(msg)
+                msgbox(msg, 'Error','error');
+            end
+        else
+            msg = 'You have reached the maximum number of rounds. Go now to Top';
+            disp(msg)
+            msgbox(msg)
+        end
     
-    % Create matrice match_record to store results
-    nb_match = length(MATRICE.matchID);
-    MATRICE.match_record = zeros(nb_match,1)+Inf;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    case 'Top'
+        
+        TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+        TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
+        TABLE.tablePlayers_forTournament.Points = zeros(option.topX,1);
+        [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch);
+        TABLE.historyMatch_tmp(:,:) = [];
+        displayPairingTable(hObject, eventdata, handles)
     
-    option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
-else
-    disp('You need to resolve all current matches first before starting a new round !!!')
-    msgbox('You need to resolve all current matches first before starting a new round !!!', 'Error','error');
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+    otherwise        
+         msg = 'Not implemented yet';
+         disp(msg)
+         msgbox(msg,'Error','error')
 end
+
+
+function displayPairingTable(hObject, eventdata, handles)
+
+global TABLE MATRICE option    
     
+disp('Display Pairing in UITable')
+TABLE.pairingTable = matchID_2_pairingTable(TABLE.tablePlayers_forTournament, TABLE.pairingTable, MATRICE.pairingWSCode, option.no_round);
+data = table2cell(TABLE.pairingTable(:,:));
+set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing);
+updateListPlayers(hObject, eventdata, handles);
+
+% Create matrice match_record to store results
+nb_match = length(MATRICE.matchID);
+MATRICE.match_record = zeros(nb_match,1)+Inf;
+
+option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
+
+
     
 function EDIT_table_Callback(hObject, eventdata, handles)
 % hObject    handle to EDIT_table (see GCBO)
@@ -362,6 +399,14 @@ function MENU_top2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global TABLE MATRICE option
+
+disp(['Going to Top 2 (Final)'])
+topX = 2;
+TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:topX,:);
+[MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTop, MATRICE.mat_HistoryMatch, option, topX);
+
 
 % --------------------------------------------------------------------
 function MENU_top4_Callback(hObject, eventdata, handles)
@@ -369,12 +414,29 @@ function MENU_top4_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global TABLE MATRICE option
+
+disp(['Going to Top 4 (Semi-finals)'])
+topX = 4;
+TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:topX,:);
+[MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTop, MATRICE.mat_HistoryMatch, option, topX);
+
 
 % --------------------------------------------------------------------
 function MENU_top8_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_top8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global TABLE MATRICE option
+
+disp(['Going to Top 8 (Quarter finals)'])
+option.topX = 8;
+option.typeRound = 'top';
+BUT_pair_Callback(hObject, eventdata, handles)
+
+
 
 
 % --------------------------------------------------------------------
@@ -478,8 +540,8 @@ if option.boolean_Round == 0
     lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
     player1 = TABLE.tablePlayers_forTournament.name(lin1);
     player2 = TABLE.tablePlayers_forTournament.name(lin2);
-    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,1));
-    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(MATRICE.matchID(table,2));
+    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
+    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
 
     TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
     TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
@@ -592,6 +654,8 @@ global option
 % Convert matchID to Pairing Table containing the name of players
 list_WSCode = tablePlayers_forTournament.WSCode;
 [m,n] = size(pairingWSCode);
+
+pairingTable(:,:) = [];
 
 % Loop for all pairings
 for i = 1:m

@@ -106,7 +106,7 @@ option.imageLogo = 'wsi_logo.jpg';
 option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};  
 option.turnOnOffGUI = true;
 option.tmp.createTournamentBool = false;
-
+option.sortOrderDB = 'ascend';
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -202,15 +202,17 @@ data = handleTable.Data;
 % get selection of handles.POP_sortBy menu
 contents = get(handleSortBy,'String'); 
 value    = contents{get(handleSortBy,'Value')};
-Index    = strfind_idx( option.columnTableDB',value,option.caseInsensitiveOption );
+% Index    = strfind_idx( option.columnTableDB',value, option.caseInsensitiveOption );
 
-% Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
-if Index>0
-    data = sortrows(data,Index);
-end
-set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
-warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
+% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
+% if Index>0
+%     data = sortrows(data,Index);
+% end
+% set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
+% warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
 
+option.column2sortDB = value;
+refreshTables(handleTable, handleSortBy, handles);
 
 
 
@@ -276,6 +278,7 @@ UITable = 'TAB_players';
 if isempty(data)~=1
     list_data = data(rows,1);
     % Loop if multiple players are selected
+    bool_msg = false;
     for i = 1:length(rows)
         % Rely on WSCode that is unique for players
         WSCode_i = list_data(i,1);
@@ -293,14 +296,22 @@ if isempty(data)~=1
             refreshTables(hObject, eventdata, handles)
             
         else
-            disp('Player is already in the tournament')
+            bool_msg = true;
+            msg = 'Player is already in the tournament';
+            disp(msg)
+           
+            set(handles.TXT_error,'String',msg);
         end
+    end
+    if bool_msg
+         msgbox(msg,'Error','error')
     end
 else
     % If no player in the DB, it is an error
     msg = 'There is no player in the DB !!';
     disp(msg)
     msgbox(msg,'Error','error')
+    set(handles.TXT_error,'String',msg);
 end
     
     
@@ -315,24 +326,25 @@ global TABLE option
 UITable = 'TAB_players_Tournament';
 [ data, rows ] = getCellSelect( UITable );
 if isempty(data)~=1
-    list_data = data(rows,1);
-    for i = 1:length(rows)
-        WSCode_i = list_data(i,1);
-        Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
-        selected_data = TABLE.tablePlayers_forTournament(Index,:);
-        % delete selected players
-        TABLE.tablePlayers_forTournament (Index,:) = [];
-        % add selected players
-        % TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];
-        
-        % display the data
-        refreshTables(hObject, eventdata, handles)
-    end
+%     list_data = data(rows,1);
+%     for i = 1:length(rows)
+%         WSCode_i = list_data(i,1);
+%         Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
+%         selected_data = TABLE.tablePlayers_forTournament(Index,:);
+%         % delete selected players
+%         TABLE.tablePlayers_forTournament (Index,:) = [];
+%         % add selected players
+%         % TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];        
+%     end
+    % display the data
+    TABLE.tablePlayers_forTournament (rows,:) = [];
+    refreshTables(hObject, eventdata, handles)
 else
     % If no player in the tournament list, it is an error
     msg = 'There is no player in the tournament';
     disp(msg)
     msgbox(msg,'Error','error')
+    set(handles.TXT_error,'String',msg);
 end
 
 
@@ -437,7 +449,7 @@ function MENU_createNewTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_createNewTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+BUT_createTournament_Callback(hObject, eventdata, handles)
 
 % --------------------------------------------------------------------
 function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
@@ -504,6 +516,7 @@ else
     msg = 'There is not enough players in the tournament. Add some players first (at least 2)';
     disp(msg)  
     msgbox(msg, 'Error','error');
+    set(handles.TXT_error,'String',msg);
 end
 
 
@@ -541,7 +554,7 @@ for i = 1:length(lon)
     hold on
     country_i = country_list{i};
     id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
-    plot(lon(i),lat(i),'.r','MarkerSize',20*length(id))
+    plot(lon(i),lat(i),'.r','MarkerSize',1*length(id))
 end
 plot_google_map
 xlabel('longitude')
@@ -966,8 +979,16 @@ function POP_sortOrder_Callback(hObject, eventdata, handles)
 global option
 
 contents = cellstr(get(hObject,'String'));
-option.sortOrderDB = contents{get(hObject,'Value')};
-
+tmp = contents{get(hObject,'Value')};
+switch tmp
+    case 'A - z'
+        option.sortOrderDB = 'ascend';
+    case 'Z - a'
+        option.sortOrderDB = 'descend';
+    otherwise
+        disp('Case not known')
+end
+refreshTables(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
 function POP_sortOrder_CreateFcn(hObject, eventdata, handles)
@@ -986,10 +1007,41 @@ function refreshTables(hObject, eventdata, handles)
 
 global TABLE option
 
+% option.sortOrderDB = 'ascending';
+
 data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+% if isempty(data)~=1
 set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
-data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+% end
+% data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
+% data2 = sortrows(data2,option.column2sortDB,option.sortOrderDB);
+
+
+if isfield(option,'column2sortDB') == 0
+    bool = false;
+elseif strcmp(option.column2sortDB,'Sort By') == 0
+    bool = false;
+else
+    bool = true;
+end
+
+if bool
+    data2 = sortrows(TABLE.tablePlayers_fromDB(:,option.columnTableDB), option.column2sortDB, option.sortOrderDB);
+else
+    disp('This is SORT BY')
+    data2 = TABLE.tablePlayers_fromDB(:,option.columnTableDB);
+end
+data2 = table2cell(data2);
 set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
+
+% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
+% if Index>0
+%     data = sortrows(data,Index);
+% end
+% set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
+% warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
+
+
 
 
 % --- Executes on selection change in POP_selectDB.
@@ -1033,28 +1085,37 @@ function BUT_saveAsLocalDB_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
-prompt = {'Enter name to save the Database'};
-dlg_title = 'Name of the database';
-date = option.tournamentInfo.dateSerial;
-formatOut = 'yyyymmdd';
-DateString = datestr(date,formatOut);
-defaultans = {[DateString '_' option.tournamentInfo.name]};
-filename = inputdlg(prompt,dlg_title,[1 50],defaultans);
+if isempty(TABLE.tablePlayers_forTournament) == 1
+    msg = 'Error : Put players in the tournament list first !!';
+    disp(msg)
+    msgbox(msg,'Error', 'error')
+    set(handles.TXT_error,'String',msg);
+else
+    
+    prompt = {'Enter name to save the Database'};
+    dlg_title = 'Name of the database';
+    date = option.tournamentInfo.dateSerial;
+    formatOut = 'yyyymmdd';
+    DateString = datestr(date,formatOut);
+    defaultans = {[DateString '_' option.tournamentInfo.name]};
+    filename = inputdlg(prompt,dlg_title,[1 50],defaultans);
 
-filename = strrep(filename,' ','');
-filename = strrep(filename,'/','');
+    filename = strrep(filename,' ','');
+    filename = strrep(filename,'/','');
 
-if isempty(filename) ==0
-    try
-        writetable(TABLE.tablePlayers_forTournament,['../data/playerDB/' filename{1} '.csv'],'Delimiter',';')
-        BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
-    catch
-        msg = 'This is not a valid name. Do it again !!!';
-        disp(msg)
-        msgbox(msg,'Error','error')
+    if isempty(filename) ==0
+        try
+            writetable(TABLE.tablePlayers_forTournament,['../data/playerDB/' filename{1} '.csv'],'Delimiter',';')
+            BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+        catch
+            msg = 'This is not a valid name. Do it again !!!';
+            disp(msg)
+            msgbox(msg,'Error','error')
+            set(handles.TXT_error,'String',msg);
+        end
     end
 end
-
+    
 % --------------------------------------------------------------------
 function MENU_update_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_update (see GCBO)
@@ -1069,7 +1130,7 @@ function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 disp('- Refreshing the local Databases')
-dirName = '../data/playerDB';              %# folder path
+dirName = '../data/playerDB';               %# folder path
 files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
 files = {files.name}';                      %'# file names
 

@@ -36,9 +36,11 @@ if option.no_round == 1
         classement_init = 1:nb_players;
     end
 
-    id_subGroup1        = 1:middle_nbPlayers;
-    id_subGroup2        = middle_nbPlayers+1:nb_players;
-
+    id_subGroup1        = playersID(1:middle_nbPlayers);
+    id_subGroup2        = playersID(middle_nbPlayers+1:nb_players);
+    id_subGroup1 = id_subGroup1';
+    id_subGroup2 = id_subGroup2';
+    
     % Le premier de S1 joue contre le premier de S2, le deuxième de S1 contre 
     % le deuxième de S2, et ainsi de suite de manière que le dernier joueur de 
     % S1 joue contre le dernier joueur de S2.
@@ -186,25 +188,25 @@ function bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, ver
     end
 end
 
-function mat_HistoryMatch = updateHistoryMatch (mat_HistoryMatch,pairingID)
-% Update mat_HistoryMatch
-    for k = 1:size(pairingID,1)
-        extract_match_index = pairingID(k,:);
-        mat_HistoryMatch(extract_match_index(1),extract_match_index(2)) = mat_HistoryMatch(extract_match_index(1),extract_match_index(2))+1;
-        mat_HistoryMatch(extract_match_index(2),extract_match_index(1)) = mat_HistoryMatch(extract_match_index(2),extract_match_index(1))+1;
-    end
-end
+% function mat_HistoryMatch = updateHistoryMatch (mat_HistoryMatch,pairingID)
+% % Update mat_HistoryMatch
+%     for k = 1:size(pairingID,1)
+%         extract_match_index = pairingID(k,:);
+%         mat_HistoryMatch(extract_match_index(1),extract_match_index(2)) = mat_HistoryMatch(extract_match_index(1),extract_match_index(2))+1;
+%         mat_HistoryMatch(extract_match_index(2),extract_match_index(1)) = mat_HistoryMatch(extract_match_index(2),extract_match_index(1))+1;
+%     end
+% end
 
-function pairingWSCode = id2WSCode(tablePlayers, pairingID)
-
-[m,n] = size(pairingID);
-for i = 1:m
-    for j = 1:n
-        id = find(tablePlayers.playerId == pairingID(i,j));
-        pairingWSCode(i,j) = tablePlayers.WSCode(id);
-    end
-end
-
-
-end
+% function pairingWSCode = id2WSCode(tablePlayers, pairingID)
+% 
+% [m,n] = size(pairingID);
+% for i = 1:m
+%     for j = 1:n
+%         id = find(tablePlayers.playerId == pairingID(i,j));
+%         pairingWSCode(i,j) = tablePlayers.WSCode(id);
+%     end
+% end
+% 
+% 
+% end
 
