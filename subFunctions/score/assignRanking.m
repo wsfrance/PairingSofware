@@ -11,11 +11,16 @@ for i = 1:nb_players
         tablePlayers_forTournament.Ranking(i) = rank_i;
         total = tablePlayers_forTournament(:,column2check);
         T2 = tablePlayers_forTournament(i,column2check);
-        idx_i = ismember(total(i+1:end,:),T2);
-        logical2id = find(idx_i==1);
-        tablePlayers_forTournament.Ranking(i+logical2id) = rank_i;
+        if i+1<=nb_players
+            idx_i = ismember(total(i+1:end,:),T2);
+            logical2id = find(idx_i==1);
+            tablePlayers_forTournament.Ranking(i+logical2id) = rank_i;
 
-        rank_i = rank_i+1+size(logical2id,1);
+            rank_i = rank_i+1+size(logical2id,1);
+        else
+            tablePlayers_forTournament.Ranking(i) = rank_i;
+            rank_i = rank_i+1+size(logical2id,1);
+        end
     end
 end
 

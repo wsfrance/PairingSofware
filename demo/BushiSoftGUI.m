@@ -122,11 +122,13 @@ set(handles.BushiSoftGUI, 'Name', 'New Bushiroad Tournament Software (by malgani
 
 % Create Data
 disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
+warning('off','all')
 BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
-
 
 disp('- Refresh Local Database')
 BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+warning('on','all')
+
 
 % Remove spaces at the begining and at the end
 % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
@@ -281,7 +283,7 @@ if isempty(data)~=1
     bool_msg = false;
     for i = 1:length(rows)
         % Rely on WSCode that is unique for players
-        WSCode_i = list_data(i,1);
+        WSCode_i = list_data{i,1};
         Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
         selected_data = TABLE.tablePlayers_fromDB(Index,:);
         % delete selected players from tablePlayers_fromDB
