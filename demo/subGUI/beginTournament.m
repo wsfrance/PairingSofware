@@ -401,12 +401,16 @@ function MENU_top2_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 
-disp(['Going to Top 2 (Final)'])
-topX = 2;
-TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
-TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:topX,:);
-[MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTop, MATRICE.mat_HistoryMatch, option, topX);
-
+disp(['Going to Top 2 (Finals)'])
+option.topX = 2;
+option.typeRound = 'Top';
+if size(TABLE.tablePlayers_forTournament,1)>option.topX
+    BUT_pair_Callback(hObject, eventdata, handles)
+else
+    msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
+    disp(msg)
+    msgbox(msg,'Error','error')
+end
 
 % --------------------------------------------------------------------
 function MENU_top4_Callback(hObject, eventdata, handles)
@@ -417,10 +421,18 @@ function MENU_top4_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option
 
 disp(['Going to Top 4 (Semi-finals)'])
-topX = 4;
-TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
-TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:topX,:);
-[MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTop, MATRICE.mat_HistoryMatch, option, topX);
+option.topX = 4;
+option.typeRound = 'Top';
+if size(TABLE.tablePlayers_forTournament,1)>option.topX
+    BUT_pair_Callback(hObject, eventdata, handles)
+else
+    msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
+    disp(msg)
+    msgbox(msg,'Error','error')
+end
+
+
+
 
 
 % --------------------------------------------------------------------
@@ -434,8 +446,13 @@ global TABLE MATRICE option
 disp(['Going to Top 8 (Quarter finals)'])
 option.topX = 8;
 option.typeRound = 'Top';
-BUT_pair_Callback(hObject, eventdata, handles)
-
+if size(TABLE.tablePlayers_forTournament,1)>option.topX
+    BUT_pair_Callback(hObject, eventdata, handles)
+else
+    msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
+    disp(msg)
+    msgbox(msg,'Error','error')
+end
 
 
 
