@@ -92,8 +92,14 @@ set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStand
 % Re-size columns width
 % autoResizeTable( handles.TAB_standing )
 
-string = {'Select Round'; 'Round 1'; 'Round 2'};
+string = cell(option.no_round+1,1);
+string(1,1) = {'Select Round'};
+for i = 1:option.no_round
+    string(i+1,1) = {['Round ' num2str(i)]};   
+end
+% string = {'Select Round'; 'Round 1'; 'Round 2'};
 set(handles.POP_selectRound,'String', string)
+set(handles.POP_selectRound,'Value', option.no_round+1)
 
 
 
