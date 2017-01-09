@@ -218,10 +218,10 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option 
 
 % Pairing of players
-saveHistoryTABLE()
 switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Round'
+        saveHistoryTABLE([]);
         if option.no_round < option.no_maxRound
             if option.boolean_Round
                 option.no_round         = option.no_round+1; % Incremente number of rounds
@@ -252,11 +252,19 @@ switch option.typeRound
             % First round of the top
             TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
             TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
+            saveHistoryTABLE([]);
         else
             % Following rounds in the top (except the 1st cut)
             disp('Cut first the number of players')
             nb_players = size(TABLE.tablePlayers_forTournament,1);
-            TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
+            % update future delete players
+            player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
+            player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);            
+            table2sort = updateFinalTable(player2top, player2update);
+            saveHistoryTABLE(table2sort)
+            % keep only the half top for next round
+            TABLE.tablePlayers_forTournament = player2top;
+           
         end
         
         TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
@@ -274,14 +282,76 @@ switch option.typeRound
 end
 
 
-function saveHistoryTABLE()
+function saveHistoryTABLE(table2sort)
 
 global TABLE option
 TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
 TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
-TABLE.HistoryTABLE.standing{option.no_round+1,1}      = TABLE.tablePlayers_forTournament;
+switch option.typeRound
+    case 'Round'
+        TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
+    case 'Top'
+        if option.no_top == 1
+            TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
+        else
+            TABLE.HistoryTABLE.standing{option.no_round+1,1} = table2sort;
+        end
+    otherwise
+        disp('Not known')
+end
+
+function table2sort = updateFinalTable(player2top, player2bottom)
+
+global TABLE option
+
+table2sort = TABLE.tablePlayers_FINAL;
+
+% Sort the list of players
+% - Extract the ids of top, bottom and other
+id_top    = find( ismember(table2sort.WSCode, player2top.WSCode)    == 1);
+id_bottom = find( ismember(table2sort.WSCode, player2bottom.WSCode) == 1);
+all_wsCodeOfTop = [player2top.WSCode; player2bottom.WSCode];
+other_id  = find( ismember(table2sort.WSCode, all_wsCodeOfTop)    == 0);
+
+% - Re-arrange ids of bottom depending on their score in rounds
+orderBottom_WSCode = sortrows(TABLE.tablePlayers_FINAL(id_bottom,:),option.column2sort,option.sortType);
+n = size(orderBottom_WSCode,1);
+id_bottom_sorted = zeros(n,1);
+for i = 1:n
+    id_bottom_sorted(i,1) = find( ismember(table2sort.WSCode, orderBottom_WSCode.WSCode(i)) == 1);
+end
+
+% - Re-arrange the table
+id_sorted = [id_top; id_bottom_sorted; other_id];
+table2sort = table2sort(id_sorted,:);
+
+% Assign ranking
+% TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
+% warning('Still to be done')
+choice = 'advanced';
+switch choice
+    case 'simple'
+        table2sort.Ranking = [1:size(table2sort,1)]';
+    case 'advanced'
+        % Top
+        table1 = table2sort(id_top,:);
+        nb_top = size(table1,1);
+        table1.Ranking = ones(nb_top,1);
+        % Bottom
+        start_ranking = nb_top+1;
+        table2 = table2sort(id_bottom_sorted,:);
+        table2 = assignRanking(table2,option.column2sort, start_ranking);
+        % Other
+        start_ranking = nb_top + size(table2,1) +1;
+        table3 = table2sort(other_id,:);
+        table3 = assignRanking(table3,option.column2sort, start_ranking);
+        
+        table2sort = [table1; table2; table3];
+end
 
 
+% Store in the Table
+TABLE.tablePlayers_FINAL = table2sort;
 
 
 function displayPairingTable(hObject, eventdata, handles)

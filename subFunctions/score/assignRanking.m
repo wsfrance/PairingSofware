@@ -1,7 +1,12 @@
-function tablePlayers_forTournament = assignRanking(tablePlayers_forTournament,column2check)
+function tablePlayers_forTournament = assignRanking(tablePlayers_forTournament,column2check, start_no_ranking)
+
+if nargin < 3
+    disp('No start_no_ranking putted. Default: 1')
+    start_no_ranking = 1;
+end
 
 nb_players = size(tablePlayers_forTournament,1);
-rank_i = 1;
+rank_i = start_no_ranking;
 
 rank_tmp = zeros(nb_players,1);
 tablePlayers_forTournament.Ranking = rank_tmp;
