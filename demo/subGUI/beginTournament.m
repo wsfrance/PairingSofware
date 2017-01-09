@@ -73,6 +73,10 @@ global TABLE MATRICE option
 set(handles.beginTournament, 'Name', 'Tournament (by malganis35)');
 
 if option.bool_Tournamentstarted == 0
+    
+    option.bool_Tournamentstarted = 1;
+    option.typeRound = 'Round';
+    
     % Update the list of players in handles.LIST_listPlayer
     updateListPlayers(hObject, eventdata, handles);
 
@@ -114,9 +118,6 @@ if option.bool_Tournamentstarted == 0
     % renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     % renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 end
-
-option.bool_Tournamentstarted = 1;
-option.typeRound = 'Round';
 
 % --- Outputs from this function are returned to the command line.
 function varargout = beginTournament_OutputFcn(hObject, eventdata, handles) 
@@ -244,36 +245,40 @@ switch option.typeRound
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     case 'Top'
-        
-        % Save the current standing to the right place in HistoryTABLE
-        option.no_round = option.no_round+1; % Incremente number of rounds
-        
-        if option.no_top == 1
-            % First round of the top
-            TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
-            TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
-            saveHistoryTABLE([]);
+        if option.boolean_Round
+            % Save the current standing to the right place in HistoryTABLE
+            option.no_round = option.no_round+1; % Incremente number of rounds
+
+            if option.no_top == 1
+                % First round of the top
+                TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
+                saveHistoryTABLE([]);
+            else
+                % Following rounds in the top (except the 1st cut)
+                disp('Cut first the number of players')
+                nb_players = size(TABLE.tablePlayers_forTournament,1);
+                % update future delete players
+                player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
+                player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);            
+                table2sort = updateFinalTable(player2top, player2update);
+                saveHistoryTABLE(table2sort)
+                % keep only the half top for next round
+                TABLE.tablePlayers_forTournament = player2top;
+
+            end
+
+            TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
+            [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
+            TABLE.historyMatch_tmp(:,:) = [];
+            displayPairingTable(hObject, eventdata, handles)
+
+            option.no_top = option.no_top+1;
         else
-            % Following rounds in the top (except the 1st cut)
-            disp('Cut first the number of players')
-            nb_players = size(TABLE.tablePlayers_forTournament,1);
-            % update future delete players
-            player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
-            player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);            
-            table2sort = updateFinalTable(player2top, player2update);
-            saveHistoryTABLE(table2sort)
-            % keep only the half top for next round
-            TABLE.tablePlayers_forTournament = player2top;
-           
+            msg = 'You need to resolve all current matches first before starting a new round !!!';
+            disp(msg)
+            msgbox(msg, 'Error','error');
         end
-        
-        TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
-        [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
-        TABLE.historyMatch_tmp(:,:) = [];
-        displayPairingTable(hObject, eventdata, handles)
-        
-        option.no_top = option.no_top+1;
-        
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     otherwise        
          msg = 'Not implemented yet';
@@ -682,7 +687,10 @@ if option.boolean_Round == 0
 %             TABLE.HistoryTABLE{1}.standing      = TABLE.tablePlayers_forTournament;
 %         end
         computeScore();
-        saveHistoryTABLE();
+        switch option.typeRound
+            case 'Round'
+                saveHistoryTABLE();
+        end
         % MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
         % MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;
 %         TABLE.HistoryTABLE(option.no_round+1).no_Round      = option.no_round;

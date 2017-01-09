@@ -67,6 +67,8 @@ guidata(hObject, handles);
 % Clean up console
 clc
 disp('Cleaning up console')
+disp('Cleaning up variables')
+clearvars -global
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 disp('Bushiroad Pairing Software')

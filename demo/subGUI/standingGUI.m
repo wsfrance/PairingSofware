@@ -100,14 +100,25 @@ if booleanTmp
 else
     nb_max_current_round = option.no_round+1;
 end
-string = cell(nb_max_current_round,1);
+string = cell(nb_max_current_round+1,1);
 string(1,1) = {'Select Round'};
-for i = 1:nb_max_current_round-1
-    string(i+1,1) = {['Round ' num2str(i)]};   
+% for i = 1:nb_max_current_round-1
+%     string(i+1,1) = {['Round ' num2str(i)]};   
+% end
+for i = 1:size(TABLE.HistoryTABLE,1)
+    typeRound = TABLE.HistoryTABLE.typeOfRound(i);
+    str_i = ['Round ' num2str(TABLE.HistoryTABLE.no_Round(i))];
+    switch typeRound{1}
+        case 'Round'
+            string(i+1,1) = {str_i};  
+        case 'Top'
+            string(i+1,1) = {[str_i ' (Top)']}; 
+    end
 end
 % string = {'Select Round'; 'Round 1'; 'Round 2'};
 set(handles.POP_selectRound,'String', string)
-set(handles.POP_selectRound,'Value', nb_max_current_round)
+nb_2display = size(string,1);
+set(handles.POP_selectRound,'Value', nb_2display)
 
 
 
@@ -192,7 +203,7 @@ function POP_selectRound_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option
 
 disp('Selecting Specific Round')
-round_selected = handles.POP_selectRound.Value-1;
+round_selected = handles.POP_selectRound.Value-2;
 id = find(TABLE.HistoryTABLE.no_Round==round_selected);
 
 if isempty(id) == 0
