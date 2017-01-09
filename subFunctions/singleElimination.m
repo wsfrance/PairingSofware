@@ -1,4 +1,4 @@
-function [ pairingID, pairingWSCode, mat_HistoryMatch ] = singleElimination( tablePlayers, mat_HistoryMatch)
+function [ pairingID, pairingWSCode, mat_HistoryMatch ] = singleElimination( tablePlayers, mat_HistoryMatch, option)
 %SINGLEELIMINATION Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -11,7 +11,6 @@ winNumber       = tablePlayers.winNumber;
 playersID       = tablePlayers.playerId;
 
 nb_players      = size(classement_init,1);
-
 
 %--------------------------------------------------------------------------
     % Divide players into 2 sub-groups

@@ -92,14 +92,22 @@ set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStand
 % Re-size columns width
 % autoResizeTable( handles.TAB_standing )
 
-string = cell(option.no_round+1,1);
+% check if round is finished
+booleanTmp = isempty(find(TABLE.HistoryTABLE.no_Round == option.no_round));
+if booleanTmp
+    % if empty, round is not recorded yet
+    nb_max_current_round = option.no_round;
+else
+    nb_max_current_round = option.no_round+1;
+end
+string = cell(nb_max_current_round,1);
 string(1,1) = {'Select Round'};
-for i = 1:option.no_round
+for i = 1:nb_max_current_round-1
     string(i+1,1) = {['Round ' num2str(i)]};   
 end
 % string = {'Select Round'; 'Round 1'; 'Round 2'};
 set(handles.POP_selectRound,'String', string)
-set(handles.POP_selectRound,'Value', option.no_round+1)
+set(handles.POP_selectRound,'Value', nb_max_current_round)
 
 
 
@@ -181,14 +189,14 @@ function POP_selectRound_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_selectRound contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_selectRound
 
-global MATRICE option
+global TABLE MATRICE option
 
 disp('Selecting Specific Round')
 round_selected = handles.POP_selectRound.Value-1;
-id = find(cell2mat(MATRICE.HistoryTABLE(:,1))==round_selected);
+id = find(TABLE.HistoryTABLE.no_Round==round_selected);
 
 if isempty(id) == 0
-    subtable = MATRICE.HistoryTABLE{id,2};
+    subtable = TABLE.HistoryTABLE.standing{id};
     data = table2cell(subtable(:,option.column2displayStanding));
     set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStanding)
 else

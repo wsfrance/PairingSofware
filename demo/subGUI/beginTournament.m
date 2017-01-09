@@ -97,6 +97,10 @@ if option.bool_Tournamentstarted == 0
                                 'VariableName', option.columnTablePairing);    
     TABLE.pairingTable(:,:) = [];
 
+    % Initialize HistoryTable : store the standing at each round
+    TABLE.HistoryTABLE = table(0,{option.typeRound}, {TABLE.tablePlayers_forTournament},'VariableName', {'no_Round', 'typeOfRound', 'standing'});  
+    % TABLE.HistoryTABLE(:,:) = []; 
+    
     % Set functions for Table
     set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
     % set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
@@ -214,6 +218,7 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option 
 
 % Pairing of players
+saveHistoryTABLE()
 switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Round'
@@ -240,19 +245,43 @@ switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     case 'Top'
         
-        TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
-        TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
-        TABLE.tablePlayers_forTournament.Points = zeros(option.topX,1);
-        [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch);
+        % Save the current standing to the right place in HistoryTABLE
+        option.no_round = option.no_round+1; % Incremente number of rounds
+        
+        if option.no_top == 1
+            % First round of the top
+            TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+            TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
+        else
+            % Following rounds in the top (except the 1st cut)
+            disp('Cut first the number of players')
+            nb_players = size(TABLE.tablePlayers_forTournament,1);
+            TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
+        end
+        
+        TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
+        [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
         TABLE.historyMatch_tmp(:,:) = [];
         displayPairingTable(hObject, eventdata, handles)
-    
+        
+        option.no_top = option.no_top+1;
+        
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     otherwise        
          msg = 'Not implemented yet';
          disp(msg)
          msgbox(msg,'Error','error')
 end
+
+
+function saveHistoryTABLE()
+
+global TABLE option
+TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
+TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
+TABLE.HistoryTABLE.standing{option.no_round+1,1}      = TABLE.tablePlayers_forTournament;
+
+
 
 
 function displayPairingTable(hObject, eventdata, handles)
@@ -444,9 +473,10 @@ function MENU_top8_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option
 
 disp(['Going to Top 8 (Quarter finals)'])
-option.topX = 8;
-option.typeRound = 'Top';
+option.topX         = 8;
 if size(TABLE.tablePlayers_forTournament,1)>option.topX
+    option.typeRound    = 'Top';
+    option.no_top       = 1; % Set to 1st round of top
     BUT_pair_Callback(hObject, eventdata, handles)
 else
     msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
@@ -573,13 +603,21 @@ if option.boolean_Round == 0
     % Check if all results have been given
     if isempty(find(isinf(MATRICE.match_record)==1)) == 1
         option.boolean_Round = 1;
-        if option.no_round == 1
-            MATRICE.HistoryTABLE{1,1} = 0;
-            MATRICE.HistoryTABLE{1,2} = TABLE.tablePlayers_forTournament;
-        end
+%         warning('TO BE PUT AGAIN')
+%         if option.no_round == 1
+%             % MATRICE.HistoryTABLE{1,1} = 0;
+%             % MATRICE.HistoryTABLE{1,2} = TABLE.tablePlayers_forTournament;
+%             TABLE.HistoryTABLE.no_Round(1)      = 0;
+%             TABLE.HistoryTABLE{1}.typeOfRound   = option.typeRound;
+%             TABLE.HistoryTABLE{1}.standing      = TABLE.tablePlayers_forTournament;
+%         end
         computeScore();
-        MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
-        MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;
+        saveHistoryTABLE();
+        % MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
+        % MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;
+%         TABLE.HistoryTABLE(option.no_round+1).no_Round      = option.no_round;
+%         TABLE.HistoryTABLE{option.no_round+1}.typeOfRound   = option.typeRound;
+%         TABLE.HistoryTABLE{option.no_round+1}.standing      = TABLE.tablePlayers_forTournament;
     end
 else
     % msg = 'You have already entered all the scores. Go to next round !!';
