@@ -251,21 +251,14 @@ switch option.typeRound
 
             if option.no_top == 1
                 % First round of the top
-                TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
-                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);
                 saveHistoryTABLE([]);
+                TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
+                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);              
             else
-                % Following rounds in the top (except the 1st cut)
-                disp('Cut first the number of players')
-                nb_players = size(TABLE.tablePlayers_forTournament,1);
-                % update future delete players
-                player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
-                player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);            
-                table2sort = updateFinalTable(player2top, player2update);
-                saveHistoryTABLE(table2sort)
+                [table2sort,player2top]= cutTable();
+                saveHistoryTABLE(table2sort);
                 % keep only the half top for next round
                 TABLE.tablePlayers_forTournament = player2top;
-
             end
 
             TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
@@ -285,6 +278,20 @@ switch option.typeRound
          disp(msg)
          msgbox(msg,'Error','error')
 end
+
+
+function [table2sort,player2top]= cutTable()
+
+global TABLE option
+% Following rounds in the top (except the 1st cut)
+disp('Cut first the number of players')
+nb_players = size(TABLE.tablePlayers_forTournament,1);
+% update future delete players
+player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
+player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);
+table2sort = updateFinalTable(player2top, player2update);
+
+
 
 
 function saveHistoryTABLE(table2sort)
@@ -370,7 +377,7 @@ set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing);
 updateListPlayers(hObject, eventdata, handles);
 
 % Create matrice match_record to store results
-nb_match = length(MATRICE.matchID);
+nb_match = size(MATRICE.matchID,1);
 MATRICE.match_record = zeros(nb_match,1)+Inf;
 
 option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
@@ -526,8 +533,9 @@ global TABLE MATRICE option
 
 disp(['Going to Top 4 (Semi-finals)'])
 option.topX = 4;
-option.typeRound = 'Top';
-if size(TABLE.tablePlayers_forTournament,1)>option.topX
+if size(TABLE.tablePlayers_forTournament,1)>=option.topX
+    option.typeRound    = 'Top';
+    option.no_top       = 1; % Set to 1st round of top
     BUT_pair_Callback(hObject, eventdata, handles)
 else
     msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
@@ -549,7 +557,7 @@ global TABLE MATRICE option
 
 disp(['Going to Top 8 (Quarter finals)'])
 option.topX         = 8;
-if size(TABLE.tablePlayers_forTournament,1)>option.topX
+if size(TABLE.tablePlayers_forTournament,1)>=option.topX
     option.typeRound    = 'Top';
     option.no_top       = 1; % Set to 1st round of top
     BUT_pair_Callback(hObject, eventdata, handles)
@@ -689,7 +697,10 @@ if option.boolean_Round == 0
         computeScore();
         switch option.typeRound
             case 'Round'
-                saveHistoryTABLE();
+                saveHistoryTABLE();  
+            case 'Top'
+                [table2sort,~]= cutTable();
+                saveHistoryTABLE(table2sort);
         end
         % MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
         % MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;

@@ -123,11 +123,8 @@ showHandlesTournament(handles, mode);
 set(handles.BushiSoftGUI, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
 
 % Create Data
-disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament')
+disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament / Refresh Local DB')
 warning('off','all')
-BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
-
-disp('- Refresh Local Database')
 BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 warning('on','all')
 
@@ -800,7 +797,7 @@ global TABLE option
 % [~,~,data] = xlsread(default_DB_filename);
 
 % import each csv
-disp('- Importing each database')
+disp('-- Importing each database')
 dirName = '../data/playerDB';              %# folder path
 files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
 files = {files.name}';                      %'# file names
@@ -841,19 +838,20 @@ global TABLE option
 for i = 1:size(files,1)
     file_i = [default_path files{i}];
     data = csvimport(file_i,'delimiter',';');
+    disp(['--- Importing: ' file_i])
 
     column_tmp = data(1,:);
     TABLE.MEGA_tablePlayers_fromDB{i,1} = files{i};
     TABLE.MEGA_tablePlayers_fromDB{i,2} = array2table(data(2:end,:), 'VariableNames', column_tmp);
 
     % Delete ""
-    disp('- Delete false characters (like ", etc.)')
+    disp('--- Delete false characters (like ", etc.)')
     TABLE.MEGA_tablePlayers_fromDB{i,2}.name = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.name,'"','');
     TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName,'"','');
     TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo,'"','');
 
     % Capital Letters
-    disp(['- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
+    disp(['--- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
     [ TABLE.MEGA_tablePlayers_fromDB{i,2} ] = Capital_FirstLetter( TABLE.MEGA_tablePlayers_fromDB{i,2}, option.columnCapitalLetters );
 end
 
@@ -1133,12 +1131,12 @@ function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-disp('- Refreshing the local Databases')
+disp('-- Refreshing the local Databases')
 dirName = '../data/playerDB';               %# folder path
 files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
 files = {files.name}';                      %'# file names
 
-disp([num2str(size(files,1)) ' file(s) were found locally: '])
+disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
 disp(files)
 files = ['Select Database'; files];
 set(handles.POP_selectDB,'String',files)

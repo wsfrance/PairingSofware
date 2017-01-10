@@ -119,7 +119,7 @@ end
 set(handles.POP_selectRound,'String', string)
 nb_2display = size(string,1);
 set(handles.POP_selectRound,'Value', nb_2display)
-
+POP_selectRound_Callback(hObject, eventdata, handles)
 
 
 % --- Outputs from this function are returned to the command line.
