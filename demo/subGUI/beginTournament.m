@@ -260,13 +260,22 @@ switch option.typeRound
                 % keep only the half top for next round
                 TABLE.tablePlayers_forTournament = player2top;
             end
+            
+            if size(TABLE.tablePlayers_forTournament) > 1
+                TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
+                [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
+                TABLE.historyMatch_tmp(:,:) = [];
+                displayPairingTable(hObject, eventdata, handles)
 
-            TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
-            [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
-            TABLE.historyMatch_tmp(:,:) = [];
-            displayPairingTable(hObject, eventdata, handles)
-
-            option.no_top = option.no_top+1;
+                option.no_top = option.no_top+1;
+            else
+                % There is only 1 player left in the tournament. Finish the
+                % tournament
+                disp('End of the tournament')
+                % Delete the last save
+                TABLE.HistoryTABLE(end,:) = [];
+                option.boolean_Round = false;
+            end
         else
             msg = 'You need to resolve all current matches first before starting a new round !!!';
             disp(msg)
@@ -510,18 +519,10 @@ function MENU_top2_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global TABLE MATRICE option
-
-disp(['Going to Top 2 (Finals)'])
+global option
 option.topX = 2;
-option.typeRound = 'Top';
-if size(TABLE.tablePlayers_forTournament,1)>option.topX
-    BUT_pair_Callback(hObject, eventdata, handles)
-else
-    msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
-    disp(msg)
-    msgbox(msg,'Error','error')
-end
+go2Top(hObject, eventdata, handles)
+
 
 % --------------------------------------------------------------------
 function MENU_top4_Callback(hObject, eventdata, handles)
@@ -529,19 +530,9 @@ function MENU_top4_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global TABLE MATRICE option
-
-disp(['Going to Top 4 (Semi-finals)'])
+global option
 option.topX = 4;
-if size(TABLE.tablePlayers_forTournament,1)>=option.topX
-    option.typeRound    = 'Top';
-    option.no_top       = 1; % Set to 1st round of top
-    BUT_pair_Callback(hObject, eventdata, handles)
-else
-    msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
-    disp(msg)
-    msgbox(msg,'Error','error')
-end
+go2Top(hObject, eventdata, handles)
 
 
 
@@ -553,10 +544,27 @@ function MENU_top8_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global TABLE MATRICE option
+global option
+option.topX = 8;
+go2Top(hObject, eventdata, handles)
 
-disp(['Going to Top 8 (Quarter finals)'])
-option.topX         = 8;
+
+
+function go2Top(hObject, eventdata, handles)
+
+global TABLE option
+
+switch option.topX
+    case 2
+        disp('Going to Top 2 (Finals)')
+    case 4
+        disp('Going to Top 4 (Semi-finals)')
+    case 8
+        disp('Going to Top 8 (Quarter finals)')
+    otherwise
+        disp('Other top or not known')
+end
+
 if size(TABLE.tablePlayers_forTournament,1)>=option.topX
     option.typeRound    = 'Top';
     option.no_top       = 1; % Set to 1st round of top
@@ -566,8 +574,6 @@ else
     disp(msg)
     msgbox(msg,'Error','error')
 end
-
-
 
 % --------------------------------------------------------------------
 function MENU_otherTop_Callback(hObject, eventdata, handles)
