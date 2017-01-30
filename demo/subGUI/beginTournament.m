@@ -450,13 +450,23 @@ function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
 % Return selection of a cell in the Table in a callback
 cellSelect(hObject, eventdata)
 
+<<<<<<< .mine
 UITable = 'TAB_pairing';
 [ data, rows] = getCellSelect( UITable );
 
 % Convert rows to Table (if pending)
 no_table = data{rows, 3};
 disp('Display Informations about the match')
+=======
+UITable = 'TAB_pairing';
+[ data, rows] = getCellSelect( UITable );
+
+% Convert rows to Table (if pending)
+no_table = data{rows, 3};
+disp('Display Informations about the match')
+>>>>>>> .theirs
 displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
+<<<<<<< .mine
 
 
 
@@ -491,6 +501,42 @@ set(handles.TEXT_player2, 'String', namePlayer2)
 
 
 
+=======
+
+
+
+function displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
+
+global MATRICE
+
+switch MATRICE.match_record(no_table,1)
+    case 1
+        set(handles.RADIO_player1,'Value', 1);
+    case 2
+        set(handles.RADIO_player2,'Value', 1);
+    case 3
+        set(handles.RADIO_draw,'Value', 1);
+    case Inf
+        set(handles.RADIO_unenteredResult,'Value', 1);
+    otherwise
+        error('MATRICE.match_record(rows,1) not known')
+end    
+
+% Determine player 1, player 2 and their table
+player1 = MATRICE.pairingWSCode(rows,1);
+namePlayer1 = data{rows,4};
+player2 = MATRICE.pairingWSCode(rows,2);
+namePlayer2 = data{rows,6};
+% table = TABLE.pairingTable.Table(rows);
+table = handles.TAB_pairing.Data(rows,3);
+% Display in the TEXT boxes
+set(handles.EDIT_table, 'String', table)
+set(handles.TEXT_player1, 'String', namePlayer1)
+set(handles.TEXT_player2, 'String', namePlayer2)
+
+
+
+>>>>>>> .theirs
     
 function EDIT_table_Callback(hObject, eventdata, handles)
 % hObject    handle to EDIT_table (see GCBO)
