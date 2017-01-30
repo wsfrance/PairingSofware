@@ -124,6 +124,10 @@ if option.bool_Tournamentstarted == 0
     [TABLE.HistoryTABLE] = tableAllocation(nb_allocation, TABLE.HistoryTABLE, TABLE.HistoryTABLE_allocation);
     % TABLE.HistoryTABLE(:,:) = []; 
     
+    TABLE.HistoryTABLE.no_Round(1,1)      = 0;
+    TABLE.HistoryTABLE.typeOfRound{1,1}   = option.typeRound;
+    TABLE.HistoryTABLE.standing{1,1}      = TABLE.tablePlayers_forTournament;
+    
     % Set functions for Table
     disp('-- Set the callbacks of the tables')
     set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
@@ -337,7 +341,7 @@ disp('-- Create matrice match_record to store results')
 nb_match             = size(MATRICE.matchID,1);
 MATRICE.match_record = zeros(nb_match,1)+inf  ;
 option.boolean_Round = 0;  % Boolean to avoid new round if not all results have been given
-
+set2Table1(hObject, eventdata, handles)
 
 
 function [table2sort,player2top] = cutTable()
@@ -450,23 +454,13 @@ function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
 % Return selection of a cell in the Table in a callback
 cellSelect(hObject, eventdata)
 
-<<<<<<< .mine
 UITable = 'TAB_pairing';
 [ data, rows] = getCellSelect( UITable );
 
 % Convert rows to Table (if pending)
 no_table = data{rows, 3};
 disp('Display Informations about the match')
-=======
-UITable = 'TAB_pairing';
-[ data, rows] = getCellSelect( UITable );
-
-% Convert rows to Table (if pending)
-no_table = data{rows, 3};
-disp('Display Informations about the match')
->>>>>>> .theirs
 displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
-<<<<<<< .mine
 
 
 
@@ -500,43 +494,6 @@ set(handles.TEXT_player1, 'String', namePlayer1)
 set(handles.TEXT_player2, 'String', namePlayer2)
 
 
-
-=======
-
-
-
-function displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
-
-global MATRICE
-
-switch MATRICE.match_record(no_table,1)
-    case 1
-        set(handles.RADIO_player1,'Value', 1);
-    case 2
-        set(handles.RADIO_player2,'Value', 1);
-    case 3
-        set(handles.RADIO_draw,'Value', 1);
-    case Inf
-        set(handles.RADIO_unenteredResult,'Value', 1);
-    otherwise
-        error('MATRICE.match_record(rows,1) not known')
-end    
-
-% Determine player 1, player 2 and their table
-player1 = MATRICE.pairingWSCode(rows,1);
-namePlayer1 = data{rows,4};
-player2 = MATRICE.pairingWSCode(rows,2);
-namePlayer2 = data{rows,6};
-% table = TABLE.pairingTable.Table(rows);
-table = handles.TAB_pairing.Data(rows,3);
-% Display in the TEXT boxes
-set(handles.EDIT_table, 'String', table)
-set(handles.TEXT_player1, 'String', namePlayer1)
-set(handles.TEXT_player2, 'String', namePlayer2)
-
-
-
->>>>>>> .theirs
     
 function EDIT_table_Callback(hObject, eventdata, handles)
 % hObject    handle to EDIT_table (see GCBO)
@@ -548,7 +505,7 @@ function EDIT_table_Callback(hObject, eventdata, handles)
 
 disp('--------------------------------------------------------------------')
 disp('Display the chosen table')
-no_table = str2double(get(hObject,'String'));
+no_table = str2double(get(handles.EDIT_table,'String'));
 disp('Display the match Informations')
 
 UITable = 'TAB_pairing';
@@ -560,10 +517,16 @@ else
     msg = 'You have exceed the number of existing tables. Coming back to Table 1';
     disp(msg)
     msgbox(msg,'Error','error')
-    set(handles.EDIT_table, 'String', 1)
-    EDIT_table_Callback(hObject, eventdata, handles)
+    set2Table1(hObject, eventdata, handles)
 end
     
+function set2Table1(hObject, eventdata, handles)
+% Set to table 1
+table1 = 1;
+set(handles.EDIT_table, 'String', table1)
+EDIT_table_Callback(hObject, eventdata, handles)
+
+
 % --- Executes during object creation, after setting all properties.
 function EDIT_table_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to EDIT_table (see GCBO)
@@ -881,6 +844,9 @@ TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forT
 
 % 3.4- Make the ranking
 disp('** Making the ranking');
+msg = 'All the matches have been reported. You can see the new standings';
+disp(['- ' msg])
+msgbox(msg, 'Error', 'error')
 
 % Sort the data : 2nd time
 TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
