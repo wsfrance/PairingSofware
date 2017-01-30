@@ -241,15 +241,18 @@ global TABLE MATRICE option
 disp('--------------------------------------------------------------------')
 disp('Start the function to pair players')
 
+% Incremente number of rounds
+disp('- Incremente number of rounds')
+option.no_round = option.no_round + 1;
+
 % Pairing of players
 switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Round'
+        disp('Save the actual Table of tournament for replay')
         saveHistoryTABLE([]);
         if option.no_round < option.no_maxRound
             if option.boolean_Round
-                % Incremente number of rounds
-                option.no_round         = option.no_round+1; 
                 disp(['- Create Pairing for Round no.' num2str(option.no_round)])
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
                 
@@ -276,32 +279,43 @@ switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     case 'Top'
         if option.boolean_Round
+            
             % Save the current standing to the right place in HistoryTABLE
-            option.no_round = option.no_round+1; % Incremente number of rounds
-
             if option.no_top == 1
                 % First round of the top
+                disp('- 1st round of the top')
+                disp('- Save table of standings of previous round')
                 saveHistoryTABLE([]);
                 TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
                 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);              
             else
+                disp('- NOT 1st round of the top')
+                disp('- Save table of standings of previous round')
                 [table2sort,player2top]= cutTable();
                 saveHistoryTABLE(table2sort);
                 % keep only the half top for next round
+                disp('- Keep only the half top for next round')                
                 TABLE.tablePlayers_forTournament = player2top;
             end
             
+            % Pairing or not of the players
             if size(TABLE.tablePlayers_forTournament) > 1
+                % If there is more players, continue to make a pairing
+                disp('- Pair the players by Single elimination')
                 TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
                 TABLE.historyMatch_tmp(:,:) = [];
+                
+                disp('- Display the pairing table in the GUI')
                 displayPairingTable(hObject, eventdata, handles)
-
+                
+                disp('- Incremente option.no_top by 1')
                 option.no_top = option.no_top+1;
+                
             else
                 % There is only 1 player left in the tournament. Finish the
                 % tournament
-                disp('End of the tournament')
+                disp('- End of the tournament')
                 % Delete the last save
                 TABLE.HistoryTABLE(end,:) = [];
                 option.boolean_Round = false;
@@ -318,12 +332,19 @@ switch option.typeRound
          msgbox(msg,'Error','error')
 end
 
+% Create matrice match_record to store results
+disp('-- Create matrice match_record to store results')
+nb_match             = size(MATRICE.matchID,1);
+MATRICE.match_record = zeros(nb_match,1)+inf  ;
+option.boolean_Round = 0;  % Boolean to avoid new round if not all results have been given
 
-function [table2sort,player2top]= cutTable()
+
+
+function [table2sort,player2top] = cutTable()
 
 global TABLE
 % Following rounds in the top (except the 1st cut)
-disp('Cut first the number of players')
+disp('-- Cut first the number of players')
 nb_players = size(TABLE.tablePlayers_forTournament,1);
 % update future delete players
 player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
@@ -409,17 +430,65 @@ function displayPairingTable(hObject, eventdata, handles)
 % Diplay the TABLE.pairingTable in the GUI of tournament
 
 global TABLE MATRICE option    
-    
+
+disp('-- Display the table')
 TABLE.pairingTable = matchID_2_pairingTable(TABLE.tablePlayers_forTournament, TABLE.pairingTable, MATRICE.pairingWSCode, option.no_round);
 data = table2cell(TABLE.pairingTable(:,:));
 set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing);
+
+disp('-- Update the list of players')
 updateListPlayers(hObject, eventdata, handles);
 
-% Create matrice match_record to store results
-nb_match = size(MATRICE.matchID,1);
-MATRICE.match_record = zeros(nb_match,1)+Inf;
 
-option.boolean_Round    = 0;  % Boolean to avoid new round if not all results have been given
+% --- Executes when selected cell(s) is changed in TAB_pairing.
+function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
+% hObject    handle to TAB_pairing (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) currently selecteds
+% handles    structure with handles and user data (see GUIDATA)
+
+% Return selection of a cell in the Table in a callback
+cellSelect(hObject, eventdata)
+
+UITable = 'TAB_pairing';
+[ data, rows] = getCellSelect( UITable );
+
+% Convert rows to Table (if pending)
+no_table = data{rows, 3};
+disp('Display Informations about the match')
+displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
+
+
+
+function displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
+
+global MATRICE
+
+switch MATRICE.match_record(no_table,1)
+    case 1
+        set(handles.RADIO_player1,'Value', 1);
+    case 2
+        set(handles.RADIO_player2,'Value', 1);
+    case 3
+        set(handles.RADIO_draw,'Value', 1);
+    case Inf
+        set(handles.RADIO_unenteredResult,'Value', 1);
+    otherwise
+        error('MATRICE.match_record(rows,1) not known')
+end    
+
+% Determine player 1, player 2 and their table
+player1 = MATRICE.pairingWSCode(rows,1);
+namePlayer1 = data{rows,4};
+player2 = MATRICE.pairingWSCode(rows,2);
+namePlayer2 = data{rows,6};
+% table = TABLE.pairingTable.Table(rows);
+table = handles.TAB_pairing.Data(rows,3);
+% Display in the TEXT boxes
+set(handles.EDIT_table, 'String', table)
+set(handles.TEXT_player1, 'String', namePlayer1)
+set(handles.TEXT_player2, 'String', namePlayer2)
+
 
 
     
@@ -431,7 +500,24 @@ function EDIT_table_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of EDIT_table as text
 %        str2double(get(hObject,'String')) returns contents of EDIT_table as a double
 
+disp('--------------------------------------------------------------------')
+disp('Display the chosen table')
+no_table = str2double(get(hObject,'String'));
+disp('Display the match Informations')
 
+UITable = 'TAB_pairing';
+[ data, rows] = getCellSelect( UITable );
+rows = no_table;
+if no_table <= size(data,1)
+    displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
+else
+    msg = 'You have exceed the number of existing tables. Coming back to Table 1';
+    disp(msg)
+    msgbox(msg,'Error','error')
+    set(handles.EDIT_table, 'String', 1)
+    EDIT_table_Callback(hObject, eventdata, handles)
+end
+    
 % --- Executes during object creation, after setting all properties.
 function EDIT_table_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to EDIT_table (see GCBO)
@@ -617,52 +703,6 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes when selected cell(s) is changed in TAB_pairing.
-function TAB_pairing_CellSelectionCallback(hObject, eventdata, handles)
-% hObject    handle to TAB_pairing (see GCBO)
-% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
-%	Indices: row and column indices of the cell(s) currently selecteds
-% handles    structure with handles and user data (see GUIDATA)
-
-global MATRICE 
-
-% Return selection of a cell in the Table in a callback
-cellSelect(hObject, eventdata)
-
-UITable = 'TAB_pairing';
-[ data, rows] = getCellSelect( UITable );
-
-% Convert rows to Table (if pending)
-no_table = data{rows, 3};
-
-switch MATRICE.match_record(no_table,1)
-    case 1
-        set(handles.RADIO_player1,'Value', 1);
-    case 2
-        set(handles.RADIO_player2,'Value', 1);
-    case 3
-        set(handles.RADIO_draw,'Value', 1);
-    case Inf
-        set(handles.RADIO_unenteredResult,'Value', 1);
-    otherwise
-        error('MATRICE.match_record(rows,1) not known')
-end    
-
-% Determine player 1, player 2 and their table
-player1 = MATRICE.pairingWSCode(rows,1);
-namePlayer1 = data{rows,4};
-player2 = MATRICE.pairingWSCode(rows,2);
-namePlayer2 = data{rows,6};
-% table = TABLE.pairingTable.Table(rows);
-table = handles.TAB_pairing.Data(rows,3);
-% Display in the TEXT boxes
-set(handles.EDIT_table, 'String', table)
-set(handles.TEXT_player1, 'String', namePlayer1)
-set(handles.TEXT_player2, 'String', namePlayer2)
-
-
 
 
 % --- Executes on button press in BUT_saveScore.
