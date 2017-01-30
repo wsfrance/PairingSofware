@@ -220,11 +220,27 @@ filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
 filename2 = [path '/export/Pairing_Round_' num2str(option.no_round) '.pdf'];
 T = TABLE.pairingTable;
 column = option.columnTablePairing;
-exportTable2CSV( T, filename, column)
 
-export_XLS2PDF(filename, filename2, option)
+try
+    disp('Delete files if they exist')
+    delete(filename, filename2)
+    
+    disp('Export the Tables in .xls')
+    exportTable2CSV( T, filename, column)
+
+    disp('Export the Tables in .pdf')
+    export_XLS2PDF(filename, filename2, option)
+catch
+    msg = 'Close Excel and/or Acrobat to export the standing !!!!';
+    disp(msg)
+    msgbox(msg, 'Error', 'error')
+    bool = false;
+end
 
 turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+
+
+
 
 
 % --- Executes on button press in BUT_playerHistory.
