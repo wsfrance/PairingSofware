@@ -22,7 +22,7 @@ function varargout = column2displayGUI(varargin)
 
 % Edit the above text to modify the response to help column2displayGUI
 
-% Last Modified by GUIDE v2.5 12-Dec-2016 11:07:18
+% Last Modified by GUIDE v2.5 30-Jan-2017 17:42:32
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,7 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes column2displayGUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.GUI_column2display);
 
 
 % --- Outputs from this function are returned to the command line.

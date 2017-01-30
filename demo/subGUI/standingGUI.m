@@ -22,7 +22,7 @@ function varargout = standingGUI(varargin)
 
 % Edit the above text to modify the response to help standingGUI
 
-% Last Modified by GUIDE v2.5 16-Dec-2016 22:50:16
+% Last Modified by GUIDE v2.5 30-Jan-2017 17:39:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,28 +63,25 @@ guidata(hObject, handles);
 
 global TABLE option
 
+disp('- Extract the Table of data with selected columns')
+% Extract Table
 subtable = TABLE.tablePlayers_forTournament;
 
-% columnTable = subtable.Properties.VariableNames;
+% Extract the columns
 columnTable = option.column2displayStanding;
-id = strfind_idx(columnTable','historyPoint');
-columnTable(id)=[];
-id = strfind_idx(columnTable','playerId');
-columnTable(id)=[];
-% Delete historyPoints that is not of size 1 x 1
-% subtable.historyPoints = [];
-% subtable.playerId = [];
+caseInsensitiveOption = true;
+id              = strfind_idx(columnTable','historyPoint', caseInsensitiveOption);
+columnTable(id) = [];
+id              = strfind_idx(columnTable','playerId', caseInsensitiveOption);
+columnTable(id) = [];
 
-% varnames = subtable.Properties.VariableNames;
-% others = ~strcmp('Ranking',varnames);
-% varnames = ['Ranking' varnames(others) ];
-% subtable = subtable(:,varnames);
-varnames = columnTable;
-others = ~strcmp('Ranking',varnames);
-varnames = ['Ranking' varnames(others) ];
+varnames    = columnTable;
+others      = ~strcmp('Ranking',varnames);
+varnames    = ['Ranking' varnames(others) ];
 option.column2displayStanding = varnames;
 
-data = table2cell(subtable(:,option.column2displayStanding));
+% Display the data
+data        = table2cell(subtable(:,option.column2displayStanding));
 set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStanding)
 
 % Maybe to put in code
@@ -93,6 +90,7 @@ set(handles.TAB_standing, 'data', data, 'ColumnName', option.column2displayStand
 % autoResizeTable( handles.TAB_standing )
 
 % check if round is finished
+disp('- Check if round is finished')
 booleanTmp = isempty(find(TABLE.HistoryTABLE.no_Round == option.no_round));
 if booleanTmp
     % if empty, round is not recorded yet
@@ -102,9 +100,8 @@ else
 end
 string = cell(nb_max_current_round+1,1);
 string(1,1) = {'Select Round'};
-% for i = 1:nb_max_current_round-1
-%     string(i+1,1) = {['Round ' num2str(i)]};   
-% end
+
+disp('- Loop to put String into the listbox')
 for i = 1:size(TABLE.HistoryTABLE,1)
     typeRound = TABLE.HistoryTABLE.typeOfRound(i);
     str_i = ['Round ' num2str(TABLE.HistoryTABLE.no_Round(i))];
@@ -114,10 +111,10 @@ for i = 1:size(TABLE.HistoryTABLE,1)
         case 'Top'
             string(i+1,1) = {[str_i ' (Top)']}; 
         otherwise
-            disp('Not known')
+            disp(['-- typeRound Not known : ' typeRound{1}])
     end
 end
-% string = {'Select Round'; 'Round 1'; 'Round 2'};
+
 set(handles.POP_selectRound,'String', string)
 nb_2display = size(string,1);
 set(handles.POP_selectRound,'Value', nb_2display)
@@ -133,6 +130,7 @@ function varargout = standingGUI_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
 
 
 % --- Executes on button press in BUT_columnSelection.
@@ -169,16 +167,22 @@ function BUT_export_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
-[ InterfaceObj, oldpointer ] = turnOffGUI( handles );
+% [ InterfaceObj, oldpointer ] = turnOffGUI( handles );
 % Export to XLS
 path = pwd;
 filename = [path '/export/Standings_Round_' num2str(option.no_round) '.xls'];
 filename2 = [path '/export/Standings_Round_' num2str(option.no_round) '.pdf'];
 T = TABLE.tablePlayers_forTournament;
-exportTable2CSV( T, filename, option.column2displayStanding )
 
+disp('- Quit the Application')
+quitApplication ();
+
+disp('- Export standings in .xls')
+exportTable2CSV( T, filename, option.column2displayStanding, option )
+
+disp('- Export standings in .pdf')
 export_XLS2PDF(filename, filename2, option)
-turnOnGUI( handles, InterfaceObj, oldpointer )
+% turnOnGUI( handles, InterfaceObj, oldpointer )
 
 
 % T = TABLE.tablePlayers_forTournament;
@@ -204,9 +208,9 @@ function POP_selectRound_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 
-disp('Selecting Specific Round')
 round_selected = handles.POP_selectRound.Value-2;
 id = find(TABLE.HistoryTABLE.no_Round==round_selected);
+disp(['- Selecting Specific Round : ' num2str(round_selected)])
 
 if isempty(id) == 0
     subtable = TABLE.HistoryTABLE.standing{id};
@@ -218,3 +222,16 @@ else
     msgbox(msg,'Error','error')
 end
 
+
+% --- Executes when user attempts to close figure1.
+function figure1_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+delete(hObject);
+
+disp('Closing the other GUI of column to display')
+handles.fig1 = findobj(0,'Type','figure','Tag','GUI_column2display');
+close(handles.fig1)
