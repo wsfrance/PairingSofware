@@ -81,6 +81,9 @@ disp('- Change automatically the directory')
 currentpath = fileparts(mfilename('fullpath'));
 cd(currentpath)
 
+disp('- Quit the Application')
+quitApplication ();
+
 global TABLE option 
 
 % User Define
