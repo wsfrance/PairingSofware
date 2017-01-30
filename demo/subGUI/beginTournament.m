@@ -719,7 +719,8 @@ else
     % disp(msg)
     % msgbox(msg,'Error','error')
     option.boolean_Round = 0;
-    TABLE.tablePlayers_forTournament = MATRICE.HistoryTABLE{option.no_round,2}; % reload previous TABLE in the data
+    id = find(TABLE.HistoryTABLE.no_Round==option.no_round-1);
+    TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id}; % reload previous TABLE in the data
     BUT_saveScore_Callback(hObject, eventdata, handles)
 end
 
