@@ -322,7 +322,7 @@ function BUT_removePlayer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global TABLE option
+global TABLE
 
 UITable = 'TAB_players_Tournament';
 [ data, rows ] = getCellSelect( UITable );

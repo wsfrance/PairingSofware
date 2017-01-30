@@ -21,31 +21,8 @@ nb_players      = size(classement_init,1);
 
 %% 1st round
 if option.no_round == 1
-    % Divide players into 2 sub-groups
-    % Au début du tournoi, les n joueurs sont classés selon leur force. 
-    % Pour le premier tour (appelé ronde dans les tournois d'échecs), les 
-    % joueurs sont divisés en deux sous-groupes : un sous-groupe S1 composé des 
-    % joueurs 1 à n/2, et un sous-groupe S2 composé des joueurs (n/2)+1 à n.    
-    
-    middle_nbPlayers = nb_players/2; % middle position of the ranking
-    
-    if mod(nb_players,2) == 1
-        % Si le nombre n'est pas pair, créer un joueur appelé bye
-        nb_players = nb_players+1;
-        byePlayer = nb_players;
-        classement_init = 1:nb_players;
-    end
-
-    id_subGroup1        = playersID(1:middle_nbPlayers);
-    id_subGroup2        = playersID(middle_nbPlayers+1:nb_players);
-    id_subGroup1 = id_subGroup1';
-    id_subGroup2 = id_subGroup2';
-    
-    % Le premier de S1 joue contre le premier de S2, le deuxième de S1 contre 
-    % le deuxième de S2, et ainsi de suite de manière que le dernier joueur de 
-    % S1 joue contre le dernier joueur de S2.
-    pairingID = [id_subGroup1' id_subGroup2'];
-
+    % 1st Round
+    pairingID = firstRoundPairing(playersID, nb_players);
 
 else
     switch option.swissRoundType
@@ -156,6 +133,37 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ADDED FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function pairingID = firstRoundPairing(playersID, nb_players)
+    % Divide players into 2 sub-groups
+    % Au début du tournoi, les n joueurs sont classés selon leur force. 
+    % Pour le premier tour (appelé ronde dans les tournois d'échecs), les 
+    % joueurs sont divisés en deux sous-groupes : un sous-groupe S1 composé des 
+    % joueurs 1 à n/2, et un sous-groupe S2 composé des joueurs (n/2)+1 à n.    
+    
+    middle_nbPlayers = nb_players/2; % middle position of the ranking
+    
+    if mod(nb_players,2) == 1
+        % Si le nombre n'est pas pair, créer un joueur appelé bye
+        nb_players = nb_players+1;
+        byePlayer = nb_players;
+        classement_init = 1:nb_players;
+    end
+
+    id_subGroup1 = playersID(1:middle_nbPlayers);
+    id_subGroup2 = playersID(middle_nbPlayers+1:nb_players);
+    id_subGroup1 = id_subGroup1';
+    id_subGroup2 = id_subGroup2';
+    
+    % Le premier de S1 joue contre le premier de S2, le deuxième de S1 contre 
+    % le deuxième de S2, et ainsi de suite de manière que le dernier joueur de 
+    % S1 joue contre le dernier joueur de S2.
+    pairingID = [id_subGroup1' id_subGroup2'];
+
+end
+
+
+
 function [currentPlayersID, rest_tmp] = separate_OddEven_case(currentPlayersID)
     % Separate Odd and even cases of number of players
     if mod(size(currentPlayersID,1),2) == 0
@@ -187,26 +195,3 @@ function bool_mat = checkAlreadyDonePairing (pairingID_tmp,mat_HistoryMatch, ver
         end
     end
 end
-
-% function mat_HistoryMatch = updateHistoryMatch (mat_HistoryMatch,pairingID)
-% % Update mat_HistoryMatch
-%     for k = 1:size(pairingID,1)
-%         extract_match_index = pairingID(k,:);
-%         mat_HistoryMatch(extract_match_index(1),extract_match_index(2)) = mat_HistoryMatch(extract_match_index(1),extract_match_index(2))+1;
-%         mat_HistoryMatch(extract_match_index(2),extract_match_index(1)) = mat_HistoryMatch(extract_match_index(2),extract_match_index(1))+1;
-%     end
-% end
-
-% function pairingWSCode = id2WSCode(tablePlayers, pairingID)
-% 
-% [m,n] = size(pairingID);
-% for i = 1:m
-%     for j = 1:n
-%         id = find(tablePlayers.playerId == pairingID(i,j));
-%         pairingWSCode(i,j) = tablePlayers.WSCode(id);
-%     end
-% end
-% 
-% 
-% end
-

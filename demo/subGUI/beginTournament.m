@@ -97,9 +97,11 @@ if option.bool_Tournamentstarted == 0
     option.column2displayStanding = option.column2displayStandingALL;
     
     % Initialize pairingTable
+    TABLE.pairingTable_allocation = {inf inf inf 'inf, inf' inf 'inf, inf' inf []};
     TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
                                 'VariableName', option.columnTablePairing);    
     TABLE.pairingTable(:,:) = [];
+    
 
     % Initialize HistoryTable : store the standing at each round
     TABLE.HistoryTABLE = table(0,{option.typeRound}, {TABLE.tablePlayers_forTournament},'VariableName', {'no_Round', 'typeOfRound', 'standing'});  
@@ -800,13 +802,19 @@ set(handles.LIST_listPlayer, 'String', names)
 
 function pairingTable = matchID_2_pairingTable(tablePlayers_forTournament, pairingTable, pairingWSCode, round)
 
-global option
+global option TABLE
 
 % Convert matchID to Pairing Table containing the name of players
 list_WSCode = tablePlayers_forTournament.WSCode;
 [m,n] = size(pairingWSCode);
 
-pairingTable(:,:) = [];
+% pairingTable(:,:) = [];
+% pairingTable_allocation = {inf inf inf 'inf, inf' inf 'inf, inf' inf []};
+% variableName = pairingTable.Properties.VariableNames;
+% pairingTable(1,:) = cell2table(TABLE.pairingTable_allocation);
+% pairingTable = repmat(cell2table(TABLE.pairingTable_allocation),m,1);
+pairingTable = tableAllocation(m, pairingTable, TABLE.pairingTable_allocation);
+
 
 % Loop for all pairings
 for i = 1:m
@@ -908,4 +916,5 @@ filename = [filepath '\results\finalResult.mat'];
 save(filename,'TABLE','MATRICE','option')
 
 % Compress into a zip file
+
 
