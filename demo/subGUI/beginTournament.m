@@ -69,18 +69,26 @@ disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
 global TABLE MATRICE option
 
+disp('--------------------------------------------------------------------')
+disp('Start the Tournament Core')
+
 % Set title
+disp('- Set the title of the window')
 set(handles.beginTournament, 'Name', 'Tournament (by malganis35)');
 
+disp('- Look if we start from a save file or a new tournament')
 if option.bool_Tournamentstarted == 0
     
+    disp('-- This is a new tournament. Set boolean to 1 and typeRound = Round')
     option.bool_Tournamentstarted = 1;
     option.typeRound = 'Round';
     
     % Update the list of players in handles.LIST_listPlayer
+    disp('-- Update the list of Players in the handles.LIST_listPlayer')
     updateListPlayers(hObject, eventdata, handles);
 
     % Make a cross-table of already done match (such that a match cannot be 'redone')
+    disp('-- Initialize the subTables and a Matrice to store already done match (such that a match cannot be re-done)')
     nb_players               = size(TABLE.tablePlayers_forTournament,1);
     MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
     [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
@@ -88,15 +96,18 @@ if option.bool_Tournamentstarted == 0
     MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
 
     % Players for Tournament
+    disp('-- Initialize the table tablePlayers_forTournament')
     TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
 
     % Show in Standing GUI
+    disp('-- Set the option of columns to display')
     columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
     option.Bool_column2displayStanding = true(size(columnTable,2),1);
     option.column2displayStandingALL = TABLE.tablePlayers_forTournament.Properties.VariableNames;
     option.column2displayStanding = option.column2displayStandingALL;
     
     % Initialize pairingTable
+    disp('-- Initialize the table pairingTable and its allocation')
     TABLE.pairingTable_allocation = {inf inf inf 'inf, inf' inf 'inf, inf' inf []};
     TABLE.pairingTable = table(1,1,1,{'temp'},1,{'temp'},1,{'temp'},...
                                 'VariableName', option.columnTablePairing);    
@@ -104,10 +115,12 @@ if option.bool_Tournamentstarted == 0
     
 
     % Initialize HistoryTable : store the standing at each round
+    disp('-- Initialize the table HistoryTable to store the standing at each round')
     TABLE.HistoryTABLE = table(0,{option.typeRound}, {TABLE.tablePlayers_forTournament},'VariableName', {'no_Round', 'typeOfRound', 'standing'});  
     % TABLE.HistoryTABLE(:,:) = []; 
     
     % Set functions for Table
+    disp('-- Set the callbacks of the tables')
     set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
     % set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
     % set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback); 
@@ -220,6 +233,9 @@ function BUT_pair_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option 
 
+disp('--------------------------------------------------------------------')
+disp('Start the function to pair players')
+
 % Pairing of players
 switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -228,20 +244,21 @@ switch option.typeRound
         if option.no_round < option.no_maxRound
             if option.boolean_Round
                 option.no_round         = option.no_round+1; % Incremente number of rounds
-                disp(['Create Pairing for Round no.' num2str(option.no_round)])
+                disp(['- Create Pairing for Round no.' num2str(option.no_round)])
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
 
                 % display pairing table
+                disp('- Display the pairing table in the GUI')
                 displayPairingTable(hObject, eventdata, handles)
 
             else
                 msg = 'You need to resolve all current matches first before starting a new round !!!';
-                disp(msg)
+                disp(['- ' msg])
                 msgbox(msg, 'Error','error');
             end
         else
             msg = 'You have reached the maximum number of rounds. Go now to Top';
-            disp(msg)
+            disp(['- ' msg])
             msgbox(msg)
         end
     
@@ -280,20 +297,20 @@ switch option.typeRound
             end
         else
             msg = 'You need to resolve all current matches first before starting a new round !!!';
-            disp(msg)
+            disp(['- ' msg])
             msgbox(msg, 'Error','error');
         end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     otherwise        
          msg = 'Not implemented yet';
-         disp(msg)
+         disp(['- ' msg])
          msgbox(msg,'Error','error')
 end
 
 
 function [table2sort,player2top]= cutTable()
 
-global TABLE option
+global TABLE
 % Following rounds in the top (except the 1st cut)
 disp('Cut first the number of players')
 nb_players = size(TABLE.tablePlayers_forTournament,1);
