@@ -231,41 +231,13 @@ delete(filename, filename2)
 
 % Export to XLS
 disp('- Export the Tables in .xls')
-exportTable2CSV( T, filename, column);
+exportTable2CSV( T, filename, column, option);
 
 % Export to PDF
 disp('- Export the Tables in .pdf')
 export_XLS2PDF(filename, filename2, option);
 
 % turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
-
-
-function quitApplication ()
-disp('- Quit Excel')
-try
-	% See if there is an existing instance of Excel running.
-	% If Excel is NOT running, this will throw an error and send us to the catch block below.
-	Excel = actxGetRunningServer('Excel.Application');
-	% If there was no error, then we were able to connect to it.
-	Excel.Quit; % Shut down Excel.
-    
-    Quit(Excel)
-    delete(Excel)
-    disp('-- Success')
-catch
-	% No instance of Excel is currently running.
-    disp('-- Fail')
-end
-
-disp('- Quit Acrobat')
-try
-    dos('taskkill /F /IM Acrobat.exe');
-    disp('-- Success')
-catch
-    disp('-- Fail')
-end
-
-
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)
@@ -853,9 +825,11 @@ function BUT_showStandings_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_showStandings (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global TABLE
+% global TABLE
 
-TABLE.tablePlayers_forTournament
+% TABLE.tablePlayers_forTournament
+disp('--------------------------------------------------------------------')
+disp('Display the Standing')
 standingGUI
 
 
