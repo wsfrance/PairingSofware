@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 28-Dec-2016 19:51:24
+% Last Modified by GUIDE v2.5 30-Jan-2017 17:53:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -81,9 +81,6 @@ disp('- Change automatically the directory')
 currentpath = fileparts(mfilename('fullpath'));
 cd(currentpath)
 
-disp('- Quit the Application')
-quitApplication ();
-
 global TABLE option 
 
 % User Define
@@ -116,6 +113,9 @@ option.sortOrderDB = 'ascend';
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
 addPath_bushisoft( option.verbose );
+
+disp('- Quit the Application')
+quitApplication ();
 
 % Visibility off for tournament
 disp('- Visibility off for tournament elements of GUI')
@@ -411,28 +411,28 @@ function MENU_newPlayer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_newPlayer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editPlayerInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_loadFromDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_loadFromDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_versionInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_versionInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_quit_Callback(hObject, eventdata, handles)
@@ -446,7 +446,7 @@ function MENU_openTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_openTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_createNewTournament_Callback(hObject, eventdata, handles)
@@ -460,32 +460,43 @@ function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editCurrentTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_printPlayerList_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_printPlayerList (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-disp('Printing Player list')
 
-global TABLE option
+futureFunctionalityMsg()
+
+% disp('Printing Player list')
+
+% global TABLE option
 
 
-handlesFigure = handles.BushiSoftGUI;
-[ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+% handlesFigure = handles.BushiSoftGUI;
+% [ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
 
-% Export to XLS
-path = pwd;
-filename = [path '/export/PlayerList.xls'];
-filename2 = [path '/export/PlayerList.pdf'];
-T = TABLE.tablePlayers_forTournament;
-column = option.columnTableDB;
-exportTable2CSV( T, filename, column)
+% disp('- Quit the Application')
+% quitApplication ();
+% 
+% % Export to XLS
+% path = pwd;
+% filename = [path '/export/PlayerList.xls'];
+% filename2 = [path '/export/PlayerList.pdf'];
+% T = TABLE.tablePlayers_forTournament;
+% column = option.columnTableDB;
+% 
+% disp('- Delete files if they exist')
+% delete(filename, filename2)
+% 
+% 
+% exportTable2CSV( T, filename, column, option)
+% 
+% export_XLS2PDF(filename, filename2, option)
 
-export_XLS2PDF(filename, filename2, option)
-
-turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+% turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
 
 
 
@@ -585,14 +596,17 @@ function MENU_help_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
+
 % --------------------------------------------------------------------
 function MENU_contactUs_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_contactUs (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-email = 'caotri.do88@gmail.com';
-url = ['mailto:',email];
-web(url)
+
+futureFunctionalityMsg()
+% email = 'caotri.do88@gmail.com';
+% url = ['mailto:',email];
+% web(url)
 
 
 % --------------------------------------------------------------------
@@ -714,14 +728,14 @@ function MENU_saveDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_saveDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_configSQLServer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_configSQLServer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_postFacebook_Callback(hObject, eventdata, handles)
@@ -729,25 +743,26 @@ function MENU_postFacebook_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-url = 'http://www.mathworks.com';
-web(url,'-browser')
-
-
-thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
-thingSpeakWriteURL = thingSpeakURL;
-writeApiKey = '1870359846540179';
-fieldName = 'field1';
-fieldValue = 42;
-response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
-
-% test for matlab online
-thingSpeakURL = 'http://api.thingspeak.com/';
-thingSpeakWriteURL = [thingSpeakURL 'update'];
-writeApiKey = '19M8YL1FP1ADB3Q4'; % 'Your Write API Key';
-data = 42;
-data = num2str(data);
-data = ['api_key=',writeApiKey,'&field1=',data];
-response = webwrite(thingSpeakWriteURL,data)
+futureFunctionalityMsg()
+% url = 'http://www.mathworks.com';
+% web(url,'-browser')
+% 
+% 
+% thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
+% thingSpeakWriteURL = thingSpeakURL;
+% writeApiKey = '1870359846540179';
+% fieldName = 'field1';
+% fieldValue = 42;
+% response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+% 
+% % test for matlab online
+% thingSpeakURL = 'http://api.thingspeak.com/';
+% thingSpeakWriteURL = [thingSpeakURL 'update'];
+% writeApiKey = '19M8YL1FP1ADB3Q4'; % 'Your Write API Key';
+% data = 42;
+% data = num2str(data);
+% data = ['api_key=',writeApiKey,'&field1=',data];
+% response = webwrite(thingSpeakWriteURL,data)
 
 
 
@@ -756,21 +771,21 @@ function MENU_preferences_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_preferences (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_manageDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_manageDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_retrieveSpecificDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_retrieveSpecificDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg()
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -859,7 +874,9 @@ for i = 1:size(files,1)
 end
 
 if option.tmp.createTournamentBool == false
-    TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{1,2}(1,:);
+    disp('-- Create the variable TABLE.tablePlayers_forTournament')
+    id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), 'fileforsw.csv');
+    TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{id,2}(1,:);
     TABLE.tablePlayers_forTournament(:,:) = [];
 end
 
@@ -940,8 +957,8 @@ end
 
 
 % --------------------------------------------------------------------
-function update_dbCSV_Callback(hObject, eventdata, handles)
-% hObject    handle to update_dbCSV (see GCBO)
+function MENU_update_dbCSV_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_update_dbCSV (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -969,7 +986,9 @@ function BUT_addPlayerBarcode_Callback(hObject, eventdata, handles)
 
 % Please download and build the core and javase parts of zxing
 % from here - http://code.google.com/p/zxing/
-barcodeScannerGUI
+
+futureFunctionalityMsg()
+% barcodeScannerGUI
 
 
 % --- Executes on selection change in POP_sortOrder.
@@ -1126,6 +1145,8 @@ function MENU_update_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_update (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+futureFunctionalityMsg()
 
 
 % --- Executes on button press in BUT_refreshLocalDB.
