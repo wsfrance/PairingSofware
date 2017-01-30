@@ -146,7 +146,7 @@ function MENU_print_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_print (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-printpreview
+% printpreview
 
 
 % --- Executes on key press with focus on TAB_standing and none of its controls.
@@ -172,7 +172,8 @@ global TABLE option
 path = pwd;
 filename = [path '/export/Standings_Round_' num2str(option.no_round) '.xls'];
 filename2 = [path '/export/Standings_Round_' num2str(option.no_round) '.pdf'];
-T = TABLE.tablePlayers_forTournament;
+% T = TABLE.tablePlayers_forTournament;
+T = TABLE.HistoryTABLE{option.round_selected, 3}{1};
 
 disp('- Quit the Application')
 quitApplication ();
@@ -209,6 +210,7 @@ function POP_selectRound_Callback(hObject, eventdata, handles)
 global TABLE MATRICE option
 
 round_selected = handles.POP_selectRound.Value-2;
+option.round_selected = round_selected;
 id = find(TABLE.HistoryTABLE.no_Round==round_selected);
 disp(['- Selecting Specific Round : ' num2str(round_selected)])
 
