@@ -46,7 +46,7 @@ delete(h)
 
 % close(hWait) 
 
-fclose('all')
+fclose('all');
 
 end
 

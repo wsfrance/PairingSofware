@@ -211,35 +211,59 @@ function BUT_printMenu_Callback(hObject, eventdata, handles)
 
 global TABLE option
 
-handlesFigure = handles.beginTournament;
-[ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+% handlesFigure = handles.beginTournament;
+% [ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+
+disp('--------------------------------------------------------------------')
+disp('Export the pairing in .XLS and .PDF')
+
+path        = pwd;
+filename    = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
+filename2   = [path '/export/Pairing_Round_' num2str(option.no_round) '.pdf'];
+T           = TABLE.pairingTable;
+column      = option.columnTablePairing;
+
+disp('- Quit the Application')
+quitApplication ();
+
+disp('- Delete files if they exist')
+delete(filename, filename2)
 
 % Export to XLS
-path = pwd;
-filename = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
-filename2 = [path '/export/Pairing_Round_' num2str(option.no_round) '.pdf'];
-T = TABLE.pairingTable;
-column = option.columnTablePairing;
+disp('- Export the Tables in .xls')
+exportTable2CSV( T, filename, column);
 
+% Export to PDF
+disp('- Export the Tables in .pdf')
+export_XLS2PDF(filename, filename2, option);
+
+% turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+
+
+function quitApplication ()
+disp('- Quit Excel')
 try
-    disp('Delete files if they exist')
-    delete(filename, filename2)
+	% See if there is an existing instance of Excel running.
+	% If Excel is NOT running, this will throw an error and send us to the catch block below.
+	Excel = actxGetRunningServer('Excel.Application');
+	% If there was no error, then we were able to connect to it.
+	Excel.Quit; % Shut down Excel.
     
-    disp('Export the Tables in .xls')
-    exportTable2CSV( T, filename, column)
-
-    disp('Export the Tables in .pdf')
-    export_XLS2PDF(filename, filename2, option)
+    Quit(Excel)
+    delete(Excel)
+    disp('-- Success')
 catch
-    msg = 'Close Excel and/or Acrobat to export the standing !!!!';
-    disp(msg)
-    msgbox(msg, 'Error', 'error')
-    bool = false;
+	% No instance of Excel is currently running.
+    disp('-- Fail')
 end
 
-turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
-
-
+disp('- Quit Acrobat')
+try
+    dos('taskkill /F /IM Acrobat.exe');
+    disp('-- Success')
+catch
+    disp('-- Fail')
+end
 
 
 
@@ -649,7 +673,7 @@ function MENU_showStandings_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_showStandings (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+BUT_showStandings_Callback(hObject, eventdata, handles)
 
 % --------------------------------------------------------------------
 function MENU_exit_Callback(hObject, eventdata, handles)
