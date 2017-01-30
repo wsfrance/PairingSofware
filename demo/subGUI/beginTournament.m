@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 28-Dec-2016 17:10:07
+% Last Modified by GUIDE v2.5 25-Jan-2017 15:28:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -884,4 +884,27 @@ for i = 1:size(MATRICE.pairingWSCode,1)
             disp(['FAIL: Message sent to ' recipients2{1}])
         end
 end
+
+
+
+% --------------------------------------------------------------------
+function MENU_send_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_send (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_sendReport_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_sendReport (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE MATRICE option
+
+filepath = pwd;
+filename = [filepath '\results\finalResult.mat'];
+save(filename,'TABLE','MATRICE','option')
+
+% Compress into a zip file
 
