@@ -142,22 +142,23 @@ end
 end
 
 
-
-
-
-
 function pairingID = monrad(playersID, nb_players, mat_HistoryMatch)
+% Pair players according to the Monrad System
+% Players are paired with the players that is the closest to him if they do
+% not have played already againt each other
 
-
+% Allocate
 boolPlayer = false(nb_players,1);
 counter = 1;
 pairingID = []; % Allocation to change
+
+% Loop for all players
 for i = 1:nb_players
     if boolPlayer(i)==0
         pairingID(counter,1) = playersID(i);
         boolPlayer(i) = true;
         bool_opponent = false;
-        % find opponent
+        % Loop to find opponent
         j = 1;
         while bool_opponent==false
             if boolPlayer(j)==0

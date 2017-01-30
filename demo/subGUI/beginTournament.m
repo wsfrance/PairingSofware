@@ -92,8 +92,10 @@ if option.bool_Tournamentstarted == 0
     nb_players               = size(TABLE.tablePlayers_forTournament,1);
     MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
     [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
-
-    MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
+    TABLE.historyMatch_tmp_allocation = {'inf' 'inf' 'inf' 'inf' inf inf};
+    
+    
+    % MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
 
     % Players for Tournament
     disp('-- Initialize the table tablePlayers_forTournament')
@@ -117,6 +119,9 @@ if option.bool_Tournamentstarted == 0
     % Initialize HistoryTable : store the standing at each round
     disp('-- Initialize the table HistoryTable to store the standing at each round')
     TABLE.HistoryTABLE = table(0,{option.typeRound}, {TABLE.tablePlayers_forTournament},'VariableName', {'no_Round', 'typeOfRound', 'standing'});  
+    TABLE.HistoryTABLE_allocation = {inf 'inf' []};
+    nb_allocation = option.no_round + 3;
+    [TABLE.HistoryTABLE] = tableAllocation(nb_allocation, TABLE.HistoryTABLE, TABLE.HistoryTABLE_allocation);
     % TABLE.HistoryTABLE(:,:) = []; 
     
     % Set functions for Table
@@ -243,10 +248,16 @@ switch option.typeRound
         saveHistoryTABLE([]);
         if option.no_round < option.no_maxRound
             if option.boolean_Round
-                option.no_round         = option.no_round+1; % Incremente number of rounds
+                % Incremente number of rounds
+                option.no_round         = option.no_round+1; 
                 disp(['- Create Pairing for Round no.' num2str(option.no_round)])
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
-
+                
+                % Allocate TABLE.historyMatch_tmp
+                disp('- Allocate TABLE.historyMatch_tmp')
+                nb_match = size(MATRICE.matchID,1);
+                TABLE.historyMatch_tmp = tableAllocation(nb_match, TABLE.historyMatch_tmp, TABLE.historyMatch_tmp_allocation);
+                
                 % display pairing table
                 disp('- Display the pairing table in the GUI')
                 displayPairingTable(hObject, eventdata, handles)
@@ -395,10 +406,10 @@ TABLE.tablePlayers_FINAL = table2sort;
 
 
 function displayPairingTable(hObject, eventdata, handles)
+% Diplay the TABLE.pairingTable in the GUI of tournament
 
 global TABLE MATRICE option    
     
-disp('Display Pairing in UITable')
 TABLE.pairingTable = matchID_2_pairingTable(TABLE.tablePlayers_forTournament, TABLE.pairingTable, MATRICE.pairingWSCode, option.no_round);
 data = table2cell(TABLE.pairingTable(:,:));
 set(handles.TAB_pairing, 'data',data, 'ColumnName', option.columnTablePairing);

@@ -40,8 +40,8 @@ for i = 1:size(tablePlayers_forTournament,1)
     % Note:
     % The fighter with a higher Opponent Match Win % wins the tiebreaker. 
     % If a fighter had any byes, exclude that round from the calculation.
-    warning('Still need for Opp_MW to excude byes from calculation')
 end
+warning('Still need for Opp_MW to exclude byes from calculation')
 
 
 end
