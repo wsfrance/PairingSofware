@@ -1,4 +1,4 @@
-function [ output_args ] = exportTable2CSV( T, filename, order_column )
+function [ output_args ] = exportTable2CSV( T, filename, order_column, option )
 %EXPORTTABLE2CSV Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -18,12 +18,12 @@ if exist(filename, 'file') == 2
 end
 
 % Write Tournament name
-A = {'Tournament name - Round no.'};
+A = {[option.tournamentInfo.name ' - Round no.' num2str(option.no_round)]};
 sheet = 1;
 xlRange = 'A1';
 xlswrite2(filename,A,sheet,xlRange)
 
-B = {'Date:'};
+B = {['Date: ' option.tournamentInfo.date]};
 xlRange = 'A2';
 xlswrite(filename,B,sheet,xlRange)
 

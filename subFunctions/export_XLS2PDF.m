@@ -6,6 +6,10 @@ hExcel = actxserver('Excel.Application');
 % hWorkbook = hExcel.Workbooks.Open(sprintf('%s','C:\test.xlsx'));
 hWorkbook = hExcel.Workbooks.Open(sprintf('%s',filename));
 hWorksheet = hWorkbook.Sheets.Item(1);
+
+% Landscape
+% hWorksheet.PageSetup.Orientation = 1; 
+
 % print this sheet to PDF
 hWorksheet.ExportAsFixedFormat('xlTypePDF',filename2);
 % open file externally
