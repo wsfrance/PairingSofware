@@ -639,14 +639,14 @@ function MENU_adjustPairingManually_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_adjustPairingManually (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_resetCurrentRound_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_resetCurrentRound (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_showStandings_Callback(hObject, eventdata, handles)
@@ -729,14 +729,14 @@ function MENU_otherTop_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_otherTop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg()
 
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg( )
 
 % --- Executes on button press in BUT_saveScore.
 function BUT_saveScore_Callback(hObject, eventdata, handles)
@@ -887,7 +887,7 @@ function BUT_startTimer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg()
 % stopwatch;
 
 
