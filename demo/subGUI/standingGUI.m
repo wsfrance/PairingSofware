@@ -113,6 +113,8 @@ for i = 1:size(TABLE.HistoryTABLE,1)
             string(i+1,1) = {str_i};  
         case 'Top'
             string(i+1,1) = {[str_i ' (Top)']}; 
+        otherwise
+            disp('Not known')
     end
 end
 % string = {'Select Round'; 'Round 1'; 'Round 2'};

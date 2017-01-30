@@ -273,11 +273,13 @@ switch option.typeRound
                 msg = 'You need to resolve all current matches first before starting a new round !!!';
                 disp(['- ' msg])
                 msgbox(msg, 'Error','error');
+                option.no_round = option.no_round - 1;
             end
         else
             msg = 'You have reached the maximum number of rounds. Go now to Top';
             disp(['- ' msg])
             msgbox(msg)
+            option.no_round = option.no_round - 1;
         end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -328,12 +330,14 @@ switch option.typeRound
             msg = 'You need to resolve all current matches first before starting a new round !!!';
             disp(['- ' msg])
             msgbox(msg, 'Error','error');
+            option.no_round = option.no_round - 1;
         end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     otherwise        
          msg = 'Not implemented yet';
          disp(['- ' msg])
          msgbox(msg,'Error','error')
+         option.no_round = option.no_round - 1;
 end
 
 % Create matrice match_record to store results
@@ -991,10 +995,42 @@ function MENU_sendReport_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 
+disp('--------------------------------------------------------------------')
+disp('Sending the report')
+
+disp('- Extract the date of now')
+formatOut = 'yyyy/mm/dd';
+date2 = datestr(datetime('today'),formatOut);
+formatOut = 'yyyymmdd';
+date1 = datestr(datetime('today'),formatOut);
+
+disp('- Save the global variable TABLE MATRICE and option to a .mat file to send')
 filepath = pwd;
-filename = [filepath '\results\finalResult.mat'];
+filename = [filepath '/results/' date1 '_config.mat'];
 save(filename,'TABLE','MATRICE','option')
 
 % Compress into a zip file
+% To be put in the future
 
+disp('- Configure the mail adress to send :')
+recipients  = 'pairing.software@gmail.com';
+subject     = [date2 ' Report of tournament : ' option.tournamentInfo.name];
+message     = 'Here is the report';
+attachments = {filename};
+
+disp(['-- ' recipients])
+disp(['-- ' subject])
+disp(['-- ' message])
+disp('-- File Attached')
+disp(attachments)
+
+disp('- Send with the Gmail adress pairing.software@gmail.com')
+try
+    sendGmail( recipients, subject, message, attachments )
+    msg = ['Report has been sent successfully to: ' recipients];
+catch
+    msg = ['FAIL : Report cannot be sent to: ' recipients];
+end
+disp(['- ' msg])
+msgbox(msg, 'Error', 'error')
 
