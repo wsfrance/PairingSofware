@@ -250,7 +250,7 @@ function BUT_playerHistory_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_playerHistory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( input_args )
+futureFunctionalityMsg( handles )
 
 
 
@@ -291,14 +291,20 @@ switch option.typeRound
 
             else
                 msg = 'You need to resolve all current matches first before starting a new round !!!';
-                disp(['- ' msg])
-                msgbox(msg, 'Error','error');
+                handles_i = handles.TXT_error;
+                prefix = '- ';
+                displayErrorMsg( msg, handles_i, prefix )
+                % disp(['- ' msg])
+                % msgbox(msg, 'Error','error');
                 option.no_round = option.no_round - 1;
             end
         else
             msg = 'You have reached the maximum number of rounds. Go now to Top';
-            disp(['- ' msg])
-            msgbox(msg)
+            handles_i = handles.TXT_error;
+            prefix = '- ';
+            displayErrorMsg( msg, handles_i, prefix )
+            % disp(['- ' msg])
+            % msgbox(msg)
             option.no_round = option.no_round - 1;
         end
     
@@ -348,15 +354,21 @@ switch option.typeRound
             end
         else
             msg = 'You need to resolve all current matches first before starting a new round !!!';
-            disp(['- ' msg])
-            msgbox(msg, 'Error','error');
+            handles_i = handles.TXT_error;
+            prefix = '- ';
+            displayErrorMsg( msg, handles_i, prefix )
+            % disp(['- ' msg])
+            % msgbox(msg, 'Error','error');
             option.no_round = option.no_round - 1;
         end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     otherwise        
          msg = 'Not implemented yet';
-         disp(['- ' msg])
-         msgbox(msg,'Error','error')
+         handles_i = handles.TXT_error;
+         prefix = '- ';
+         displayErrorMsg( msg, handles_i, prefix )        
+         % disp(['- ' msg])
+         % msgbox(msg,'Error','error')
          option.no_round = option.no_round - 1;
 end
 
@@ -539,8 +551,11 @@ if no_table <= size(data,1)
     displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
 else
     msg = 'You have exceed the number of existing tables. Coming back to Table 1';
-    disp(msg)
-    msgbox(msg,'Error','error')
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)
+    % msgbox(msg,'Error','error')
     set2Table1(hObject, eventdata, handles)
 end
     
@@ -639,14 +654,14 @@ function MENU_adjustPairingManually_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_adjustPairingManually (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_resetCurrentRound_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_resetCurrentRound (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_showStandings_Callback(hObject, eventdata, handles)
@@ -720,8 +735,11 @@ if size(TABLE.tablePlayers_forTournament,1)>=option.topX
     BUT_pair_Callback(hObject, eventdata, handles)
 else
     msg = 'Not enough player in the tournament to make a top 8. Lower the number of player in your top';
-    disp(msg)
-    msgbox(msg,'Error','error')
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)
+    % msgbox(msg,'Error','error')
 end
 
 % --------------------------------------------------------------------
@@ -729,7 +747,7 @@ function MENU_otherTop_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_otherTop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
@@ -871,8 +889,11 @@ TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forT
 % 3.4- Make the ranking
 disp('** Making the ranking');
 msg = 'All the matches have been reported. You can see the new standings';
-disp(['- ' msg])
-msgbox(msg, 'Error', 'error')
+handles_i = handles.TXT_error;
+prefix = '- ';
+displayErrorMsg( msg, handles_i, prefix )
+% disp(['- ' msg])
+% msgbox(msg, 'Error', 'error')
 
 % Sort the data : 2nd time
 TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
@@ -887,7 +908,7 @@ function BUT_startTimer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 % stopwatch;
 
 
@@ -1055,6 +1076,9 @@ try
 catch
     msg = ['FAIL : Report cannot be sent to: ' recipients];
 end
-disp(['- ' msg])
-msgbox(msg, 'Error', 'error')
+handles_i = handles.TXT_error;
+prefix = '';
+displayErrorMsg( msg, handles_i, prefix )
+% disp(['- ' msg])
+% msgbox(msg, 'Error', 'error')
 

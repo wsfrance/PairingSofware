@@ -315,20 +315,26 @@ if isempty(data)~=1
         else
             bool_msg = true;
             msg = 'Player is already in the tournament';
-            disp(msg)
-           
-            set(handles.TXT_error,'String',msg);
+            handles_i = handles.TXT_error;
+            prefix = '';
+            displayErrorMsg( msg, handles_i, prefix )            
+            % disp(msg)
+            % set(handles.TXT_error,'String',msg);
+            
         end
     end
-    if bool_msg
-         msgbox(msg,'Error','error')
-    end
+    % if bool_msg
+    %      msgbox(msg,'Error','error')
+    % end
 else
     % If no player in the DB, it is an error
     msg = 'There is no player in the DB !!';
-    disp(msg)
-    msgbox(msg,'Error','error')
-    set(handles.TXT_error,'String',msg);
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)
+    % msgbox(msg,'Error','error')
+    % set(handles.TXT_error,'String',msg);
 end
     
     
@@ -359,9 +365,12 @@ if isempty(data)~=1
 else
     % If no player in the tournament list, it is an error
     msg = 'There is no player in the tournament';
-    disp(msg)
-    msgbox(msg,'Error','error')
-    set(handles.TXT_error,'String',msg);
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)
+    % msgbox(msg,'Error','error')
+    % set(handles.TXT_error,'String',msg);
 end
 
 
@@ -424,28 +433,28 @@ function MENU_newPlayer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_newPlayer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editPlayerInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_loadFromDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_loadFromDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_versionInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_versionInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_quit_Callback(hObject, eventdata, handles)
@@ -459,7 +468,7 @@ function MENU_openTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_openTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_createNewTournament_Callback(hObject, eventdata, handles)
@@ -473,7 +482,7 @@ function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editCurrentTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_printPlayerList_Callback(hObject, eventdata, handles)
@@ -481,7 +490,7 @@ function MENU_printPlayerList_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % disp('Printing Player list')
 
@@ -542,9 +551,12 @@ if size(TABLE.tablePlayers_forTournament,1)>1
     beginTournament
 else
     msg = 'There is not enough players in the tournament. Add some players first (at least 2)';
-    disp(msg)  
-    msgbox(msg, 'Error','error');
-    set(handles.TXT_error,'String',msg);
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)  
+    % msgbox(msg, 'Error','error');
+    % set(handles.TXT_error,'String',msg);
 end
 
 
@@ -616,7 +628,7 @@ function MENU_contactUs_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 % email = 'caotri.do88@gmail.com';
 % url = ['mailto:',email];
 % web(url)
@@ -741,14 +753,14 @@ function MENU_saveDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_saveDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_configSQLServer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_configSQLServer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_postFacebook_Callback(hObject, eventdata, handles)
@@ -756,7 +768,7 @@ function MENU_postFacebook_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 % url = 'http://www.mathworks.com';
 % web(url,'-browser')
 % 
@@ -784,21 +796,21 @@ function MENU_preferences_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_preferences (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_manageDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_manageDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 % --------------------------------------------------------------------
 function MENU_retrieveSpecificDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_retrieveSpecificDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1000,7 +1012,7 @@ function BUT_addPlayerBarcode_Callback(hObject, eventdata, handles)
 % Please download and build the core and javase parts of zxing
 % from here - http://code.google.com/p/zxing/
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 % barcodeScannerGUI
 
 
@@ -1124,9 +1136,12 @@ global TABLE option
 
 if isempty(TABLE.tablePlayers_forTournament) == 1
     msg = 'Error : Put players in the tournament list first !!';
-    disp(msg)
-    msgbox(msg,'Error', 'error')
-    set(handles.TXT_error,'String',msg);
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+    % disp(msg)
+    % msgbox(msg,'Error', 'error')
+    % set(handles.TXT_error,'String',msg);
 else
     
     prompt = {'Enter name to save the Database'};
@@ -1146,9 +1161,12 @@ else
             BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
         catch
             msg = 'This is not a valid name. Do it again !!!';
-            disp(msg)
-            msgbox(msg,'Error','error')
-            set(handles.TXT_error,'String',msg);
+            handles_i = handles.TXT_error;
+            prefix = '';
+            displayErrorMsg( msg, handles_i, prefix )
+            % disp(msg)
+            % msgbox(msg,'Error','error')
+            % set(handles.TXT_error,'String',msg);
         end
     end
 end
@@ -1159,7 +1177,7 @@ function MENU_update_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg()
+futureFunctionalityMsg(handles)
 
 
 % --- Executes on button press in BUT_refreshLocalDB.
