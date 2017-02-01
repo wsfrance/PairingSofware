@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 01-Feb-2017 19:59:04
+% Last Modified by GUIDE v2.5 01-Feb-2017 20:32:18
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -585,10 +585,18 @@ function MENU_contactUs_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
 % email = 'caotri.do88@gmail.com';
 % url = ['mailto:',email];
 % web(url)
+
+% Ask the user its information
+[ ~, msg ] = contactUs(  );
+
+handles_i = handles.TXT_error;
+prefix = '';
+displayErrorMsg( msg, handles_i, prefix )
+
 
 
 % --------------------------------------------------------------------
@@ -599,6 +607,13 @@ function MENU_wsfrance_Callback(hObject, eventdata, handles)
 url = 'http://www.ws-france.fr';
 web(url,'-browser')
 
+% --------------------------------------------------------------------
+function MENU_wsitalia_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_wsitalia (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+url = 'http://www.wseleague.com/';
+web(url,'-browser')
 
 
 function EDIT_searchPlayer_Callback(hObject, eventdata, handles)
@@ -1261,4 +1276,5 @@ if answer
 else
     disp('Application is not closed')
 end
+
 
