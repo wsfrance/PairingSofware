@@ -821,7 +821,7 @@ if option.boolean_Round == 0
 %             TABLE.HistoryTABLE{1}.typeOfRound   = option.typeRound;
 %             TABLE.HistoryTABLE{1}.standing      = TABLE.tablePlayers_forTournament;
 %         end
-        computeScore();
+        computeScore(hObject, eventdata, handles);
         switch option.typeRound
             case 'Round'
                 saveHistoryTABLE();  

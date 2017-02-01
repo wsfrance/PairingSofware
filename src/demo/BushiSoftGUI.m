@@ -314,18 +314,22 @@ if isempty(data)~=1
             
         else
             bool_msg = true;
-            msg = 'Player is already in the tournament';
-            handles_i = handles.TXT_error;
-            prefix = '';
-            displayErrorMsg( msg, handles_i, prefix )            
+            % msg = 'Player is already in the tournament';
+            % handles_i = handles.TXT_error;
+            % prefix = '';
+            % displayErrorMsg( msg, handles_i, prefix )            
             % disp(msg)
             % set(handles.TXT_error,'String',msg);
             
         end
     end
-    % if bool_msg
-    %      msgbox(msg,'Error','error')
-    % end
+    if bool_msg
+%          msgbox(msg,'Error','error')
+        msg = 'Selected Player(s) are already in the tournament';
+        handles_i = handles.TXT_error;
+        prefix = '';
+        displayErrorMsg( msg, handles_i, prefix )
+    end
 else
     % If no player in the DB, it is an error
     msg = 'There is no player in the DB !!';
@@ -570,7 +574,8 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-disp('doing some statistics')
+disp('--------------------------------------------------------------------')
+disp('Doing some statistics')
 
 global TABLE
 path = pwd;
@@ -587,31 +592,58 @@ lat = cell2mat(list_coordinate.latitude);
 lon = cell2mat(list_coordinate.longitude);
 country_list = TABLE.LocalizationReference.country(bool_country,:);
 
-% Plot the data
-figure(1)
-clf
-for i = 1:length(lon)
-    hold on
-    country_i = country_list{i};
-    id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
-    plot(lon(i),lat(i),'.r','MarkerSize',1*length(id))
-end
-plot_google_map
-xlabel('longitude')
-ylabel('latitude')
-title('Country origin of the players')
 
-% Convert to categorical
-try
-    tmp         = TABLE.tablePlayers_fromDB;
-    tmp.country = categorical(TABLE.tablePlayers_fromDB.country);
-    tmp.town    = categorical(TABLE.tablePlayers_fromDB.town);
-    tmp.serie   = categorical(TABLE.tablePlayers_fromDB.serie);
-    summary(tmp)
-catch
-    warning ('there is some error in the loading')
-end
+bool_internetConnection = haveInet();
 
+if bool_internetConnection
+    disp('- Internet connection was detected. Starting to do statistics ...')
+    disp('- Plot the database of players by countries')
+    % Plot the data
+    figure(1)
+    clf
+    % Determine the size of each symbol
+    nb_country = length(lon);
+    MAT_nbplayersCountry = zeros(length(nb_country),1) + inf;
+    for i =1:length(lon)
+        country_i = country_list{i};
+        id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        MAT_nbplayersCountry(i) = length(id);
+    end
+    mini = min(MAT_nbplayersCountry);
+    maxi = max(MAT_nbplayersCountry);
+    mini_size = 0;
+    maxi_size = 60;
+    for i = 1:length(lon)
+        hold on
+        country_i = country_list{i};
+        id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        plot(lon(i),lat(i),'.r','MarkerSize',length(id)*maxi_size/100)
+    end
+    disp('- Retrieve map from Google database')
+    plot_google_map
+    xlabel('longitude')
+    ylabel('latitude')
+    title('Country origin of the players')
+
+    % Convert to categorical
+    disp('- Make a summary of the data in the database')
+    try
+        tmp         = TABLE.tablePlayers_fromDB;
+        tmp.country = categorical(TABLE.tablePlayers_fromDB.country);
+        tmp.town    = categorical(TABLE.tablePlayers_fromDB.town);
+        tmp.serie   = categorical(TABLE.tablePlayers_fromDB.serie);
+        summary(tmp)
+    catch
+        warning ('-- There is some errors in the loading. Has to be checked in the future versions.')
+    end
+else
+    msg = 'No internet connection detected. Check it !!';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+end
+    
+    
 % statarray = grpstats(TABLE.tablePlayers_fromDB,'age')
 
 % --------------------------------------------------------------------
