@@ -1135,7 +1135,9 @@ function MENU_update_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 futureFunctionalityMsg(handles)
-
+% See in the future \externalLibs\update_check from FileExchange
+% We can for example check a version of a server of WS Italia
+% Then, dl the program and then call the function
 
 % --- Executes on button press in BUT_refreshLocalDB.
 function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
