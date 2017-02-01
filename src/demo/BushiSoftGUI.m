@@ -775,7 +775,7 @@ function MENU_manageDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_manageDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+manageDBGUI();
 
 % --------------------------------------------------------------------
 function MENU_retrieveSpecificDB_Callback(hObject, eventdata, handles)
@@ -1161,9 +1161,7 @@ function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 disp('-- Refreshing the local Databases')
-dirName = '../data/playerDB';               %# folder path
-files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
-files = {files.name}';                      %'# file names
+files = listDBPlayers( );
 
 disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
 disp(files)
