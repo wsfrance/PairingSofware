@@ -458,7 +458,7 @@ function MENU_versionInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_versionInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+versionInfoGUI();
 
 % --------------------------------------------------------------------
 function MENU_quit_Callback(hObject, eventdata, handles)

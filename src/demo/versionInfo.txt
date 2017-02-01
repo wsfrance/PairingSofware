@@ -1,0 +1,20 @@
+Tournament Pairing Software
+
+
+Author: malganis35
+Mail: caotri.do88@gmail.com
+
+
+This software is a new software for tournament pairing based on the Bushiroad software.
+It includes many of its functionalities and add new ones.
+
+This project was initiated by the WS France Table Ronde and in collaboration with WS Italia
+
+Don't hesitate to visit our website:
+www.ws-france.fr
+
+Log:
+V1.1
+- add .exe executable to launch the program
+- need to be installed on the machine: Excel, Acrobat Reader, Matlab Runtime
+- can't be used for odd number of players for now
