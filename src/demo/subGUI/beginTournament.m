@@ -754,7 +754,7 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( )
+futureFunctionalityMsg( handles )
 
 % --- Executes on button press in BUT_saveScore.
 function BUT_saveScore_Callback(hObject, eventdata, handles)
