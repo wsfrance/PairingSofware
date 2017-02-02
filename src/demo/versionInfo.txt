@@ -17,6 +17,14 @@ Don't hesitate to visit our website:
 www.ws-france.fr
 
 Log:
+V1.3
+- visibility in rounds
+- ask number of rounds
+- fix sort by
+- online help
+- edit tournament info
+- fix bug for even number of players
+
 V1.2
 - BYE is taken into account in the computation of the pairing
 - add licence
