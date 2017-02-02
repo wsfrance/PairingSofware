@@ -40,7 +40,9 @@ for i = 1:size(tablePlayers_forTournament,1)
     % Note:
     % The fighter with a higher Opponent Match Win % wins the tiebreaker. 
     % If a fighter had any byes, exclude that round from the calculation.
-    id_opp = id_opp(id_opp~=playerID_BYE);
+    if isempty(playerID_BYE) == 0
+        id_opp = id_opp(id_opp~=playerID_BYE);
+    end
     
     if isempty(id_opp) == 0
         id_table    = ismember(tablePlayers_forTournament.playerId, id_opp);

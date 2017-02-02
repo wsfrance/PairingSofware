@@ -290,7 +290,7 @@ switch option.typeRound
                 % display pairing table
                 disp('- Display the pairing table in the GUI')
                 displayPairingTable(hObject, eventdata, handles)
-
+                option.boolean_Round = false;  % Boolean to avoid new round if not all results have been given
             else
                 msg = 'You need to resolve all current matches first before starting a new round !!!';
                 handles_i = handles.TXT_error;
@@ -347,14 +347,17 @@ switch option.typeRound
                 
                 disp('- Incremente option.no_top by 1')
                 option.no_top = option.no_top+1;
-                
+                option.boolean_Round = false;  % Boolean to avoid new round if not all results have been given
             else
                 % There is only 1 player left in the tournament. Finish the
                 % tournament
-                disp('- End of the tournament')
+                msg = 'You have finished the tournament. Send now the report (Go to MENU Send --> Send Report) !';
+                handles_i = handles.TXT_error;
+                prefix = '- ';
+                displayErrorMsg( msg, handles_i, prefix )
                 % Delete the last save
                 TABLE.HistoryTABLE(end,:) = [];
-                option.boolean_Round = false;
+                option.boolean_Round = true;
             end
         else
             msg = 'You need to resolve all current matches first before starting a new round !!!';
@@ -380,7 +383,6 @@ end
 disp('-- Create matrice match_record to store results')
 nb_match             = size(MATRICE.matchID,1);
 MATRICE.match_record = zeros(nb_match,1)+inf  ;
-option.boolean_Round = 0;  % Boolean to avoid new round if not all results have been given
 set2Table1(hObject, eventdata, handles)
 
 % Automatically assign win to the player opposing the bye
@@ -400,35 +402,38 @@ function automaticCheck_BYE_OfPairingTable(hObject, eventdata, handles, pairingW
 
     [table, column] = strfind_idx(pairingWSCode, '**BYE**');
 
-    % Extract information about the players
-    disp('- Extract informations about the players')
-    lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
-    lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
-    player1 = TABLE.tablePlayers_forTournament.name(lin1);
-    player2 = TABLE.tablePlayers_forTournament.name(lin2);
-    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
-    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
-    
-    % assign score
-    disp('- Assign score according to BYE: 1-0, 0-0, or 0-1 ')
-    score = assignScore4BYE(hObject, eventdata, handles, table, column);
-    TABLE.pairingTable.Result(table) = {score};
-    
-    % Store in historyMatch_tmp
-    disp('- Store the match in the record of the rounds (TABLE.historyMatch_tmp)')
-    TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
-    TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
-    TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
-    TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
-    TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
-    TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
+    if isempty(table) == 0
+        % Extract information about the players
+        disp('- Extract informations about the players')
+        lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
+        lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
+        player1 = TABLE.tablePlayers_forTournament.name(lin1);
+        player2 = TABLE.tablePlayers_forTournament.name(lin2);
+        WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
+        WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
 
-    % WSCode1 = pairingWSCode(table,1);
-    % WSCode2 = pairingWSCode(table,2);
-    bool_radio = false;
-    automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
-% score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
+        % assign score
+        disp('- Assign score according to BYE: 1-0, 0-0, or 0-1 ')
+        score = assignScore4BYE(hObject, eventdata, handles, table, column);
+        TABLE.pairingTable.Result(table) = {score};
 
+        % Store in historyMatch_tmp
+        disp('- Store the match in the record of the rounds (TABLE.historyMatch_tmp)')
+        TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
+        TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
+        TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
+        TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
+        TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
+        TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
+
+        % WSCode1 = pairingWSCode(table,1);
+        % WSCode2 = pairingWSCode(table,2);
+        bool_radio = false;
+        automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
+    % score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
+    else
+        disp('No BYE Player detected.')
+    end
 
 
     
@@ -1181,6 +1186,14 @@ global TABLE MATRICE option
 disp('--------------------------------------------------------------------')
 disp('Sending the report')
 
+prompt      = {'Enter your name:','Enter your email address', 'Enter additionnal informations (if you want)'};
+dlg_title   = 'Send the report';
+num_lines   = 1;
+defaultans  = {'my_name','my_adress@adress.com', 'my additionnal information'};
+answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
+
+
 disp('- Extract the date of now')
 formatOut = 'yyyy/mm/dd';
 date2 = datestr(datetime('today'),formatOut);
@@ -1197,8 +1210,8 @@ save(filename,'TABLE','MATRICE','option')
 
 disp('- Configure the mail adress to send :')
 recipients  = 'pairing.software@gmail.com';
-subject     = [date2 ' Report of tournament : ' option.tournamentInfo.name];
-message     = 'Here is the report';
+subject     = [date2 ' Report of tournament (' answer{1} '):' option.tournamentInfo.name];
+message     = ['Here is the report from: ' answer{2} ' with the following informations: ' answer{3}];
 attachments = {filename};
 
 disp(['-- ' recipients])
