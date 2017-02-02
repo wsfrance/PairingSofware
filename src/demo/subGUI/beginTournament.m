@@ -277,6 +277,8 @@ switch option.typeRound
         saveHistoryTABLE([]);
         if option.no_round < option.no_maxRound
             if option.boolean_Round
+                disp('- Reset option.tmp.compteur_computeScore to 0')
+                option.tmp.compteur_computeScore = 0;
                 disp(['- Create Pairing for Round no.' num2str(option.no_round)])
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
                 
@@ -311,7 +313,9 @@ switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
     case 'Top'
         if option.boolean_Round
-            
+            disp('- Reset option.tmp.compteur_computeScore to 0')
+            option.tmp.compteur_computeScore = 0;
+                
             % Save the current standing to the right place in HistoryTABLE
             if option.no_top == 1
                 % First round of the top
@@ -392,16 +396,44 @@ CHECK_showPendingResult_Callback(hObject, eventdata, handles);
 function automaticCheck_BYE_OfPairingTable(hObject, eventdata, handles, pairingWSCode)
 % Automatically assign win to the player opposing the bye
 
-global TABLE
+    global TABLE MATRICE option
 
-[table, column] = strfind_idx(pairingWSCode, '**BYE**');
-score = assignScore4BYE(hObject, eventdata, handles, table, column);
-TABLE.pairingTable.Result(table) = {score};
-WSCode1 = pairingWSCode(table,1);
-WSCode2 = pairingWSCode(table,2);
-bool_radio = false;
-automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
+    [table, column] = strfind_idx(pairingWSCode, '**BYE**');
+
+    % Extract information about the players
+    disp('- Extract informations about the players')
+    lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
+    lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
+    player1 = TABLE.tablePlayers_forTournament.name(lin1);
+    player2 = TABLE.tablePlayers_forTournament.name(lin2);
+    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
+    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
+    
+    % assign score
+    disp('- Assign score according to BYE: 1-0, 0-0, or 0-1 ')
+    score = assignScore4BYE(hObject, eventdata, handles, table, column);
+    TABLE.pairingTable.Result(table) = {score};
+    
+    % Store in historyMatch_tmp
+    disp('- Store the match in the record of the rounds (TABLE.historyMatch_tmp)')
+    TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
+    TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
+    TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
+    TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
+    TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
+    TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
+
+    % WSCode1 = pairingWSCode(table,1);
+    % WSCode2 = pairingWSCode(table,2);
+    bool_radio = false;
+    automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
 % score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
+
+
+
+    
+
+
 
 
 function automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
@@ -945,32 +977,48 @@ futureFunctionalityMsg( handles )
 function computeScore(hObject, eventdata, handles)
 global TABLE MATRICE option
 
+option.tmp.compteur_computeScore = option.tmp.compteur_computeScore +1;
+
 % Assign scores
+disp('-- Assign Scores')
 for i = 1:size(TABLE.historyMatch_tmp,1)    
     TABLE.tablePlayers_forTournament = assignScores(TABLE.tablePlayers_forTournament, MATRICE.matchID, MATRICE.match_record, i, option );
 end
 
+disp('-- Update TABLE.historyMatch')
+if option.tmp.compteur_computeScore > 1
+    disp('--- NOT 1st time to compute score: Need to delete line in TABLE.historyMatch before storing')
+    nb_match = size(TABLE.historyMatch_tmp,1);
+    TABLE.historyMatch(end-nb_match+1:end,:) = [];
+else
+    disp('--- 1st time to compute score: Store directly the TABLE.historyMatch_tmp to TABLE.historyMatch')    
+end
 TABLE.historyMatch = [TABLE.historyMatch; TABLE.historyMatch_tmp];
 
 % Sort the data : 1st time
+disp('-- Sort the data : 1st time')
 TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
 
 
 % Compute Solkoff or Buchholz points
+disp('-- Compute Solkoff or Buchholz points')
 typeSolkoff_buchholz = 'median';
 TABLE.tablePlayers_forTournament = Solkoff_buchholz_Compute (TABLE.historyMatch, TABLE.tablePlayers_forTournament, typeSolkoff_buchholz, option.no_maxRound);
 
 % Determine if 1st Loss and store it
+disp('-- Determine if 1st Loss and store it')
 TABLE.tablePlayers_forTournament = firstLoss(TABLE.tablePlayers_forTournament, TABLE.historyMatch_tmp);
 
 % Store cumulative score
+disp('-- Store cumulative score')
 TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forTournament, option.no_round);
 
 % Compute Bushi Points
+disp('-- Compute Bushi Points')
 [ TABLE.tablePlayers_forTournament ] = bushi_points( MATRICE.mat_HistoryMatch, TABLE.tablePlayers_forTournament, option.no_round, option.no_maxRound );
 
 % 3.4- Make the ranking
-disp('** Making the ranking');
+disp('-- Making the ranking');
 msg = 'All the matches have been reported. You can see the new standings';
 handles_i = handles.TXT_error;
 prefix = '- ';
@@ -979,9 +1027,11 @@ displayErrorMsg( msg, handles_i, prefix )
 % msgbox(msg, 'Error', 'error')
 
 % Sort the data : 2nd time
+disp('-- Sort the data : 2nd time');
 TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
 
 % Assign ranking
+disp('-- Assign ranking');
 TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
 
 
