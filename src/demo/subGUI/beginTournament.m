@@ -83,6 +83,9 @@ if option.bool_Tournamentstarted == 0
     option.bool_Tournamentstarted = 1;
     option.typeRound = 'Round';
     
+    % Check the numbers of players
+    [ TABLE.tablePlayers_forTournament ] = createByePlayer( TABLE.tablePlayers_forTournament );
+    
     % Update the list of players in handles.LIST_listPlayer
     disp('-- Update the list of Players in the handles.LIST_listPlayer')
     updateListPlayers(hObject, eventdata, handles);
