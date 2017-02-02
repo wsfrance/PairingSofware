@@ -481,7 +481,7 @@ function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editCurrentTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+tournamentInfoGUI
 
 % --------------------------------------------------------------------
 function MENU_printPlayerList_Callback(hObject, eventdata, handles)

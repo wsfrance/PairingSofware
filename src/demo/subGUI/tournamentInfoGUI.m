@@ -67,18 +67,40 @@ global option
 path = pwd;
 
 % from CSV
-default_Locations = [path '/import/Locations.csv'];
-option.list.locations = csvimport(default_Locations,'delimiter',';');
-default_pairingMethod = [path '/import/PairingMethod.csv'];
-option.list.pairingMethod = csvimport(default_pairingMethod,'delimiter',';');
-default_tournamentType = [path '/import/TournamentType.csv'];
-option.list.tournamentType = csvimport(default_tournamentType,'delimiter',';');
+default_Locations           = [path '/import/Locations.csv'];
+option.list.locations       = csvimport(default_Locations,'delimiter',';');
+default_pairingMethod       = [path '/import/PairingMethod.csv'];
+option.list.pairingMethod   = csvimport(default_pairingMethod,'delimiter',';');
+default_tournamentType      = [path '/import/TournamentType.csv'];
+option.list.tournamentType  = csvimport(default_tournamentType,'delimiter',';');
 
 set(handles.POP_location, 'String', option.list.locations);
 set(handles.POP_pairingMethod, 'String', option.list.pairingMethod)
 set(handles.POP_tournamentType, 'String', option.list.tournamentType)
 
 set(handles.tournamentInfoGUI, 'Name', 'Tournament Information (by malganis35)');
+
+if isfield(option.tournamentInfo, 'date')
+    disp('Editing Tournament Information')
+    displayTournamentInfo(hObject, eventdata, handles)
+else
+    disp('Creating a new tournament')
+end
+
+
+function displayTournamentInfo(hObject, eventdata, handles)
+global option
+set(handles.BUT_date, 'String', option.tournamentInfo.date)
+set(handles.EDIT_tournamentName, 'String', option.tournamentInfo.name)
+set(handles.EDIT_tournamentDescription, 'String', option.tournamentInfo.description)
+id = strfind_idx(option.list.locations, option.tournamentInfo.location);
+set(handles.POP_location, 'Value', id)
+id = strfind_idx(option.list.pairingMethod, option.tournamentInfo.pairingMethod);
+set(handles.POP_pairingMethod, 'Value', id)
+id = strfind_idx(option.list.tournamentType, option.tournamentInfo.tournamentType);
+set(handles.POP_tournamentType, 'Value', id)
+
+displayMsg(hObject, eventdata, handles)
 
 
 % --- Outputs from this function are returned to the command line.
@@ -277,18 +299,8 @@ option.tournamentInfo.tournamentType = 'Local';
 option.tournamentInfo.pairingMethod = 'Swiss Round';
 option.tournamentInfo.location = 'Other';
 
+displayTournamentInfo(hObject, eventdata, handles);
 
-set(handles.BUT_date, 'String', option.tournamentInfo.date)
-set(handles.EDIT_tournamentName, 'String', option.tournamentInfo.name)
-set(handles.EDIT_tournamentDescription, 'String', option.tournamentInfo.description)
-id = strfind_idx(option.list.locations, option.tournamentInfo.location);
-set(handles.POP_location, 'Value', id)
-id = strfind_idx(option.list.pairingMethod, option.tournamentInfo.pairingMethod);
-set(handles.POP_pairingMethod, 'Value', id)
-id = strfind_idx(option.list.tournamentType, option.tournamentInfo.tournamentType);
-set(handles.POP_tournamentType, 'Value', id)
-
-displayMsg(hObject, eventdata, handles)
 
 
 
