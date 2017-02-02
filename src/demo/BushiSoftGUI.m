@@ -112,6 +112,7 @@ option.turnOnOffGUI = true;
 option.tmp.createTournamentBool = false;
 option.sortOrderDB = 'ascend';
 option.column2sortDB = 'Sort By';
+option.tmp.bool_createTournament = false;
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -482,7 +483,20 @@ function MENU_editCurrentTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editCurrentTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-tournamentInfoGUI
+
+global option
+
+disp('Edit Tournament Info')
+if option.tmp.bool_createTournament
+    disp('- Accorded')
+    tournamentInfoGUI
+else
+    msg = 'Before editing a tournament, you have a create one first !';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+end
+
 
 % --------------------------------------------------------------------
 function MENU_printPlayerList_Callback(hObject, eventdata, handles)

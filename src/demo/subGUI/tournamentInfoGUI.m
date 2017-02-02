@@ -85,6 +85,7 @@ if isfield(option.tournamentInfo, 'date')
     displayTournamentInfo(hObject, eventdata, handles)
 else
     disp('Creating a new tournament')
+    option.tmp.bool_createTournament = true;
 end
 
 
