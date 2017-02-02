@@ -1,7 +1,10 @@
-Tournament Pairing Software
+<Tournament Pairing Software>  Copyright (C) <2018>  <Cao Tri DO >
+This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+This is free software, and you are welcome to redistribute it
+under certain conditions; type `show c' for details.
 
 
-Author: malganis35
+Author: Cao Tri DO (malganis35)
 Mail: caotri.do88@gmail.com
 
 
@@ -14,6 +17,10 @@ Don't hesitate to visit our website:
 www.ws-france.fr
 
 Log:
+V1.121
+- correct bugs
+- can used for odd number of players
+
 V1.1
 - add .exe executable to launch the program
 - need to be installed on the machine: Excel, Acrobat Reader, Matlab Runtime

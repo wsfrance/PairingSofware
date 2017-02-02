@@ -975,6 +975,8 @@ futureFunctionalityMsg( handles )
 
 
 function computeScore(hObject, eventdata, handles)
+% Compute the score of the TABLE.tablePlayers_forTournament
+
 global TABLE MATRICE option
 
 option.tmp.compteur_computeScore = option.tmp.compteur_computeScore +1;
