@@ -130,3 +130,17 @@ end
 disp(msg)
 msgbox(msg, 'Error', 'error')
 updatelistDB(hObject, eventdata, handles) 
+
+% Update main GUI
+disp('- Update main GUI')
+handleListDB = findobj('Tag', 'POP_selectDB');
+files        = listDBPlayers( );
+disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
+disp(files)
+files = ['Select Database'; files];
+set(handleListDB,'String',files, 'Value', size(files,1))
+
+
+
+
+
