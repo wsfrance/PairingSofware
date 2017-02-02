@@ -76,6 +76,12 @@ disp('Start the Tournament Core')
 disp('- Set the title of the window')
 set(handles.beginTournament, 'Name', 'Tournament (by malganis35)');
 
+% ask the number of rounds
+disp('- Ask the number of rounds')
+answer = askNbRounds();
+option.no_maxRound = str2num(answer);
+
+
 disp('- Look if we start from a save file or a new tournament')
 if option.bool_Tournamentstarted == 0
     
@@ -141,6 +147,28 @@ if option.bool_Tournamentstarted == 0
     % renderer = jtable.getCellRenderer(2,2);
     % renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     % renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+end
+
+function answer = askNbRounds()
+bool_Notnumber = true;
+while bool_Notnumber
+    
+    prompt      = {'Enter the number of desired rounds (default: 6) (NB: you can go to Top before)'};
+    dlg_title   = 'Question : Number of rounds';
+    num_lines   = 1;
+    defaultans  = {'6'};
+    answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+    answer      = answer{1};
+    if all(ismember(answer, '0123456789+-.eEdD')) == 1
+        msg = '- This a number. Continue ...';
+        disp(msg)
+        bool_Notnumber = false;
+    else
+        msg = '- This is not a number. Go again ...';
+        bool_Notnumber = true;
+        disp(msg)
+        msgbox(msg,'Error','error');
+    end
 end
 
 % --- Outputs from this function are returned to the command line.
