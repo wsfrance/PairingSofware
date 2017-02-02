@@ -1039,11 +1039,11 @@ set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTab
 
 
 if isfield(option,'column2sortDB') == 0
-    bool = false;
-elseif strcmp(option.column2sortDB,'Sort By') == 0
-    bool = false;
-else
     bool = true;
+elseif strcmp(option.column2sortDB,'Sort By') == 0
+    bool = true;
+else
+    bool = false;
 end
 
 if bool
