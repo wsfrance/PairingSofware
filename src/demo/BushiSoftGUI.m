@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 01-Feb-2017 20:32:18
+% Last Modified by GUIDE v2.5 02-Feb-2017 19:59:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -111,6 +111,7 @@ option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};
 option.turnOnOffGUI = true;
 option.tmp.createTournamentBool = false;
 option.sortOrderDB = 'ascend';
+option.column2sortDB = 'Sort By';
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -1276,3 +1277,11 @@ else
 end
 
 
+% --------------------------------------------------------------------
+function MENU_license_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_license (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+filename = '../../LICENSE.txt';
+winopen(filename)
