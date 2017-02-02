@@ -147,6 +147,11 @@ if option.bool_Tournamentstarted == 0
     % renderer = jtable.getCellRenderer(2,2);
     % renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
     % renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    
+    disp('- Visibility Off')
+    mode = 'Off';
+    visibilityOnOff(handles, mode)
+    
 end
 
 function answer = askNbRounds()
@@ -303,8 +308,13 @@ switch option.typeRound
     case 'Round'
         disp('Save the actual Table of tournament for replay')
         saveHistoryTABLE([]);
-        if option.no_round < option.no_maxRound
+        if option.no_round <= option.no_maxRound
             if option.boolean_Round
+                
+                disp('- Visibility ON')
+                mode = 'On';
+                visibilityOnOff(handles, mode)
+
                 disp('- Reset option.tmp.compteur_computeScore to 0')
                 option.tmp.compteur_computeScore = 0;
                 disp(['- Create Pairing for Round no.' num2str(option.no_round)])
@@ -386,6 +396,9 @@ switch option.typeRound
                 % Delete the last save
                 TABLE.HistoryTABLE(end,:) = [];
                 option.boolean_Round = true;
+                disp('- Visibility Off')
+                mode = 'Off';
+                visibilityOnOff(handles, mode)
             end
         else
             msg = 'You need to resolve all current matches first before starting a new round !!!';
@@ -1260,4 +1273,14 @@ prefix = '';
 displayErrorMsg( msg, handles_i, prefix )
 % disp(['- ' msg])
 % msgbox(msg, 'Error', 'error')
+
+
+function visibilityOnOff(handles, mode)
+
+set(handles.BUT_printMenu, 'Visible', mode)
+set(handles.BUT_sendPairing, 'Visible', mode)
+set(handles.BUT_startTimer, 'Visible', mode)
+set(handles.TAB_pairing, 'Visible', mode)
+set(handles.GROUP_reportScores, 'Visible', mode)
+set(handles.CHECK_showPendingResult, 'Visible', mode)
 
