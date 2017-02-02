@@ -17,6 +17,12 @@ Don't hesitate to visit our website:
 www.ws-france.fr
 
 Log:
+V1.2
+- BYE is taken into account in the computation of the pairing
+- add licence
+- bug fixed
+
+
 V1.121
 - correct bugs
 - can used for odd number of players
