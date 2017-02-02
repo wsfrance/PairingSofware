@@ -22,7 +22,7 @@ function varargout = tournamentInfoGUI(varargin)
 
 % Edit the above text to modify the response to help tournamentInfoGUI
 
-% Last Modified by GUIDE v2.5 28-Dec-2016 16:14:19
+% Last Modified by GUIDE v2.5 02-Feb-2017 20:20:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -370,4 +370,3 @@ set(GUI1_handles.TEXT_tournamentInformation, 'String', option.tournamentInfo.des
 
 mode = 'on';
 showHandlesTournament(GUI1_handles, mode);
-

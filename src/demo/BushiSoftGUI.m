@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 02-Feb-2017 19:59:01
+% Last Modified by GUIDE v2.5 02-Feb-2017 20:24:14
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1296,6 +1296,14 @@ function MENU_license_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_license (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 filename = '../../LICENSE.txt';
 winopen(filename)
+
+
+% --------------------------------------------------------------------
+function MENU_onlineHelp_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_onlineHelp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+url = 'http://www.ws-france.fr';
+web(url,'-browser')
