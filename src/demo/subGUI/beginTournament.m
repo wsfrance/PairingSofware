@@ -979,21 +979,24 @@ global TABLE MATRICE option
 
 option.tmp.compteur_computeScore = option.tmp.compteur_computeScore +1;
 
-% Assign scores
-disp('-- Assign Scores')
-for i = 1:size(TABLE.historyMatch_tmp,1)    
-    TABLE.tablePlayers_forTournament = assignScores(TABLE.tablePlayers_forTournament, MATRICE.matchID, MATRICE.match_record, i, option );
-end
-
 disp('-- Update TABLE.historyMatch')
 if option.tmp.compteur_computeScore > 1
     disp('--- NOT 1st time to compute score: Need to delete line in TABLE.historyMatch before storing')
     nb_match = size(TABLE.historyMatch_tmp,1);
     TABLE.historyMatch(end-nb_match+1:end,:) = [];
+    disp('-- Reload TABLE.tablePlayers_forTournament from last round')
+    id = find(TABLE.HistoryTABLE.no_Round == option.no_round-1);
+    TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id};
 else
     disp('--- 1st time to compute score: Store directly the TABLE.historyMatch_tmp to TABLE.historyMatch')    
 end
 TABLE.historyMatch = [TABLE.historyMatch; TABLE.historyMatch_tmp];
+
+% Assign scores
+disp('-- Assign Scores')
+for i = 1:size(TABLE.historyMatch_tmp,1)    
+    TABLE.tablePlayers_forTournament = assignScores(TABLE.tablePlayers_forTournament, MATRICE.matchID, MATRICE.match_record, i, option );
+end
 
 % Sort the data : 1st time
 disp('-- Sort the data : 1st time')
