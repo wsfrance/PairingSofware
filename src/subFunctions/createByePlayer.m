@@ -1,4 +1,4 @@
-function [ tablePlayerOut ] = createByePlayer( tablePlayer )
+function [ tablePlayerOut, bool_byePlayer ] = createByePlayer( tablePlayer )
 %CREATEBYEPLAYER Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -20,10 +20,11 @@ if mod(nb_player,2) == 1
 
     % Assign to the new table
     tablePlayerOut  = [tablePlayer; byePlayer];
-
+    bool_byePlayer  = true;
 else
     disp('-- Even number of player. All is ok. Continue ...')
-    tablePlayerOut = tablePlayer;
+    tablePlayerOut  = tablePlayer;
+    bool_byePlayer  = false;
 
 end
 

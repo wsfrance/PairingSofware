@@ -84,7 +84,7 @@ if option.bool_Tournamentstarted == 0
     option.typeRound = 'Round';
     
     % Check the numbers of players
-    [ TABLE.tablePlayers_forTournament ] = createByePlayer( TABLE.tablePlayers_forTournament );
+    [ TABLE.tablePlayers_forTournament, option.tmp.bool_byePlayer ] = createByePlayer( TABLE.tablePlayers_forTournament );
     
     % Update the list of players in handles.LIST_listPlayer
     disp('-- Update the list of Players in the handles.LIST_listPlayer')
@@ -97,9 +97,6 @@ if option.bool_Tournamentstarted == 0
     [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
     TABLE.historyMatch_tmp_allocation = {'inf' 'inf' 'inf' 'inf' inf inf};
     
-    
-    % MATRICE.HistoryTABLE = cell(option.no_maxRound,2);
-
     % Players for Tournament
     disp('-- Initialize the table tablePlayers_forTournament')
     TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
@@ -194,12 +191,12 @@ global TABLE option
 bool_check = handles.CHECK_showPendingResult.Value;
 if bool_check
     % Checkbox is checked
-    disp('Select and show pending results (Tables) only')
+    disp('- Select and show pending results (Tables) only')
     id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
     data = table2cell(TABLE.pairingTable(id,:));
 else
     % Checkbox is not checked
-    disp('Show all results (Tables)')
+    disp('- Show all results (Tables)')
     data = table2cell(TABLE.pairingTable(:,:)); 
 end
 set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
@@ -382,9 +379,192 @@ MATRICE.match_record = zeros(nb_match,1)+inf  ;
 option.boolean_Round = 0;  % Boolean to avoid new round if not all results have been given
 set2Table1(hObject, eventdata, handles)
 
+% Automatically assign win to the player opposing the bye
+disp('- Assign win to player against BYE')
+automaticCheck_BYE_OfPairingTable(hObject, eventdata, handles, MATRICE.pairingWSCode)
+
+% Display table 
+% displayPairingTable(hObject, eventdata, handles)
+disp('- Refresh the table of pairing')
+CHECK_showPendingResult_Callback(hObject, eventdata, handles);
+
+
+function automaticCheck_BYE_OfPairingTable(hObject, eventdata, handles, pairingWSCode)
+% Automatically assign win to the player opposing the bye
+
+global TABLE
+
+[table, column] = strfind_idx(pairingWSCode, '**BYE**');
+score = assignScore4BYE(hObject, eventdata, handles, table, column);
+TABLE.pairingTable.Result(table) = {score};
+WSCode1 = pairingWSCode(table,1);
+WSCode2 = pairingWSCode(table,2);
+bool_radio = false;
+automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
+% score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
+
+
+function automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
+	disp('-- Checking if there is a **BYE** Player')
+
+    if strcmp(WSCode1, '**BYE**') == 1
+        msg = 'Automatic **BYE** Player was detected. Assigning WIN automatically the score to the player';
+        handles_i = handles.TXT_error;
+        prefix = '-- ';
+        displayErrorMsg( msg, handles_i, prefix )
+        disp('-- Player 1 is **BYE**')
+        disp('-- Assigning Radio button automatically')
+        if bool_radio
+            set(handles.RADIO_player2, 'Value', 1)
+        end
+    elseif strcmp(WSCode2, '**BYE**') == 1
+        msg = 'Automatic **BYE** Player was detected. Assigning WIN automatically the score to the player';
+        handles_i = handles.TXT_error;
+        prefix = '-- ';
+        displayErrorMsg( msg, handles_i, prefix )
+        disp('-- Player 2 is **BYE**')
+        disp('-- Assigning Radio button automatically')
+        if bool_radio
+            set(handles.RADIO_player1, 'Value', 1)
+        end
+    else
+        disp('-- There is no **BYE** player')
+    end
+
+function score = assignScore4BYE(hObject, eventdata, handles, table, column)
+    % Assign score according to the button radio
+    global MATRICE
+    
+    % Store in match_record
+    disp('-- Checking the state of BYE player')
+    if column == 2
+        % Player 1 win
+        MATRICE.match_record(table,1) = 1;
+        score = '1-0';
+    elseif column == 1
+        % Player 2 win
+        MATRICE.match_record(table,1) = 2;
+        score = '0-1';
+    else
+        error('Problem. There is no 1 in any boutton radio')
+    end
+    disp(['-- The score is: ' score])
+
+% --- Executes on button press in BUT_saveScore.
+function BUT_saveScore_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_saveScore (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE MATRICE option
+
+if option.boolean_Round == 0
+    % all scores has not been added
+    disp('- All scores has not been added')
+    % Save records of the match
+    table = str2num(handles.EDIT_table.String{1});
+
+    % Extract information about the players
+    disp('- Extract informations about the players')
+    lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
+    lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
+    player1 = TABLE.tablePlayers_forTournament.name(lin1);
+    player2 = TABLE.tablePlayers_forTournament.name(lin2);
+    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
+    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
+    
+    % assign score
+    disp('- Assign score : 1-0, 0-0, or 0-1 according to the radio button')
+    score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
+    TABLE.pairingTable.Result(table) = {score};
+    
+    % Store in historyMatch_tmp
+    disp('- Store the match in the record of the rounds (TABLE.historyMatch_tmp)')
+    TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
+    TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
+    TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
+    TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
+    TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
+    TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
+    
+    % Display of the match
+    disp('- Display the match (if only pending result or all results)')
+    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
+    
+    
+    % Check if all results have been given
+    if isempty(find(isinf(MATRICE.match_record)==1)) == 1
+        option.boolean_Round = 1;
+        computeScore(hObject, eventdata, handles);
+        switch option.typeRound
+            case 'Round'
+                saveHistoryTABLE();  
+            case 'Top'
+                [table2sort,~]= cutTable();
+                saveHistoryTABLE(table2sort);
+        end
+    end
+else
+    option.boolean_Round = 0;
+    id = find(TABLE.HistoryTABLE.no_Round==option.no_round-1);
+    TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id}; % reload previous TABLE in the data
+    BUT_saveScore_Callback(hObject, eventdata, handles)
+end
+
+
+
+function score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2)
+    % Assign score according to the button radio
+    global MATRICE
+    
+    % Check for BYE player        
+    bool_radio = true;
+    automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
+    
+    % Store in match_record
+    disp('-- Checking the state of the button radio : pending, win Player1, win Player 2, draw')
+    if handles.RADIO_unenteredResult.Value == 1
+        % do nothing
+        score = '<pending>';
+        MATRICE.match_record(table,1) = Inf;
+    elseif handles.RADIO_draw.Value == 1
+        % draw
+        MATRICE.match_record(table,1) = 3;
+        score = '0-0';
+    elseif handles.RADIO_player1.Value == 1
+        % Player 1 win
+        MATRICE.match_record(table,1) = 1;
+        score = '1-0';
+    elseif handles.RADIO_player2.Value == 1
+        % Player 2 win
+        MATRICE.match_record(table,1) = 2;
+        score = '0-1';
+    else
+        error('Problem. There is no 1 in any boutton radio')
+    end
+    disp(['-- The score is: ' score])
+
+    
+
+
+
+% --- Executes on button press in BUT_showStandings.
+function BUT_showStandings_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_showStandings (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% global TABLE
+
+% TABLE.tablePlayers_forTournament
+disp('--------------------------------------------------------------------')
+disp('Display the Standing')
+standingGUI
+
+
+
 
 function [table2sort,player2top] = cutTable()
-
+% Function to cut the number of player to the top
 global TABLE
 % Following rounds in the top (except the 1st cut)
 disp('-- Cut first the number of players')
@@ -759,107 +939,7 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 futureFunctionalityMsg( handles )
 
-% --- Executes on button press in BUT_saveScore.
-function BUT_saveScore_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_saveScore (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-global TABLE MATRICE option
-
-if option.boolean_Round == 0
-    % all scores has not been added
-    % Save records of the match
-    table = str2num(handles.EDIT_table.String{1});
-
-    % Store in match_record
-    if handles.RADIO_unenteredResult.Value == 1
-        % do nothing
-        score = '<pending>';
-        MATRICE.match_record(table,1) = Inf;
-    elseif handles.RADIO_draw.Value == 1
-        % draw
-        MATRICE.match_record(table,1) = 3;
-        score = '0-0';
-    elseif handles.RADIO_player1.Value == 1
-        % Player 1 win
-        MATRICE.match_record(table,1) = 1;
-        score = '1-0';
-    elseif handles.RADIO_player2.Value == 1
-        % Player 2 win
-        MATRICE.match_record(table,1) = 2;
-        score = '0-1';
-    else
-        error('Problem. There is no 1 in any boutton radio')
-    end
-
-    TABLE.pairingTable.Result(table) = {score};
-    
-    % Store in historyMatch_tmp
-    lin1 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,1));
-    lin2 = find(TABLE.tablePlayers_forTournament.playerId == MATRICE.matchID(table,2));
-    player1 = TABLE.tablePlayers_forTournament.name(lin1);
-    player2 = TABLE.tablePlayers_forTournament.name(lin2);
-    WSCode1 = TABLE.tablePlayers_forTournament.WSCode(lin1);   
-    WSCode2 = TABLE.tablePlayers_forTournament.WSCode(lin2);
-
-    TABLE.historyMatch_tmp.Player1(table,1) = cellstr(player1);
-    TABLE.historyMatch_tmp.Player2(table,1) = cellstr(player2);
-    TABLE.historyMatch_tmp.WSCode1(table,1) = cellstr(WSCode1);
-    TABLE.historyMatch_tmp.WSCode2(table,1) = cellstr(WSCode2);
-    TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
-    TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
-
-    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
-    
-    
-    % Check if all results have been given
-    if isempty(find(isinf(MATRICE.match_record)==1)) == 1
-        option.boolean_Round = 1;
-%         warning('TO BE PUT AGAIN')
-%         if option.no_round == 1
-%             % MATRICE.HistoryTABLE{1,1} = 0;
-%             % MATRICE.HistoryTABLE{1,2} = TABLE.tablePlayers_forTournament;
-%             TABLE.HistoryTABLE.no_Round(1)      = 0;
-%             TABLE.HistoryTABLE{1}.typeOfRound   = option.typeRound;
-%             TABLE.HistoryTABLE{1}.standing      = TABLE.tablePlayers_forTournament;
-%         end
-        computeScore(hObject, eventdata, handles);
-        switch option.typeRound
-            case 'Round'
-                saveHistoryTABLE();  
-            case 'Top'
-                [table2sort,~]= cutTable();
-                saveHistoryTABLE(table2sort);
-        end
-        % MATRICE.HistoryTABLE{option.no_round+1,1} = option.no_round;
-        % MATRICE.HistoryTABLE{option.no_round+1,2} = TABLE.tablePlayers_forTournament;
-%         TABLE.HistoryTABLE(option.no_round+1).no_Round      = option.no_round;
-%         TABLE.HistoryTABLE{option.no_round+1}.typeOfRound   = option.typeRound;
-%         TABLE.HistoryTABLE{option.no_round+1}.standing      = TABLE.tablePlayers_forTournament;
-    end
-else
-    % msg = 'You have already entered all the scores. Go to next round !!';
-    % disp(msg)
-    % msgbox(msg,'Error','error')
-    option.boolean_Round = 0;
-    id = find(TABLE.HistoryTABLE.no_Round==option.no_round-1);
-    TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id}; % reload previous TABLE in the data
-    BUT_saveScore_Callback(hObject, eventdata, handles)
-end
-
-
-% --- Executes on button press in BUT_showStandings.
-function BUT_showStandings_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_showStandings (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% global TABLE
-
-% TABLE.tablePlayers_forTournament
-disp('--------------------------------------------------------------------')
-disp('Display the Standing')
-standingGUI
 
 
 function computeScore(hObject, eventdata, handles)
