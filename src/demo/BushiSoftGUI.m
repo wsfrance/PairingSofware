@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 02-Feb-2017 20:24:14
+% Last Modified by GUIDE v2.5 02-Feb-2017 21:11:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -111,7 +111,9 @@ option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};
 option.turnOnOffGUI = true;
 option.tmp.createTournamentBool = false;
 option.sortOrderDB = 'ascend';
+option.sortOrderTournament = 'ascend';
 option.column2sortDB = 'Sort By';
+option.column2sortTournament = 'Sort By';
 option.tmp.bool_createTournament = false;
 
 % Add path, subfunctions, etc.
@@ -185,101 +187,6 @@ varargout{1} = handles.output;
 
 
 
-% --- Executes on selection change in POP_sortBy.
-function POP_sortBy_Callback(hObject, eventdata, handles)
-% hObject    handle to POP_sortBy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POP_sortBy
-
-% global option
-% 
-% data = handles.TAB_players.Data;
-% 
-% % get selection of handles.POP_sortBy menu
-% contents = get(handles.POP_sortBy,'String'); 
-% value    = contents{get(handles.POP_sortBy,'Value')};
-% Index    = strfind_idx( option.columnTableDB',value );
-% 
-% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
-% if Index>0
-%     data = sortrows(data,Index);
-% end
-% set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
-
-handleTable = handles.TAB_players;
-handleSortBy = handles.POP_sortBy;
-sortBy(handleTable, handleSortBy, handles);
-
-function data = sortBy(handleTable, handleSortBy, handles)
-global option
-
-data = handleTable.Data;
-
-% get selection of handles.POP_sortBy menu
-contents = get(handleSortBy,'String'); 
-value    = contents{get(handleSortBy,'Value')};
-% Index    = strfind_idx( option.columnTableDB',value, option.caseInsensitiveOption );
-
-% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
-% if Index>0
-%     data = sortrows(data,Index);
-% end
-% set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
-% warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
-
-option.column2sortDB = value;
-refreshTables(handleTable, handleSortBy, handles);
-
-
-
-% --- Executes during object creation, after setting all properties.
-function POP_sortBy_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POP_sortBy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');  
-    
-end
-
-
-
-
-% --- Executes on selection change in POP_sortByTournament.
-function POP_sortByTournament_Callback(hObject, eventdata, handles)
-% hObject    handle to POP_sortByTournament (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortByTournament contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POP_sortByTournament
-
-handleTable = handles.TAB_players_Tournament ;
-handleSortBy = handles.POP_sortByTournament;
-sortBy(handleTable, handleSortBy, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function POP_sortByTournament_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POP_sortByTournament (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-
 % --- Executes on button press in BUT_addPlayer.
 function BUT_addPlayer_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_addPlayer (see GCBO)
@@ -312,6 +219,7 @@ if isempty(data)~=1
             TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
 
             % display the data
+            refreshTables(hObject, eventdata, handles)
             refreshTables(hObject, eventdata, handles)
             
         else
@@ -1003,28 +911,32 @@ futureFunctionalityMsg(handles)
 % barcodeScannerGUI
 
 
-% --- Executes on selection change in POP_sortOrder.
-function POP_sortOrder_Callback(hObject, eventdata, handles)
-% hObject    handle to POP_sortOrder (see GCBO)
+
+% --- Executes during object creation, after setting all properties.
+function POP_sortBy_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortBy (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    empty - handles not created until after all CreateFcns called
 
-% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortOrder contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POP_sortOrder
-
-global option
-
-contents = cellstr(get(hObject,'String'));
-tmp = contents{get(hObject,'Value')};
-switch tmp
-    case 'A - z'
-        option.sortOrderDB = 'ascend';
-    case 'Z - a'
-        option.sortOrderDB = 'descend';
-    otherwise
-        disp('Case not known')
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');  
+    
 end
-refreshTables(hObject, eventdata, handles)
+
+% --- Executes during object creation, after setting all properties.
+function POP_sortByTournament_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortByTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 % --- Executes during object creation, after setting all properties.
 function POP_sortOrder_CreateFcn(hObject, eventdata, handles)
@@ -1038,44 +950,186 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+% --- Executes during object creation, after setting all properties.
+function POP_sortOrderTournament_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to POP_sortOrderTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
 
-function refreshTables(hObject, eventdata, handles)
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in POP_sortOrder.
+function POP_sortOrder_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortOrder (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortOrder contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortOrder
+
+global option
+contents            = cellstr(get(hObject,'String'));
+tmp                 = contents{get(hObject,'Value')};
+option.sortOrderDB  = assignAscendingDescending(tmp);
+type                = 'DB';
+refreshTables(hObject, eventdata, handles, type)
+
+
+function sortOrder = assignAscendingDescending(tmp)
+switch tmp
+    case 'A - z'
+        sortOrder = 'ascend';
+    case 'Z - a'
+        sortOrder = 'descend';
+    otherwise
+        disp('Case not known')
+end
+
+% --- Executes on selection change in POP_sortOrderTournament.
+function POP_sortOrderTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortOrderTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortOrderTournament contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortOrderTournament
+
+global option
+contents            = cellstr(get(hObject,'String'));
+tmp                 = contents{get(hObject,'Value')};
+option.sortOrderTournament  = assignAscendingDescending(tmp);
+type                = 'tournament';
+refreshTables(hObject, eventdata, handles, type)
+
+
+
+
+% --- Executes on selection change in POP_sortBy.
+function POP_sortBy_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortBy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortBy contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortBy
+
+handleTable = handles.TAB_players;
+handleSortBy = handles.POP_sortBy;
+type = 'DB';
+
+sortBy(handleTable, handleSortBy, handles, type);
+
+
+% --- Executes on selection change in POP_sortByTournament.
+function POP_sortByTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to POP_sortByTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns POP_sortByTournament contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from POP_sortByTournament
+
+handleTable = handles.TAB_players_Tournament ;
+handleSortBy = handles.POP_sortByTournament;
+type = 'tournament';
+sortBy(handleTable, handleSortBy, handles, type);
+
+
+
+function data = sortBy(handleTable, handleSortBy, handles, type)
+
+global option
+% get selection of handles.POP_sortBy menu or handles.POP_sortByTournament
+contents = get(handleSortBy,'String'); 
+value    = contents{get(handleSortBy,'Value')};
+switch type
+    case 'DB'              
+        option.column2sortDB = value;
+    case 'tournament'
+        option.column2sortTournament = value;
+    otherwise
+        disp('case not known')
+end
+
+data = handleTable.Data;
+refreshTables(handleTable, handleSortBy, handles, type);
+
+
+
+function refreshTables(hObject, eventdata, handles, type)
 
 global TABLE option
+if nargin < 4 
+    refreshTables(hObject, eventdata, handles, 'DB')
+    refreshTables(hObject, eventdata, handles, 'tournament')
+else
+    switch type
+        case 'DB'        
+            column2sort     = option.column2sortDB      ;
+            table_tmp       = TABLE.tablePlayers_fromDB ;
+            handle_display  = handles.TAB_players       ;
+            column2display  = option.columnTableDB      ;
+            sortOrder       = option.sortOrderDB        ;
+            displayOrderTable(option, column2sort, table_tmp, handle_display, column2display, sortOrder)
 
-% option.sortOrderDB = 'ascending';
+        case 'tournament'
+            column2sort     = option.column2sortTournament      ;
+            table_tmp       = TABLE.tablePlayers_forTournament  ;
+            handle_display  = handles.TAB_players_Tournament    ;
+            column2display  = option.columnTableDB              ;
+            sortOrder       = option.sortOrderTournament        ;
+            displayOrderTable(option,column2sort, table_tmp, handle_display, column2display, sortOrder)
 
-data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-% if isempty(data)~=1
-set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
-% end
-% data2 = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-% data2 = sortrows(data2,option.column2sortDB,option.sortOrderDB);
-
+            % data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
+            % set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
+        otherwise
+            disp('case not known')
+    end
+end
+    
+function displayOrderTable(option, column2sort, table_tmp, handle_display, column2display, sortOrder)
 
 if isfield(option,'column2sortDB') == 0
     bool = true;
-elseif strcmp(option.column2sortDB,'Sort By') == 0
+elseif strcmp(column2sort,'Sort By') == 0
     bool = true;
 else
     bool = false;
 end
 
 if bool
-    data2 = sortrows(TABLE.tablePlayers_fromDB(:,option.columnTableDB), option.column2sortDB, option.sortOrderDB);
+    data2 = sortrows(table_tmp(:,column2display), column2sort, sortOrder);
 else
     disp('This is SORT BY')
-    data2 = TABLE.tablePlayers_fromDB(:,option.columnTableDB);
+    data2 = table_tmp(:,column2display);
 end
 data2 = table2cell(data2);
-set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
+set(handle_display, 'data', data2, 'ColumnName', column2display)
 
-% % Sort by rows if there is a valid selection (=0 is the Sort by option = not valid)
-% if Index>0
-%     data = sortrows(data,Index);
+
+
+% if isfield(option,'column2sortDB') == 0
+%     bool = true;
+% elseif strcmp(option.column2sortDB,'Sort By') == 0
+%     bool = true;
+% else
+%     bool = false;
 % end
-% set(handleTable, 'data', data, 'ColumnName', option.columnTableDB)
-% warning('sortBy : VIZU TABLE TO BE PUT IN refreshTABLE')
+% 
+% if bool
+%     data2 = sortrows(TABLE.tablePlayers_fromDB(:,option.columnTableDB), option.column2sortDB, option.sortOrderDB);
+% else
+%     disp('This is SORT BY')
+%     data2 = TABLE.tablePlayers_fromDB(:,option.columnTableDB);
+% end
+% data2 = table2cell(data2);
+% set(handles.TAB_players, 'data', data2, 'ColumnName', option.columnTableDB)
+
 
 
 
@@ -1307,3 +1361,6 @@ function MENU_onlineHelp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 url = 'http://www.ws-france.fr';
 web(url,'-browser')
+
+
+
