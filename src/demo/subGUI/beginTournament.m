@@ -218,21 +218,23 @@ function CHECK_showPendingResult_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_showPendingResult
 
-global TABLE option
+futureFunctionalityMsg(handles)
 
-% Check is box of CHECK_showPendingResult is checked or not
-bool_check = handles.CHECK_showPendingResult.Value;
-if bool_check
-    % Checkbox is checked
-    disp('- Select and show pending results (Tables) only')
-    id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
-    data = table2cell(TABLE.pairingTable(id,:));
-else
-    % Checkbox is not checked
-    disp('- Show all results (Tables)')
-    data = table2cell(TABLE.pairingTable(:,:)); 
-end
-set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
+% global TABLE option
+% 
+% % Check is box of CHECK_showPendingResult is checked or not
+% bool_check = handles.CHECK_showPendingResult.Value;
+% if bool_check
+%     % Checkbox is checked
+%     disp('- Select and show pending results (Tables) only')
+%     id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
+%     data = table2cell(TABLE.pairingTable(id,:));
+% else
+%     % Checkbox is not checked
+%     disp('- Show all results (Tables)')
+%     data = table2cell(TABLE.pairingTable(:,:)); 
+% end
+% set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
 
 
 % --- Executes on button press in BUT_printMenu.
@@ -885,6 +887,7 @@ function CHECK_dropPlayer1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_dropPlayer1
+futureFunctionalityMsg(handles)
 
 
 % --- Executes on button press in CHECK_dropPlayer2.
@@ -894,6 +897,7 @@ function CHECK_dropPlayer2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_dropPlayer2
+futureFunctionalityMsg(handles)
 
 
 % --------------------------------------------------------------------
