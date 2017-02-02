@@ -23,25 +23,36 @@ for i = 1:size(tablePlayers_forTournament,1)
 %     end      
 end
 
+% Search **BYE** player
+id_BYE = strfind_idx(tablePlayers_forTournament.WSCode, '**BYE**');
+playerID_BYE = tablePlayers_forTournament.playerId(id_BYE);
+
+% Loop for Opp_MW
 for i = 1:size(tablePlayers_forTournament,1)
     % Opp_MW
     % For each fighter, add up each of his or her opponents’match win %
     % and divide by the number of those opponents.
     % The result of this calculation is called the Opponent Match Win %. 
-    id_player = tablePlayers_forTournament.playerId(i);
-    id_opp = find(historyMatch(id_player,:)>=1);
-    id_table = ismember(tablePlayers_forTournament.playerId, id_opp);
-    opp_MWP = tablePlayers_forTournament.MWP(id_table,1);
-    tablePlayers_forTournament.Opp_MW(i,1) = sum(opp_MWP)/length(opp_MWP);
-    if isnan(tablePlayers_forTournament.Opp_MW(i,1))
-        disp('Problem')
-    end
-    
+    id_player   = tablePlayers_forTournament.playerId(i);
+    id_opp      = find(historyMatch(id_player,:)>=1);
+    % warning('Still need for Opp_MW to exclude byes from calculation')
+    % Get rid of BYE in opponent
     % Note:
     % The fighter with a higher Opponent Match Win % wins the tiebreaker. 
     % If a fighter had any byes, exclude that round from the calculation.
+    id_opp = id_opp(id_opp~=playerID_BYE);
+    
+    if isempty(id_opp) == 0
+        id_table    = ismember(tablePlayers_forTournament.playerId, id_opp);
+        opp_MWP     = tablePlayers_forTournament.MWP(id_table,1);
+        tablePlayers_forTournament.Opp_MW(i,1) = sum(opp_MWP)/length(opp_MWP);
+        if isnan(tablePlayers_forTournament.Opp_MW(i,1))
+            disp('Problem')
+        end
+    end
+    
 end
-warning('Still need for Opp_MW to exclude byes from calculation')
+
 
 
 end
