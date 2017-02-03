@@ -165,7 +165,7 @@ addPath_bushisoft( option.verbose );
     delete('export/*.xls')
     delete('export/*.xlsx')
     delete('export/*.pdf')
-    
+    delete('export/*.html')
 % else
 %     disp('Wrong password of username')
 %     % close
