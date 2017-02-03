@@ -1260,7 +1260,7 @@ num_lines   = 1;
 defaultans  = {'my_name','my_adress@adress.com', 'my additionnal information', 'pairing.software@gmail.com; '};
 answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
-
+h = waitbar(0.50,'Sending the report. Please wait ...');
 
 disp('- Extract the date of now')
 formatOut = 'yyyy/mm/dd';
@@ -1278,12 +1278,24 @@ save(filename,'TABLE','MATRICE','option')
 
 disp('- Get IP Adress')
 try
-    MyExternalIP=regexp(urlread('http://checkip.dyndns.org'),'(\d+)(\.\d+){3}','match');
+    MyExternalIP = regexp(urlread('http://checkip.dyndns.org'),'(\d+)(\.\d+){3}','match');
+    linkIPLocation = ['http://www.infosniper.net/index.php?ip_address=' ...
+                      MyExternalIP ...
+                      '&map_source=1&overview_map=1&lang=1&map_type=1&zoom_level=7'];
+    linkIPLocation = strjoin(linkIPLocation,'');
+              
 catch
     warning('No internet connection !')
-    ip = '';
+    MyExternalIP = {'NoIP'};
+    linkIPLocation = 'NoIP';
 end
-    
+
+
+
+disp('- Get Mac Adress of the Machine')
+[status,result] = dos('getmac');
+mac = result(160:176);
+
 disp('- Configure the mail adress to send :')
 recipients = answer{4};
 recipients  = strsplit(recipients,';');
@@ -1297,8 +1309,11 @@ message     = ['Dear Admin,' 10 10 ...
                 'Here is the report' 10 ...
                 'Author: ' answer{1} 10 ...
                 'Contact: ' answer{2} 10 ...
-                'IP Adress: ' MyExternalIP{1} 10 10 ...
-                'Additionnal informations: ' 10 answer{3}];
+                'IP Adress: ' MyExternalIP{1} 10 ....
+                'MAC Address: ' mac 10 10 ...
+                'Additionnal informations: ' 10 answer{3} 10 10 10 ...
+                'Note: You can view the origin of the sender by clicking the following link: ' 10 ...
+                linkIPLocation];
 attachments = {filename, fileNameStanding, fileNameCSV};
 
 disp(['-- ' recipients])
@@ -1320,6 +1335,7 @@ displayErrorMsg( msg, handles_i, prefix )
 % disp(['- ' msg])
 % msgbox(msg, 'Error', 'error')
 
+close(h)
 
 function visibilityOnOff(handles, mode)
 
