@@ -1,5 +1,5 @@
 <deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
-  <configuration build-checksum="534272371" file="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\TournamentPairingSofware.prj" location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code" name="TournamentPairingSofware" preferred-package-location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\bin\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+  <configuration build-checksum="1894396964" file="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\TournamentPairingSofware.prj" location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code" name="TournamentPairingSofware" preferred-package-location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\bin\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
     <param.appname>TournamentPairingSofware</param.appname>
     <param.icon>${PROJECT_ROOT}\TournamentPairingSofware_resources\icon.ico</param.icon>
     <param.icons>
@@ -73,7 +73,14 @@
       <file>${PROJECT_ROOT}\src\subFunctions</file>
     </fileset.resources>
     <fileset.package />
-    <fileset.depfun />
+    <fileset.depfun>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\barcodeScanner.m</file>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\UPCReader\All_Files\BYhorizontal.m</file>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\UPCReader\All_Files\CheckT.m</file>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\UPCReader\All_Files\Collect.m</file>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\UPCReader\All_Files\eanupc.m</file>
+      <file>${PROJECT_ROOT}\src\0_toClassify\barcode\UPCReader\UPCReader\All_Files\Region.m</file>
+    </fileset.depfun>
     <build-deliverables>
       <file location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code" name="splash.png" optional="false">E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\splash.png</file>
       <file location="E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code" name="readme.txt" optional="true">E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing Software\code\readme.txt</file>

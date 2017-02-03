@@ -1276,6 +1276,14 @@ save(filename,'TABLE','MATRICE','option')
 % Compress into a zip file
 % To be put in the future
 
+disp('- Get IP Adress')
+try
+    MyExternalIP=regexp(urlread('http://checkip.dyndns.org'),'(\d+)(\.\d+){3}','match');
+catch
+    warning('No internet connection !')
+    ip = '';
+end
+    
 disp('- Configure the mail adress to send :')
 recipients = answer{4};
 recipients  = strsplit(recipients,';');
@@ -1288,7 +1296,8 @@ subject     = [date2 ' Report of tournament (' answer{1} '):' option.tournamentI
 message     = ['Dear Admin,' 10 10 ...
                 'Here is the report' 10 ...
                 'Author: ' answer{1} 10 ...
-                'Contact: ' answer{2} 10 10 ...
+                'Contact: ' answer{2} 10 ...
+                'IP Adress: ' MyExternalIP{1} 10 10 ...
                 'Additionnal informations: ' 10 answer{3}];
 attachments = {filename, fileNameStanding, fileNameCSV};
 
