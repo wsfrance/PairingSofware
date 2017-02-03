@@ -1236,10 +1236,13 @@ global TABLE MATRICE option
 disp('--------------------------------------------------------------------')
 disp('Sending the report')
 
-prompt      = {'Enter your name:','Enter your email address', 'Enter additionnal informations (if you want)'};
+disp('- Save the report')
+fileNameStanding = writeStanding();
+
+prompt      = {'Enter your name:', 'Enter your email address', 'Enter additionnal informations (if you want)', 'Enter email addresses to send (put a comma between each email)'};
 dlg_title   = 'Send the report';
 num_lines   = 1;
-defaultans  = {'my_name','my_adress@adress.com', 'my additionnal information'};
+defaultans  = {'my_name','my_adress@adress.com', 'my additionnal information', 'pairing.software@gmail.com; '};
 answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
 
@@ -1259,10 +1262,20 @@ save(filename,'TABLE','MATRICE','option')
 % To be put in the future
 
 disp('- Configure the mail adress to send :')
-recipients  = 'pairing.software@gmail.com';
+recipients = answer{4};
+recipients  = strsplit(recipients,';');
+if strcmp(recipients(end),' ') == 1
+    recipients = recipients(1:end-1);
+end
+% recipients(strcmp('',recipients)) = [];
+% recipients  = recipients(~cellfun('isempty', recipients)); % delete empty cell 
 subject     = [date2 ' Report of tournament (' answer{1} '):' option.tournamentInfo.name];
-message     = ['Here is the report from: ' answer{2} ' with the following informations: ' answer{3}];
-attachments = {filename};
+message     = ['Dear Admin,' 10 10 ...
+                'Here is the report' 10 ...
+                'Author: ' answer{1} 10 ...
+                'Contact: ' answer{2} 10 10 ...
+                'Additionnal informations: ' 10 answer{3}];
+attachments = {filename, fileNameStanding};
 
 disp(['-- ' recipients])
 disp(['-- ' subject])
