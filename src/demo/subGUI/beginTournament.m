@@ -126,8 +126,8 @@ if option.bool_Tournamentstarted == 0
     disp('-- Initialize the table HistoryTable to store the standing at each round')
     TABLE.HistoryTABLE = table(0,{option.typeRound}, {TABLE.tablePlayers_forTournament},'VariableName', {'no_Round', 'typeOfRound', 'standing'});  
     TABLE.HistoryTABLE_allocation = {inf 'inf' []};
-    nb_allocation = option.no_round + 3;
-    [TABLE.HistoryTABLE] = tableAllocation(nb_allocation, TABLE.HistoryTABLE, TABLE.HistoryTABLE_allocation);
+    % nb_allocation = option.no_round + 3;
+    % [TABLE.HistoryTABLE] = tableAllocation(nb_allocation, TABLE.HistoryTABLE, TABLE.HistoryTABLE_allocation);
     % TABLE.HistoryTABLE(:,:) = []; 
     
     TABLE.HistoryTABLE.no_Round(1,1)      = 0;
