@@ -375,14 +375,13 @@ switch option.typeRound
         if option.boolean_Round
             disp('- Reset option.tmp.compteur_computeScore to 0')
             option.tmp.compteur_computeScore = 0;
-                
+            
             % Save the current standing to the right place in HistoryTABLE
             if option.no_top == 1
                 % First round of the top
                 disp('- 1st round of the top')
                 disp('- Save table of standings of previous round')
                 saveHistoryTABLE([]);
-                TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;
                 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);              
             else
                 disp('- NOT 1st round of the top')
@@ -1108,6 +1107,8 @@ TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,opt
 % Assign ranking
 disp('-- Assign ranking');
 TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
+
+TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;    
 
 
 % --- Executes on button press in BUT_startTimer.
