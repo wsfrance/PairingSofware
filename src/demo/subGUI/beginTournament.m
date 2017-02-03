@@ -218,23 +218,25 @@ function CHECK_showPendingResult_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_showPendingResult
 
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
 
-% global TABLE option
-% 
-% % Check is box of CHECK_showPendingResult is checked or not
+global TABLE option
+
+% Check is box of CHECK_showPendingResult is checked or not
 % bool_check = handles.CHECK_showPendingResult.Value;
-% if bool_check
-%     % Checkbox is checked
-%     disp('- Select and show pending results (Tables) only')
-%     id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
-%     data = table2cell(TABLE.pairingTable(id,:));
-% else
-%     % Checkbox is not checked
-%     disp('- Show all results (Tables)')
-%     data = table2cell(TABLE.pairingTable(:,:)); 
-% end
-% set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
+bool_check = false;
+disp('CHECK_showPendingResult_Callback added in the future')
+if bool_check
+    % Checkbox is checked
+    disp('- Select and show pending results (Tables) only')
+    id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
+    data = table2cell(TABLE.pairingTable(id,:));
+else
+    % Checkbox is not checked
+    disp('- Show all results (Tables)')
+    data = table2cell(TABLE.pairingTable(:,:)); 
+end
+set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
 
 
 % --- Executes on button press in BUT_printMenu.
@@ -248,6 +250,8 @@ global TABLE option
 
 % handlesFigure = handles.beginTournament;
 % [ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+
+h = waitbar(0.50,'Export the pairing in .XLS and .PDF. Please wait ...');
 
 disp('--------------------------------------------------------------------')
 disp('Export the pairing in .XLS and .PDF')
@@ -279,6 +283,7 @@ disp('- Export the Tables in .pdf')
 export_XLS2PDF(filename, filename2, option);
 
 % turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+close(h)
 
 % --- Executes on button press in BUT_playerHistory.
 function BUT_playerHistory_Callback(hObject, eventdata, handles)
