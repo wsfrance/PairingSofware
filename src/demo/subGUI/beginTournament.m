@@ -1237,7 +1237,7 @@ disp('--------------------------------------------------------------------')
 disp('Sending the report')
 
 disp('- Save the report')
-fileNameStanding = writeStanding();
+[fileNameStanding fileNameCSV] = writeStanding();
 
 prompt      = {'Enter your name:', 'Enter your email address', 'Enter additionnal informations (if you want)', 'Enter email addresses to send (put a comma between each email)'};
 dlg_title   = 'Send the report';
@@ -1264,7 +1264,7 @@ save(filename,'TABLE','MATRICE','option')
 disp('- Configure the mail adress to send :')
 recipients = answer{4};
 recipients  = strsplit(recipients,';');
-if strcmp(recipients(end),' ') == 1
+if strcmp(recipients(end),' ') == 1 || strcmp(recipients(end),'') == 1
     recipients = recipients(1:end-1);
 end
 % recipients(strcmp('',recipients)) = [];
@@ -1275,7 +1275,7 @@ message     = ['Dear Admin,' 10 10 ...
                 'Author: ' answer{1} 10 ...
                 'Contact: ' answer{2} 10 10 ...
                 'Additionnal informations: ' 10 answer{3}];
-attachments = {filename, fileNameStanding};
+attachments = {filename, fileNameStanding, fileNameCSV};
 
 disp(['-- ' recipients])
 disp(['-- ' subject])
