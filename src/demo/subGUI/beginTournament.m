@@ -257,6 +257,7 @@ disp('--------------------------------------------------------------------')
 disp('Export the pairing in .XLS and .PDF')
 
 path        = pwd;
+filenamehtml= [path '/export/Pairing_Round_' num2str(option.no_round) '.html'];
 filename    = [path '/export/Pairing_Round_' num2str(option.no_round) '.xls'];
 filename2   = [path '/export/Pairing_Round_' num2str(option.no_round) '.pdf'];
 T           = TABLE.pairingTable;
@@ -274,13 +275,27 @@ if exist(filename2, 'file') == 2
     delete(filename2)
 end
 
-% Export to XLS
-disp('- Export the Tables in .xls')
-exportTable2CSV( T, filename, column, option);
+try
+    % Export to XLS
+    disp('- Export the Tables in .xls')
+    exportTable2CSV( T, filename, column, option);
 
-% Export to PDF
-disp('- Export the Tables in .pdf')
-export_XLS2PDF(filename, filename2, option);
+    % Export to PDF
+    disp('- Export the Tables in .pdf')
+    export_XLS2PDF(filename, filename2, option);
+       
+catch
+    % Export in HTML
+    disp('- Export the Tables in .html')
+    exportTable2html( T, filenamehtml, column, option);
+    
+    % Open in Internet explorer
+    % url = 'http://www.ws-france.fr';
+    web(filenamehtml,'-browser')
+    
+end
+
+
 
 % turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
 close(h)
