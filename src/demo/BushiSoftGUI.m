@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 02-Feb-2017 21:11:25
+% Last Modified by GUIDE v2.5 04-Feb-2017 19:20:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -389,6 +389,15 @@ else
     prefix = '- ';
     displayErrorMsg( msg, handles_i, prefix )  
 end
+
+
+% --------------------------------------------------------------------
+function MENU_managePlayersLocalDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_managePlayersLocalDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+futureFunctionalityMsg(handles)
+
 
 
 % --------------------------------------------------------------------
@@ -1406,6 +1415,5 @@ function MENU_onlineHelp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 url = 'http://www.ws-france.fr';
 web(url,'-browser')
-
 
 
