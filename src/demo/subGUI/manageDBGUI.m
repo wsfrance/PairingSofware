@@ -115,7 +115,9 @@ function BUT_deleteDB_Callback(hObject, eventdata, handles)
 contents = cellstr(get(handles.LIST_DB,'String'));
 selected_DB = contents{get(handles.LIST_DB,'Value')};
 
-if strcmp(selected_DB, 'fileforsw.csv') == 0
+% option.default_DBOnline = 'fileforsw.csv';
+% option.default_DBLocal = 'NewPlayers_local.csv';
+if strcmp(selected_DB, option.default_DBOnline) == 0 && strcmp(selected_DB, option.default_DBLocal) == 0
     dirName = '../data/playerDB';
     filename = [dirName '/' selected_DB];
     try
@@ -125,7 +127,7 @@ if strcmp(selected_DB, 'fileforsw.csv') == 0
         msg = ['FAIL : Delete' selected_DB];
     end
 else
-    msg = 'cannot delete fileforsw.csv. This is the default DB';
+    msg = ['cannot delete ' option.default_DBOnline ' or ' option.default_DBLocal '. This is the default DB'];
 end
 disp(msg)
 msgbox(msg, 'Error', 'error')

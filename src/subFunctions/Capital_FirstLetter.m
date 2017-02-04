@@ -8,7 +8,11 @@ for k = 1:size(column,2)
     column_k = column{k};
     subtable = array_str{:,{column_k}};
     out_array_str = capitalize(subtable);
-    out_table(:,column_k) = out_array_str;
+    if size(out_array_str,1) == 1
+        out_table{:,column_k} = out_array_str;
+    else
+        out_table(:,column_k) = out_array_str;
+    end
 end
 
 

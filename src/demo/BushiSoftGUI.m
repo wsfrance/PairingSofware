@@ -115,6 +115,10 @@ option.sortOrderTournament = 'ascend';
 option.column2sortDB = 'Sort By';
 option.column2sortTournament = 'Sort By';
 option.tmp.bool_createTournament = false;
+option.delimiter = ';';
+option.default_DBOnline = 'fileforsw.csv';
+option.default_DBLocal = 'NewPlayers_local.csv';
+
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -347,7 +351,11 @@ function MENU_newPlayer_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_newPlayer (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
+
+global TABLE MATRICE option
+addNewPlayer(TABLE, MATRICE, option)
+BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
 
 % --------------------------------------------------------------------
 function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
@@ -747,7 +755,7 @@ default_path = '../data/playerDB/';
 importDB(hObject, eventdata, handles, default_path, files) 
 
 % Set default Database in memory
-defaultDB_name = 'fileforsw.csv';
+defaultDB_name = option.default_DBOnline;
 list = TABLE.MEGA_tablePlayers_fromDB(:,1);
 index = strfind_idx(list, defaultDB_name, option.caseInsensitiveOption);
 TABLE.tablePlayers_fromDB = TABLE.MEGA_tablePlayers_fromDB{index,2};
@@ -775,7 +783,7 @@ global TABLE option
 
 for i = 1:size(files,1)
     file_i = [default_path files{i}];
-    data = csvimport(file_i,'delimiter',';');
+    data = csvimport(file_i,'delimiter',option.delimiter);
     disp(['--- Importing: ' file_i])
 
     column_tmp = data(1,:);
@@ -795,7 +803,7 @@ end
 
 if option.tmp.createTournamentBool == false
     disp('-- Create the variable TABLE.tablePlayers_forTournament')
-    id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), 'fileforsw.csv');
+    id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBOnline);
     TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{id,2}(1,:);
     TABLE.tablePlayers_forTournament(:,:) = [];
 end
