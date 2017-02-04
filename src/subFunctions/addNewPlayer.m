@@ -14,8 +14,14 @@ num_lines   = 1;
 defaultans  = variableName2;
 answer      = inputdlg(prompt,dlg_title,num_lines, defaultans);
 
-% Generate a WS Code
-wscode_i = 'ZZabc';
+% Generate a random WS Code starting by ZZZ...
+% wscode_i = 'ZZabc';
+symbols = ['A':'Z' '0':'9'];
+MAX_ST_LENGTH = 3;
+stLength = randi(MAX_ST_LENGTH);
+nums = randi(numel(symbols),[1 stLength]);
+wscode_i = ['ZZZ' symbols(nums)];
+
 answer = answer';
 cellNewPlayer   = [answer(1:idx-1) wscode_i answer(idx:end)];
 tableNewPlayer  = cell2table(cellNewPlayer, 'Variable', variableName);

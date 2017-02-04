@@ -112,6 +112,8 @@ function BUT_deleteDB_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global option
+
 contents = cellstr(get(handles.LIST_DB,'String'));
 selected_DB = contents{get(handles.LIST_DB,'Value')};
 
