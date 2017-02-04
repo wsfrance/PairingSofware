@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Feb-2017 19:20:37
+% Last Modified by GUIDE v2.5 04-Feb-2017 19:23:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1415,5 +1415,3 @@ function MENU_onlineHelp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 url = 'http://www.ws-france.fr';
 web(url,'-browser')
-
-
