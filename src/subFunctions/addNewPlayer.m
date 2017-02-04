@@ -14,42 +14,47 @@ num_lines   = 1;
 defaultans  = variableName2;
 answer      = inputdlg(prompt,dlg_title,num_lines, defaultans);
 
-% Generate a random WS Code starting by ZZZ...
-% wscode_i = 'ZZabc';
-symbols = ['A':'Z' '0':'9'];
-MAX_ST_LENGTH = 3;
-stLength = randi(MAX_ST_LENGTH);
-nums = randi(numel(symbols),[1 stLength]);
-wscode_i = ['ZZZ' symbols(nums)];
 
-answer = answer';
-cellNewPlayer   = [answer(1:idx-1) wscode_i answer(idx:end)];
-tableNewPlayer  = cell2table(cellNewPlayer, 'Variable', variableName);
-
-% Capital Letters
-[ tableNewPlayer ] = Capital_FirstLetter( tableNewPlayer, option.columnCapitalLetters );
-
-% Check if it exists in fileforcsv.csv
-DBName = option.default_DBOnline ; % 'fileforsw.csv';
-[bool_continue1] = checkIfexist (DBName, TABLE, tableNewPlayer);
-
-% Check if it exists already in the local DB
-DBNameLocal = option.default_DBLocal; % 'NewPlayers_local.csv';
-[bool_continue2] = checkIfexist (DBNameLocal, TABLE, tableNewPlayer);
-
-if bool_continue1 && bool_continue2
-    % If not, add it to local DB
-    id_tableLocal = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), DBNameLocal);
-    tableLocal = TABLE.MEGA_tablePlayers_fromDB{id_tableLocal,2};
-    tableLocal = [tableLocal; tableNewPlayer];
-
-    % Update the csv file
-    fileName = '../data/playerDB/NewPlayers_local.csv';
-    writetable(tableLocal,fileName,'Delimiter',option.delimiter)
-
-    disp('Add Player xxx to database')
+if isempty(answer) == 0
+    % Generate a random WS Code starting by ZZZ...
+    % wscode_i = 'ZZabc';
+    symbols = ['A':'Z' '0':'9'];
+    MAX_ST_LENGTH = 3;
+    stLength = randi(MAX_ST_LENGTH);
+    nums = randi(numel(symbols),[1 stLength]);
+    wscode_i = ['ZZZ' symbols(nums)];
+    
+    answer = answer';
+    cellNewPlayer   = [answer(1:idx-1) wscode_i answer(idx:end)];
+    tableNewPlayer  = cell2table(cellNewPlayer, 'Variable', variableName);
+    
+    % Capital Letters
+    [ tableNewPlayer ] = Capital_FirstLetter( tableNewPlayer, option.columnCapitalLetters );
+    
+    % Check if it exists in fileforcsv.csv
+    DBName = option.default_DBOnline ; % 'fileforsw.csv';
+    [bool_continue1] = checkIfexist (DBName, TABLE, tableNewPlayer);
+    
+    % Check if it exists already in the local DB
+    DBNameLocal = option.default_DBLocal; % 'NewPlayers_local.csv';
+    [bool_continue2] = checkIfexist (DBNameLocal, TABLE, tableNewPlayer);
+    
+    if bool_continue1 && bool_continue2
+        % If not, add it to local DB
+        id_tableLocal = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), DBNameLocal);
+        tableLocal = TABLE.MEGA_tablePlayers_fromDB{id_tableLocal,2};
+        tableLocal = [tableLocal; tableNewPlayer];
+        
+        % Update the csv file
+        fileName = '../data/playerDB/NewPlayers_local.csv';
+        writetable(tableLocal,fileName,'Delimiter',option.delimiter)
+        
+        disp('Add Player xxx to database')
+        
+    end
+else
+    disp('- Creation of players was cancelled')
 end
-
 end
 
 

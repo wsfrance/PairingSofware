@@ -362,7 +362,34 @@ function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_editPlayerInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
+global TABLE MATRICE option
+contents = cellstr(get(handles.POP_selectDB,'String'));
+name_DB = contents{get(handles.POP_selectDB,'Value')};
+
+if strcmp(name_DB, option.default_DBLocal) == 1
+    idTable = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), 'NewPlayers_local.csv');
+    data = TABLE.MEGA_tablePlayers_fromDB{idTable,2};
+    UITable = 'TAB_players';
+    [ ~, idx ] = getCellSelect( UITable );
+    if isempty(idx) == 0
+        data = data(idx,:);
+        editExistingPlayer(TABLE, MATRICE, option, data, idx);
+        defaultDB_name = option.default_DBLocal;
+        BUT_refreshLocalDB_Callback(hObject, eventdata, handles, defaultDB_name)
+    else
+        msg = 'Please select a player';
+        handles_i = handles.TXT_error;
+        prefix = '- ';
+        displayErrorMsg( msg, handles_i, prefix )  
+    end
+else
+    msg = ['Error. A player can only be edited if it belongs to the local database: ' option.default_DBLocal];
+    handles_i = handles.TXT_error;
+    prefix = '- ';
+    displayErrorMsg( msg, handles_i, prefix )  
+end
+
 
 % --------------------------------------------------------------------
 function MENU_loadFromDB_Callback(hObject, eventdata, handles)
@@ -732,9 +759,13 @@ image(matlabImage)
 axis off
 % axis image
 
-function loadDefaultPlayer(hObject, eventdata, handles)
+function loadDefaultPlayer(hObject, eventdata, handles, defaultDB_name)
 
 global TABLE option
+
+if nargin < 4
+    defaultDB_name = option.default_DBOnline;
+end
 
 % path = pwd;
 
@@ -755,7 +786,6 @@ default_path = '../data/playerDB/';
 importDB(hObject, eventdata, handles, default_path, files) 
 
 % Set default Database in memory
-defaultDB_name = option.default_DBOnline;
 list = TABLE.MEGA_tablePlayers_fromDB(:,1);
 index = strfind_idx(list, defaultDB_name, option.caseInsensitiveOption);
 TABLE.tablePlayers_fromDB = TABLE.MEGA_tablePlayers_fromDB{index,2};
@@ -1232,10 +1262,17 @@ futureFunctionalityMsg(handles)
 % Then, dl the program and then call the function
 
 % --- Executes on button press in BUT_refreshLocalDB.
-function BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+function BUT_refreshLocalDB_Callback(hObject, eventdata, handles, defaultDB_name)
 % hObject    handle to BUT_refreshLocalDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+if nargin < 4
+    defaultDB_name = option.default_DBOnline;
+end
+
 
 disp('-- Refreshing the local Databases')
 files = listDBPlayers( );
@@ -1245,7 +1282,7 @@ disp(files)
 files = ['Select Database'; files];
 set(handles.POP_selectDB,'String',files)
 
-loadDefaultPlayer(hObject, eventdata, handles)
+loadDefaultPlayer(hObject, eventdata, handles, defaultDB_name)
 
 
 % --------------------------------------------------------------------
