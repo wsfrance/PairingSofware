@@ -329,7 +329,7 @@ switch option.typeRound
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     case 'Round'
         disp('Save the actual Table of tournament for replay')
-        saveHistoryTABLE([]);
+        % saveHistoryTABLE([]);
         if option.no_round <= option.no_maxRound
             if option.boolean_Round
                 
@@ -378,26 +378,34 @@ switch option.typeRound
             
             % Save the current standing to the right place in HistoryTABLE
             if option.no_top == 1
+                % New type
+                option.column2sort = ['PointsOfTop' option.column2sort];
+                option.sortType    = ['descend' option.sortType];
                 % First round of the top
                 disp('- 1st round of the top')
                 disp('- Save table of standings of previous round')
-                saveHistoryTABLE([]);
-                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);              
+                % saveHistoryTABLE([]);
+                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:); 
+                % Reset PointsOfTop to zero
+                zeroMat = zeros(option.topX,1);
+                TABLE.tablePlayers_forTournament.PointsOfTop = zeroMat;
             else
                 disp('- NOT 1st round of the top')
                 disp('- Save table of standings of previous round')
-                [table2sort,player2top]= cutTable();
-                saveHistoryTABLE(table2sort);
-                % keep only the half top for next round
-                disp('- Keep only the half top for next round')                
-                TABLE.tablePlayers_forTournament = player2top;
+                option.topX = option.topX/2;
+                TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);                 
+%                 [table2sort,player2top]= cutTable();
+%                 saveHistoryTABLE(table2sort);
+%                 % keep only the half top for next round
+%                 disp('- Keep only the half top for next round')                
+%                 TABLE.tablePlayers_forTournament = player2top;
             end
             
             % Pairing or not of the players
             if size(TABLE.tablePlayers_forTournament) > 1
                 % If there is more players, continue to make a pairing
                 disp('- Pair the players by Single elimination')
-                TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
+                % TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = singleElimination (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
                 TABLE.historyMatch_tmp(:,:) = [];
                 
@@ -595,13 +603,14 @@ if option.boolean_Round == 0
     if isempty(find(isinf(MATRICE.match_record)==1)) == 1
         option.boolean_Round = 1;
         computeScore(hObject, eventdata, handles);
-        switch option.typeRound
-            case 'Round'
-                saveHistoryTABLE();  
-            case 'Top'
-                [table2sort,~]= cutTable();
-                saveHistoryTABLE(table2sort);
-        end
+%         switch option.typeRound
+%             case 'Round'
+%                 saveHistoryTABLE();  
+%             case 'Top'
+%                 [table2sort,~]= cutTable();
+%                 % saveHistoryTABLE_afterMatch(table2sort);
+%                 saveHistoryTABLE(table2sort);
+%         end
     end
 else
     option.boolean_Round = 0;
@@ -609,6 +618,11 @@ else
     TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id}; % reload previous TABLE in the data
     BUT_saveScore_Callback(hObject, eventdata, handles)
 end
+
+
+function saveHistoryTABLE_afterMatch(table2sort)
+
+global TABLE MATRICE option
 
 
 
@@ -676,23 +690,23 @@ table2sort = updateFinalTable(player2top, player2update);
 
 
 
-function saveHistoryTABLE(table2sort)
-
-global TABLE option
-TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
-TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
-switch option.typeRound
-    case 'Round'
-        TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
-    case 'Top'
-        if option.no_top == 1
-            TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
-        else
-            TABLE.HistoryTABLE.standing{option.no_round+1,1} = table2sort;
-        end
-    otherwise
-        disp('Not known')
-end
+% function saveHistoryTABLE(table2sort)
+% 
+% global TABLE option
+% TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
+% TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
+% switch option.typeRound
+%     case 'Round'
+%         TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
+%     case 'Top'
+%         if option.no_top == 1
+%             TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
+%         else
+%             TABLE.HistoryTABLE.standing{option.no_round+1,1} = table2sort;
+%         end
+%     otherwise
+%         disp('Not known')
+% end
 
 function table2sort = updateFinalTable(player2top, player2bottom)
 
@@ -1073,23 +1087,39 @@ end
 disp('-- Sort the data : 1st time')
 TABLE.tablePlayers_forTournament = sortrows(TABLE.tablePlayers_forTournament,option.column2sort,option.sortType);
 
-
-% Compute Solkoff or Buchholz points
-disp('-- Compute Solkoff or Buchholz points')
-typeSolkoff_buchholz = 'median';
-TABLE.tablePlayers_forTournament = Solkoff_buchholz_Compute (TABLE.historyMatch, TABLE.tablePlayers_forTournament, typeSolkoff_buchholz, option.no_maxRound);
+% take back if in top
+switch option.typeRound
+    case 'Top'
+        TableFromLastRound = TABLE.HistoryTABLE.standing{option.no_round,1};
+        nb_current_player = size(TABLE.tablePlayers_forTournament,1);
+        subtable = [TABLE.tablePlayers_forTournament; TableFromLastRound(nb_current_player+1:end,:)];
+        TABLE.tablePlayers_forTournament = subtable;
+end
 
 % Determine if 1st Loss and store it
 disp('-- Determine if 1st Loss and store it')
 TABLE.tablePlayers_forTournament = firstLoss(TABLE.tablePlayers_forTournament, TABLE.historyMatch_tmp);
 
-% Store cumulative score
-disp('-- Store cumulative score')
-TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forTournament, option.no_round);
+switch option.typeRound
+    case 'Round'        
+        % Compute Solkoff or Buchholz points
+        disp('-- Compute Solkoff or Buchholz points')
+        typeSolkoff_buchholz = 'median';
+        TABLE.tablePlayers_forTournament = Solkoff_buchholz_Compute (TABLE.historyMatch, TABLE.tablePlayers_forTournament, typeSolkoff_buchholz, option.no_maxRound);
 
-% Compute Bushi Points
-disp('-- Compute Bushi Points')
-[ TABLE.tablePlayers_forTournament ] = bushi_points( MATRICE.mat_HistoryMatch, TABLE.tablePlayers_forTournament, option.no_round, option.no_maxRound );
+        % Store cumulative score
+        disp('-- Store cumulative score')
+        TABLE.tablePlayers_forTournament = Cumulative_Tie_break (TABLE.tablePlayers_forTournament, option.no_round);
+
+        % Compute Bushi Points
+        disp('-- Compute Bushi Points')
+        [ TABLE.tablePlayers_forTournament ] = bushi_points( MATRICE.mat_HistoryMatch, TABLE.tablePlayers_forTournament, option.no_round, option.no_maxRound );
+    
+    case 'Top'
+        disp('This Top. No computation for cumulative score and Bushi Points')
+    otherwise
+        disp('Case not known')
+end
 
 % 3.4- Make the ranking
 disp('-- Making the ranking');
@@ -1109,6 +1139,11 @@ disp('-- Assign ranking');
 TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
 
 TABLE.tablePlayers_FINAL = TABLE.tablePlayers_forTournament;    
+
+disp('-- Save in HistoryTABLE')
+TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
+TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
+TABLE.HistoryTABLE.standing{option.no_round+1,1}      = TABLE.tablePlayers_forTournament; 
 
 
 % --- Executes on button press in BUT_startTimer.

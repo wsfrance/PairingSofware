@@ -130,20 +130,26 @@ idTable = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBLoca
 data = TABLE.MEGA_tablePlayers_fromDB{idTable,2};
 idx = handles.LIST_playerLocalDB.Value;
 
-if isempty(idx) == 0
-    data = data(idx,:);
-    deletePlayer(TABLE, MATRICE, option, data, idx);
-    defaultDB_name = option.default_DBLocal;
-    % To avoid error if last selected, diminue value by 1
-    if idx == size(TABLE.MEGA_tablePlayers_fromDB{idTable,2},1)
-        set(handles.LIST_playerLocalDB, 'Value', idx-1);
-    end
-    updateAllGUI(hObject, eventdata, handles, defaultDB_name)
+if size(TABLE.MEGA_tablePlayers_fromDB{idTable,2},1) == 1
+    msg = 'There must be at least 1 player to avoid errors';
+    disp(msg)
+    msgbox(msg,'Error', 'error')
 else
-    msg = 'Please select a player';
-    handles_i = handles.TXT_error;
-    prefix = '- ';
-    displayErrorMsg( msg, handles_i, prefix )
+    if isempty(idx) == 0
+        data = data(idx,:);
+        deletePlayer(TABLE, MATRICE, option, data, idx);
+        defaultDB_name = option.default_DBLocal;
+        % To avoid error if last selected, diminue value by 1
+        if idx == size(TABLE.MEGA_tablePlayers_fromDB{idTable,2},1)
+            set(handles.LIST_playerLocalDB, 'Value', idx-1);
+        end
+        updateAllGUI(hObject, eventdata, handles, defaultDB_name)
+    else
+        msg = 'Please select a player';
+        handles_i = handles.TXT_error;
+        prefix = '- ';
+        displayErrorMsg( msg, handles_i, prefix )
+    end
 end
 
 % --- Executes on button press in BUT_newPlayer.
