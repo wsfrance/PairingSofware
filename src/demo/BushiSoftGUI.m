@@ -214,31 +214,18 @@ if isempty(data)~=1
         WSCode_i = list_data{i,1};
         Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
         selected_data = TABLE.tablePlayers_fromDB(Index,:);
-        % delete selected players from tablePlayers_fromDB
-        % TABLE.tablePlayers_fromDB (Index,:) = []; 
         % check if player is already added
         Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
         if isempty(Index2)==1       
             % add selected players to tablePlayers_forTournament
             TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
-
             % display the data
-            refreshTables(hObject, eventdata, handles)
-            refreshTables(hObject, eventdata, handles)
-            
+            refreshTables(hObject, eventdata, handles)            
         else
-            bool_msg = true;
-            % msg = 'Player is already in the tournament';
-            % handles_i = handles.TXT_error;
-            % prefix = '';
-            % displayErrorMsg( msg, handles_i, prefix )            
-            % disp(msg)
-            % set(handles.TXT_error,'String',msg);
-            
+            bool_msg = true;            
         end
     end
     if bool_msg
-%          msgbox(msg,'Error','error')
         msg = 'Selected Player(s) are already in the tournament';
         handles_i = handles.TXT_error;
         prefix = '';
@@ -250,9 +237,6 @@ else
     handles_i = handles.TXT_error;
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
-    % disp(msg)
-    % msgbox(msg,'Error','error')
-    % set(handles.TXT_error,'String',msg);
 end
     
     
@@ -267,16 +251,6 @@ global TABLE
 UITable = 'TAB_players_Tournament';
 [ data, rows ] = getCellSelect( UITable );
 if isempty(data)~=1
-%     list_data = data(rows,1);
-%     for i = 1:length(rows)
-%         WSCode_i = list_data(i,1);
-%         Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
-%         selected_data = TABLE.tablePlayers_forTournament(Index,:);
-%         % delete selected players
-%         TABLE.tablePlayers_forTournament (Index,:) = [];
-%         % add selected players
-%         % TABLE.tablePlayers_fromDB = [TABLE.tablePlayers_fromDB; selected_data];        
-%     end
     % display the data
     TABLE.tablePlayers_forTournament (rows,:) = [];
     refreshTables(hObject, eventdata, handles)
@@ -286,9 +260,6 @@ else
     handles_i = handles.TXT_error;
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
-    % disp(msg)
-    % msgbox(msg,'Error','error')
-    % set(handles.TXT_error,'String',msg);
 end
 
 
@@ -701,34 +672,6 @@ function MENU_configSQLServer_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 futureFunctionalityMsg(handles)
-
-% --------------------------------------------------------------------
-function MENU_postFacebook_Callback(hObject, eventdata, handles)
-% hObject    handle to MENU_postFacebook (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-futureFunctionalityMsg(handles)
-% url = 'http://www.mathworks.com';
-% web(url,'-browser')
-% 
-% 
-% thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
-% thingSpeakWriteURL = thingSpeakURL;
-% writeApiKey = '1870359846540179';
-% fieldName = 'field1';
-% fieldValue = 42;
-% response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
-% 
-% % test for matlab online
-% thingSpeakURL = 'http://api.thingspeak.com/';
-% thingSpeakWriteURL = [thingSpeakURL 'update'];
-% writeApiKey = '19M8YL1FP1ADB3Q4'; % 'Your Write API Key';
-% data = 42;
-% data = num2str(data);
-% data = ['api_key=',writeApiKey,'&field1=',data];
-% response = webwrite(thingSpeakWriteURL,data)
-
 
 
 % --------------------------------------------------------------------

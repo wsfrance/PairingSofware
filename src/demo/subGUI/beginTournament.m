@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 25-Jan-2017 15:28:01
+% Last Modified by GUIDE v2.5 05-Feb-2017 18:16:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -356,8 +356,6 @@ switch option.typeRound
                 handles_i = handles.TXT_error;
                 prefix = '- ';
                 displayErrorMsg( msg, handles_i, prefix )
-                % disp(['- ' msg])
-                % msgbox(msg, 'Error','error');
                 option.no_round = option.no_round - 1;
             end
         else
@@ -365,8 +363,6 @@ switch option.typeRound
             handles_i = handles.TXT_error;
             prefix = '- ';
             displayErrorMsg( msg, handles_i, prefix )
-            % disp(['- ' msg])
-            % msgbox(msg)
             option.no_round = option.no_round - 1;
         end
     
@@ -383,8 +379,6 @@ switch option.typeRound
                 option.sortType    = ['descend' option.sortType];
                 % First round of the top
                 disp('- 1st round of the top')
-                disp('- Save table of standings of previous round')
-                % saveHistoryTABLE([]);
                 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:); 
                 % Reset PointsOfTop to zero
                 zeroMat = zeros(option.topX,1);
@@ -394,11 +388,6 @@ switch option.typeRound
                 disp('- Save table of standings of previous round')
                 option.topX = option.topX/2;
                 TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(1:option.topX,:);                 
-%                 [table2sort,player2top]= cutTable();
-%                 saveHistoryTABLE(table2sort);
-%                 % keep only the half top for next round
-%                 disp('- Keep only the half top for next round')                
-%                 TABLE.tablePlayers_forTournament = player2top;
             end
             
             % Pairing or not of the players
@@ -434,8 +423,6 @@ switch option.typeRound
             handles_i = handles.TXT_error;
             prefix = '- ';
             displayErrorMsg( msg, handles_i, prefix )
-            % disp(['- ' msg])
-            % msgbox(msg, 'Error','error');
             option.no_round = option.no_round - 1;
         end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
@@ -496,11 +483,8 @@ function automaticCheck_BYE_OfPairingTable(hObject, eventdata, handles, pairingW
         TABLE.historyMatch_tmp.Round(table,1) = option.no_round;
         TABLE.historyMatch_tmp.winner(table,1) = MATRICE.match_record(table,1);
 
-        % WSCode1 = pairingWSCode(table,1);
-        % WSCode2 = pairingWSCode(table,2);
         bool_radio = false;
         automaticWinAgainstBYE(hObject, eventdata, handles, WSCode1, WSCode2, bool_radio)
-    % score = assignScoreAccording2RadioButton(hObject, eventdata, handles, table, WSCode1, WSCode2);
     else
         disp('No BYE Player detected.')
     end
@@ -603,14 +587,6 @@ if option.boolean_Round == 0
     if isempty(find(isinf(MATRICE.match_record)==1)) == 1
         option.boolean_Round = 1;
         computeScore(hObject, eventdata, handles);
-%         switch option.typeRound
-%             case 'Round'
-%                 saveHistoryTABLE();  
-%             case 'Top'
-%                 [table2sort,~]= cutTable();
-%                 % saveHistoryTABLE_afterMatch(table2sort);
-%                 saveHistoryTABLE(table2sort);
-%         end
     end
 else
     option.boolean_Round = 0;
@@ -685,81 +661,57 @@ nb_players = size(TABLE.tablePlayers_forTournament,1);
 % update future delete players
 player2top = TABLE.tablePlayers_forTournament(1:nb_players/2,:);
 player2update = TABLE.tablePlayers_forTournament(nb_players/2+1:end,:);
-table2sort = updateFinalTable(player2top, player2update);
+% table2sort = updateFinalTable(player2top, player2update);
 
 
-
-
-% function saveHistoryTABLE(table2sort)
+% function table2sort = updateFinalTable(player2top, player2bottom)
 % 
 % global TABLE option
-% TABLE.HistoryTABLE.no_Round(option.no_round+1,1)      = option.no_round;
-% TABLE.HistoryTABLE.typeOfRound{option.no_round+1,1}   = option.typeRound;
-% switch option.typeRound
-%     case 'Round'
-%         TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
-%     case 'Top'
-%         if option.no_top == 1
-%             TABLE.HistoryTABLE.standing{option.no_round+1,1} = TABLE.tablePlayers_forTournament;
-%         else
-%             TABLE.HistoryTABLE.standing{option.no_round+1,1} = table2sort;
-%         end
-%     otherwise
-%         disp('Not known')
+% 
+% table2sort = TABLE.tablePlayers_FINAL;
+% 
+% % Sort the list of players
+% % - Extract the ids of top, bottom and other
+% id_top    = find( ismember(table2sort.WSCode, player2top.WSCode)    == 1);
+% id_bottom = find( ismember(table2sort.WSCode, player2bottom.WSCode) == 1);
+% all_wsCodeOfTop = [player2top.WSCode; player2bottom.WSCode];
+% other_id  = find( ismember(table2sort.WSCode, all_wsCodeOfTop)    == 0);
+% 
+% % - Re-arrange ids of bottom depending on their score in rounds
+% orderBottom_WSCode = sortrows(TABLE.tablePlayers_FINAL(id_bottom,:),option.column2sort,option.sortType);
+% n = size(orderBottom_WSCode,1);
+% id_bottom_sorted = zeros(n,1);
+% for i = 1:n
+%     id_bottom_sorted(i,1) = find( ismember(table2sort.WSCode, orderBottom_WSCode.WSCode(i)) == 1);
 % end
-
-function table2sort = updateFinalTable(player2top, player2bottom)
-
-global TABLE option
-
-table2sort = TABLE.tablePlayers_FINAL;
-
-% Sort the list of players
-% - Extract the ids of top, bottom and other
-id_top    = find( ismember(table2sort.WSCode, player2top.WSCode)    == 1);
-id_bottom = find( ismember(table2sort.WSCode, player2bottom.WSCode) == 1);
-all_wsCodeOfTop = [player2top.WSCode; player2bottom.WSCode];
-other_id  = find( ismember(table2sort.WSCode, all_wsCodeOfTop)    == 0);
-
-% - Re-arrange ids of bottom depending on their score in rounds
-orderBottom_WSCode = sortrows(TABLE.tablePlayers_FINAL(id_bottom,:),option.column2sort,option.sortType);
-n = size(orderBottom_WSCode,1);
-id_bottom_sorted = zeros(n,1);
-for i = 1:n
-    id_bottom_sorted(i,1) = find( ismember(table2sort.WSCode, orderBottom_WSCode.WSCode(i)) == 1);
-end
-
-% - Re-arrange the table
-id_sorted = [id_top; id_bottom_sorted; other_id];
-table2sort = table2sort(id_sorted,:);
-
-% Assign ranking
-% TABLE.tablePlayers_forTournament = assignRanking(TABLE.tablePlayers_forTournament,option.column2sort);
-% warning('Still to be done')
-choice = 'advanced';
-switch choice
-    case 'simple'
-        table2sort.Ranking = [1:size(table2sort,1)]';
-    case 'advanced'
-        % Top
-        table1 = table2sort(id_top,:);
-        nb_top = size(table1,1);
-        table1.Ranking = ones(nb_top,1);
-        % Bottom
-        start_ranking = nb_top+1;
-        table2 = table2sort(id_bottom_sorted,:);
-        table2 = assignRanking(table2,option.column2sort, start_ranking);
-        % Other
-        start_ranking = nb_top + size(table2,1) +1;
-        table3 = table2sort(other_id,:);
-        table3 = assignRanking(table3,option.column2sort, start_ranking);
-        
-        table2sort = [table1; table2; table3];
-end
-
-
-% Store in the Table
-TABLE.tablePlayers_FINAL = table2sort;
+% 
+% % - Re-arrange the table
+% id_sorted = [id_top; id_bottom_sorted; other_id];
+% table2sort = table2sort(id_sorted,:);
+% 
+% % Assign ranking
+% choice = 'advanced';
+% switch choice
+%     case 'simple'
+%         table2sort.Ranking = [1:size(table2sort,1)]';
+%     case 'advanced'
+%         % Top
+%         table1 = table2sort(id_top,:);
+%         nb_top = size(table1,1);
+%         table1.Ranking = ones(nb_top,1);
+%         % Bottom
+%         start_ranking = nb_top+1;
+%         table2 = table2sort(id_bottom_sorted,:);
+%         table2 = assignRanking(table2,option.column2sort, start_ranking);
+%         % Other
+%         start_ranking = nb_top + size(table2,1) +1;
+%         table3 = table2sort(other_id,:);
+%         table3 = assignRanking(table3,option.column2sort, start_ranking);
+%         
+%         table2sort = [table1; table2; table3];
+% end
+% % Store in the Table
+% TABLE.tablePlayers_FINAL = table2sort;
 
 
 function displayPairingTable(hObject, eventdata, handles)
@@ -997,9 +949,6 @@ option.topX = 4;
 go2Top(hObject, eventdata, handles)
 
 
-
-
-
 % --------------------------------------------------------------------
 function MENU_top8_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_top8 (see GCBO)
@@ -1036,8 +985,6 @@ else
     handles_i = handles.TXT_error;
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
-    % disp(msg)
-    % msgbox(msg,'Error','error')
 end
 
 % --------------------------------------------------------------------
@@ -1045,8 +992,35 @@ function MENU_otherTop_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_otherTop (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
 
+global option
+bool = false;
+
+prompt      = 'Number of players in the Top (it has to be a power of 2)';
+
+while bool == false
+    % Ask for the new player
+    
+    dlg_title   = 'Question : Top Cut';
+    num_lines   = 1;
+    defaultans  = {'8'};
+    answer      = inputdlg(prompt,dlg_title,num_lines, defaultans);
+    if isempty(answer) == 0
+        n = str2num(answer{1});
+        bool = floor(log2(n))==log2(n);
+
+        if bool
+            option.topX = answer{1};
+            go2Top(hObject, eventdata, handles)
+        else
+            prompt      = 'Entered number was not a number of 2. Again : Number of players in the Top (it has to be a power of 2)';
+        end
+    else
+        disp('Selection was cancelled.')
+        bool = true;
+    end
+end
 % --------------------------------------------------------------------
 function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
@@ -1166,8 +1140,10 @@ function varargout = updateListPlayers(hObject, eventdata, handles)
 
 global TABLE option
 % Set list
-firstnames  = table2cell(TABLE.tablePlayers_forTournament(:,'name'));
-lastnames   = table2cell(TABLE.tablePlayers_forTournament(:,'familyName'));
+% subtable = TABLE.tablePlayers_forTournament
+subtable = TABLE.HistoryTABLE.standing{1};
+firstnames  = table2cell(subtable(:,'name'));
+lastnames   = table2cell(subtable(:,'familyName'));
 names       = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');
 names       = sort(names); % Sort name by alphabetical order
 set(handles.LIST_listPlayer, 'String', names)
@@ -1363,7 +1339,9 @@ try
     sendGmail( recipients, subject, message, attachments )
     msg = ['Report has been sent successfully to: ' recipients];
 catch
-    msg = ['FAIL : Report cannot be sent to: ' recipients];
+    msg = ['FAIL : Report cannot be sent to: ' recipients '. Maybe you have to configure your '...
+           'antivirus to allow mail to be sent outside (Problem known with Avast: ' ...
+           'paramètres, protection active, agent mail, tu cliques sur la roue dentée et tu décoches la case " analyser le courrier sortant"'];
 end
 handles_i = handles.TXT_error;
 prefix = '';
@@ -1382,3 +1360,30 @@ set(handles.TAB_pairing, 'Visible', mode)
 set(handles.GROUP_reportScores, 'Visible', mode)
 set(handles.CHECK_showPendingResult, 'Visible', mode)
 
+
+
+% --------------------------------------------------------------------
+function MENU_postFacebook_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_postFacebook (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+futureFunctionalityMsg(handles)
+% url = 'http://www.mathworks.com';
+% web(url,'-browser')
+% 
+% 
+% thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
+% thingSpeakWriteURL = thingSpeakURL;
+% writeApiKey = '1870359846540179';
+% fieldName = 'field1';
+% fieldValue = 42;
+% response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+% 
+% % test for matlab online
+% thingSpeakURL = 'http://api.thingspeak.com/';
+% thingSpeakWriteURL = [thingSpeakURL 'update'];
+% writeApiKey = '19M8YL1FP1ADB3Q4'; % 'Your Write API Key';
+% data = 42;
+% data = num2str(data);
+% data = ['api_key=',writeApiKey,'&field1=',data];
+% response = webwrite(thingSpeakWriteURL,data)
