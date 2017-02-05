@@ -1,2 +1,3 @@
-familyName;name;WSCode;pseudo;country;locations
-Familyname;Name;ZZZ6E6;Pseudo;country;locations
+Language;Series;WSCode;country;familyName;locations;name;pseudo
+;;ZZZ6E6;country;Familyname;locations;Name;Pseudo
+Language;Series;ZZZXB4;country;Familyname;locations;Name;Pseudo
