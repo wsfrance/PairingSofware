@@ -43,7 +43,8 @@ if isempty(answer) == 0
         % If not, add it to local DB
         id_tableLocal = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), DBNameLocal);
         tableLocal = TABLE.MEGA_tablePlayers_fromDB{id_tableLocal,2};
-        tableLocal = [tableLocal; tableNewPlayer];
+        % tableLocal = [tableLocal; tableNewPlayer];
+        tableLocal = concatenateTable(tableLocal, tableNewPlayer);
         
         % Update the csv file
         fileName = '../data/playerDB/NewPlayers_local.csv';
