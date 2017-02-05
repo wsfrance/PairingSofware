@@ -355,7 +355,8 @@ function MENU_newPlayer_Callback(hObject, eventdata, handles)
 
 global TABLE MATRICE option
 addNewPlayer(TABLE, MATRICE, option)
-BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
+defaultDB_name = option.default_DBLocal;
+BUT_refreshLocalDB_Callback(hObject, eventdata, handles, defaultDB_name);
 
 % --------------------------------------------------------------------
 function MENU_editPlayerInfo_Callback(hObject, eventdata, handles)
@@ -368,7 +369,7 @@ contents = cellstr(get(handles.POP_selectDB,'String'));
 name_DB = contents{get(handles.POP_selectDB,'Value')};
 
 if strcmp(name_DB, option.default_DBLocal) == 1
-    idTable = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), 'NewPlayers_local.csv');
+    idTable = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBLocal);
     data = TABLE.MEGA_tablePlayers_fromDB{idTable,2};
     UITable = 'TAB_players';
     [ ~, idx ] = getCellSelect( UITable );
@@ -396,7 +397,7 @@ function MENU_managePlayersLocalDB_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_managePlayersLocalDB (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+manageLocalPlayerGUI();
 
 
 
@@ -768,84 +769,10 @@ image(matlabImage)
 axis off
 % axis image
 
-function loadDefaultPlayer(hObject, eventdata, handles, defaultDB_name)
-
-global TABLE option
-
-if nargin < 4
-    defaultDB_name = option.default_DBOnline;
-end
-
-% path = pwd;
-
-% From excel file
-% default_DB_filename = [path '/import/Database_Players.xls'];
-% [~,~,data] = xlsread(default_DB_filename);
-
-% import each csv
-disp('-- Importing each database')
-dirName = '../data/playerDB';              %# folder path
-files = dir( fullfile(dirName,'*.csv') );   %# list all *.xyz files
-files = {files.name}';                      %'# file names
-
-% from CSV
-% default_DB_filename = '../data/playerDB/fileforsw.csv';
-default_path = '../data/playerDB/';
-
-importDB(hObject, eventdata, handles, default_path, files) 
-
-% Set default Database in memory
-list = TABLE.MEGA_tablePlayers_fromDB(:,1);
-index = strfind_idx(list, defaultDB_name, option.caseInsensitiveOption);
-TABLE.tablePlayers_fromDB = TABLE.MEGA_tablePlayers_fromDB{index,2};
-
-% Set the POP menu to default database
-contents = cellstr(get(handles.POP_selectDB,'String'));
-index = strfind_idx(contents, defaultDB_name, option.caseInsensitiveOption);
-set(handles.POP_selectDB,'Value',index)
-
-% Select Data to vizualize
-% data = table2cell(TABLE.tablePlayers_fromDB(:,option.columnTableDB));
-% set(handles.TAB_players, 'data', data, 'ColumnName', option.columnTableDB)
-% data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-% set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
-refreshTables(hObject, eventdata, handles)
-
-% List of sortBy possibilities and display it into handles.POP_sortBy
-sortBy_option = ['Sort By'; option.columnTableDB'];
-set(handles.POP_sortBy,'String', sortBy_option)  ;
 
 
-function importDB(hObject, eventdata, handles, default_path, files) 
 
-global TABLE option
 
-for i = 1:size(files,1)
-    file_i = [default_path files{i}];
-    data = csvimport(file_i,'delimiter',option.delimiter);
-    disp(['--- Importing: ' file_i])
-
-    column_tmp = data(1,:);
-    TABLE.MEGA_tablePlayers_fromDB{i,1} = files{i};
-    TABLE.MEGA_tablePlayers_fromDB{i,2} = array2table(data(2:end,:), 'VariableNames', column_tmp);
-
-    % Delete ""
-    disp('--- Delete false characters (like ", etc.)')
-    TABLE.MEGA_tablePlayers_fromDB{i,2}.name = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.name,'"','');
-    TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.familyName,'"','');
-    TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.pseudo,'"','');
-
-    % Capital Letters
-    disp(['--- Set Capital Letters to selected columns : ' strjoin(option.columnCapitalLetters,', ')])
-    [ TABLE.MEGA_tablePlayers_fromDB{i,2} ] = Capital_FirstLetter( TABLE.MEGA_tablePlayers_fromDB{i,2}, option.columnCapitalLetters );
-end
-
-if option.tmp.createTournamentBool == false
-    disp('-- Create the variable TABLE.tablePlayers_forTournament')
-    id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBOnline);
-    TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{id,2}(1,:);
-    TABLE.tablePlayers_forTournament(:,:) = [];
-end
 
 % --- Executes on key press with focus on EDIT_searchPlayer and none of its controls.
 function EDIT_searchPlayer_KeyPressFcn(hObject,eventdata,handles)
@@ -1108,55 +1035,9 @@ refreshTables(handleTable, handleSortBy, handles, type);
 
 
 
-function refreshTables(hObject, eventdata, handles, type)
 
-global TABLE option
-if nargin < 4 
-    refreshTables(hObject, eventdata, handles, 'DB')
-    refreshTables(hObject, eventdata, handles, 'tournament')
-else
-    switch type
-        case 'DB'        
-            column2sort     = option.column2sortDB      ;
-            table_tmp       = TABLE.tablePlayers_fromDB ;
-            handle_display  = handles.TAB_players       ;
-            column2display  = option.columnTableDB      ;
-            sortOrder       = option.sortOrderDB        ;
-            displayOrderTable(option, column2sort, table_tmp, handle_display, column2display, sortOrder)
-
-        case 'tournament'
-            column2sort     = option.column2sortTournament      ;
-            table_tmp       = TABLE.tablePlayers_forTournament  ;
-            handle_display  = handles.TAB_players_Tournament    ;
-            column2display  = option.columnTableDB              ;
-            sortOrder       = option.sortOrderTournament        ;
-            displayOrderTable(option,column2sort, table_tmp, handle_display, column2display, sortOrder)
-
-            % data = table2cell(TABLE.tablePlayers_forTournament(:,option.columnTableDB));
-            % set(handles.TAB_players_Tournament, 'data', data, 'ColumnName', option.columnTableDB)
-        otherwise
-            disp('case not known')
-    end
-end
     
-function displayOrderTable(option, column2sort, table_tmp, handle_display, column2display, sortOrder)
 
-if isfield(option,'column2sortDB') == 0
-    bool = true;
-elseif strcmp(column2sort,'Sort By') == 0
-    bool = true;
-else
-    bool = false;
-end
-
-if bool
-    data2 = sortrows(table_tmp(:,column2display), column2sort, sortOrder);
-else
-    disp('This is SORT BY')
-    data2 = table_tmp(:,column2display);
-end
-data2 = table2cell(data2);
-set(handle_display, 'data', data2, 'ColumnName', column2display)
 
 
 
@@ -1281,17 +1162,17 @@ global option
 if nargin < 4
     defaultDB_name = option.default_DBOnline;
 end
-
-
-disp('-- Refreshing the local Databases')
-files = listDBPlayers( );
-
-disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
-disp(files)
-files = ['Select Database'; files];
-set(handles.POP_selectDB,'String',files)
-
-loadDefaultPlayer(hObject, eventdata, handles, defaultDB_name)
+BUT_refreshLocalDB(hObject, eventdata, handles, defaultDB_name)
+% 
+% disp('-- Refreshing the local Databases')
+% files = listDBPlayers( );
+% 
+% disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
+% disp(files)
+% files = ['Select Database'; files];
+% set(handles.POP_selectDB,'String',files)
+% 
+% loadDefaultPlayer(hObject, eventdata, handles, defaultDB_name)
 
 
 % --------------------------------------------------------------------
