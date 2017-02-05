@@ -1,4 +1,5 @@
 function showHandlesTournament(handles, mode)
+
 set(handles.BUT_addPlayer, 'Visible', mode)
 set(handles.BUT_removePlayer, 'Visible', mode)
 set(handles.TEXT_playerForTournament, 'Visible', mode)
@@ -12,3 +13,5 @@ set(handles.TEXT_tournamentName, 'Visible', mode)
 set(handles.EDIT_tournamentName, 'Visible', mode)
 set(handles.TEXT_tournamentInformation, 'Visible', mode)
 set(handles.BUT_saveAsLocalDB, 'Visible', mode)
+set(handles.BUT_editPlayerAdditionnalInformation, 'Visible', mode)
+set(handles.BUT_addPlayerBarcode, 'Visible', mode)

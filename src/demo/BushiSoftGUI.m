@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 04-Feb-2017 19:23:07
+% Last Modified by GUIDE v2.5 05-Feb-2017 21:33:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -118,7 +118,7 @@ option.tmp.bool_createTournament = false;
 option.delimiter = ';';
 option.default_DBOnline = 'fileforsw.csv';
 option.default_DBLocal = 'NewPlayers_local.csv';
-
+option.additionnalTournamentVariable = {'Series' 'Language'};
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -145,7 +145,9 @@ addPath_bushisoft( option.verbose );
     warning('off','all')
     BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
     warning('on','all')
-
+    
+    
+    
 
     % Remove spaces at the begining and at the end
     % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
@@ -218,7 +220,9 @@ if isempty(data)~=1
         Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
         if isempty(Index2)==1       
             % add selected players to tablePlayers_forTournament
-            TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
+            % TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
+            output = concatenateTable(TABLE.tablePlayers_forTournament, selected_data);
+            TABLE.tablePlayers_forTournament = output;
             % display the data
             refreshTables(hObject, eventdata, handles)            
         else
@@ -1239,3 +1243,64 @@ function MENU_onlineHelp_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 url = 'http://www.ws-france.fr';
 web(url,'-browser')
+
+
+% --- Executes on button press in BUT_editPlayerAdditionnalInformation.
+function BUT_editPlayerAdditionnalInformation_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_editPlayerAdditionnalInformation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE option
+
+UITable = 'TAB_players_Tournament';
+[ data, rows] = getCellSelect( UITable );
+
+% If the selection is not empty, transfer player from
+% TABLE.tablePlayers_fromDB to TABLE.tablePlayers_forTournament
+if isempty(data)~=1
+    list_data = data(rows,1);
+    % Loop if multiple players are selected
+    for i = 1:length(rows)
+        % Rely on WSCode that is unique for players
+        WSCode_i = list_data{i,1};
+        Index = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
+        
+        % Look at existing answer
+        existing_answer = TABLE.tablePlayers_forTournament(:,option.additionnalTournamentVariable);
+        existing_answer = table2cell(existing_answer)';
+        
+        namePlayer = [TABLE.tablePlayers_forTournament.name{Index} ', '  TABLE.tablePlayers_forTournament.familyName{Index}] ;
+        answer = askAdditionnalInfo(option, existing_answer, namePlayer);
+        if isempty(answer)==0
+            variableAll =  TABLE.tablePlayers_forTournament.Properties.VariableNames;
+            for j = 1:size(option.additionnalTournamentVariable,2)
+                variable_j = option.additionnalTournamentVariable{j};
+                idx = strfind_idx(variableAll', variable_j);
+                TABLE.tablePlayers_forTournament{Index,idx} = {answer{j}};
+            end
+            refreshTables(hObject, eventdata, handles)         
+        else
+            disp('- Edit was cancelled')
+        end
+    end
+else
+    % If no player in the DB, it is an error
+    msg = 'Selection in cancelled !!';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+end
+
+
+function answer = askAdditionnalInfo(option, existing_answer, namePlayer)
+
+% Ask for the new player
+prompt      = option.additionnalTournamentVariable;
+dlg_title   = ['Additionnal information: ' namePlayer];
+N           = 30;
+num_lines   = 1;
+defaultans  = existing_answer; % option.additionnalTournamentVariable;
+answer      = inputdlg(prompt,dlg_title, [num_lines, length(dlg_title)+N], defaultans);
+
+

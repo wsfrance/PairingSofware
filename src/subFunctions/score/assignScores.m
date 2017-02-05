@@ -33,9 +33,17 @@ switch match_record(i,1)
         % Player 1 or 2 winner
         tablePlayers_forTournament.winNumber(id_winner) = tablePlayers_forTournament.winNumber(id_winner)+1;
         tablePlayers_forTournament.lossNumber(id_loser) = tablePlayers_forTournament.lossNumber(id_loser)+1;
-
-        tablePlayers_forTournament.Points(id_winner) = tablePlayers_forTournament.Points(id_winner)+ option.winningPoint;
-        tablePlayers_forTournament.Points(id_loser) = tablePlayers_forTournament.Points(id_loser)+ option.losePoint;
+        
+        switch option.typeRound
+            case 'Round'
+                tablePlayers_forTournament.Points(id_winner) = tablePlayers_forTournament.Points(id_winner)+ option.winningPoint;
+                tablePlayers_forTournament.Points(id_loser) = tablePlayers_forTournament.Points(id_loser)+ option.losePoint;
+            case 'Top'
+                tablePlayers_forTournament.PointsOfTop(id_winner) = tablePlayers_forTournament.PointsOfTop(id_winner)+ option.winningPoint;
+                tablePlayers_forTournament.PointsOfTop(id_loser) = tablePlayers_forTournament.PointsOfTop(id_loser)+ option.losePoint;
+            otherwise
+                disp('Case not known')
+        end
     
     case 3    
         % Player 1 and 2 tied

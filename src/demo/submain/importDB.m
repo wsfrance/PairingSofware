@@ -24,7 +24,10 @@ end
 
 if option.tmp.createTournamentBool == false
     disp('-- Create the variable TABLE.tablePlayers_forTournament')
-    id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBOnline);
-    TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{id,2}(1,:);
-    TABLE.tablePlayers_forTournament(:,:) = [];
+    % id = strfind_idx(TABLE.MEGA_tablePlayers_fromDB(:,1), option.default_DBOnline);
+    % TABLE.tablePlayers_forTournament = TABLE.MEGA_tablePlayers_fromDB{id,2}(1,:);
+    % TABLE.tablePlayers_forTournament(:,:) = [];
+    disp('- Create Tournament database')
+    output = create_tablePlayersTournament(TABLE, option);
+    TABLE.tablePlayers_forTournament = output;
 end

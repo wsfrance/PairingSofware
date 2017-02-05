@@ -351,7 +351,7 @@ function BUT_save_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global option
+global TABLE option
 
 close
 
@@ -370,3 +370,7 @@ set(GUI1_handles.TEXT_tournamentInformation, 'String', option.tournamentInfo.des
 
 mode = 'on';
 showHandlesTournament(GUI1_handles, mode);
+
+disp('- Create Tournament database')
+output = create_tablePlayersTournament(TABLE, option);
+TABLE.tablePlayers_forTournament = output;

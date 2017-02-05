@@ -1141,7 +1141,11 @@ function varargout = updateListPlayers(hObject, eventdata, handles)
 global TABLE option
 % Set list
 % subtable = TABLE.tablePlayers_forTournament
-subtable = TABLE.HistoryTABLE.standing{1};
+try
+    subtable    = TABLE.HistoryTABLE.standing{1};
+catch
+    subtable = TABLE.tablePlayers_forTournament;
+end
 firstnames  = table2cell(subtable(:,'name'));
 lastnames   = table2cell(subtable(:,'familyName'));
 names       = strcat(lastnames, {', '}, firstnames, {' ('}, num2str(option.no_round), ')');

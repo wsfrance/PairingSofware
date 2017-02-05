@@ -20,14 +20,14 @@ end
 
 % Write header
 fid         = fopen( fileName, 'wt' );
-nb_endRound = size(TABLE.HistoryTABLE,1);
-tableIn     = TABLE.HistoryTABLE.standing{nb_endRound};
+% nb_endRound = size(TABLE.HistoryTABLE,1);
+tableIn     = TABLE.tablePlayers_FINAL; % TABLE.HistoryTABLE.standing{nb_endRound};
 
 % Write standings
 header = ['Standings - Neo Standard - ' option.tournamentInfo.location ' - ' option.tournamentInfo.date ':'];
 fprintf( fid, '%s\n\n', header);
 for i = 1:size(tableIn,1)
-    fprintf( fid, '%d. %s,%s (%s)\n', tableIn.Ranking(i), tableIn.name{i}, tableIn.familyName{i}, tableIn.WSCode{i});
+    fprintf( fid, '%d. %s,%s - %s (%s)\n', tableIn.Ranking(i), tableIn.name{i}, tableIn.familyName{i}, tableIn.Series{i}, tableIn.Language{i});
 end
 fclose(fid);
 
