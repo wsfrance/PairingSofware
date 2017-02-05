@@ -22,7 +22,7 @@ function varargout = manageDBGUI(varargin)
 
 % Edit the above text to modify the response to help manageDBGUI
 
-% Last Modified by GUIDE v2.5 01-Feb-2017 21:15:56
+% Last Modified by GUIDE v2.5 05-Feb-2017 13:15:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -143,8 +143,3 @@ disp(['-- ' num2str(size(files,1)) ' file(s) were found locally: '])
 disp(files)
 files = ['Select Database'; files];
 set(handleListDB,'String',files, 'Value', size(files,1))
-
-
-
-
-
