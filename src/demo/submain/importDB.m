@@ -6,11 +6,17 @@ for i = 1:size(files,1)
     file_i = [default_path files{i}];
     data = csvimport(file_i,'delimiter',option.delimiter);
     disp(['--- Importing: ' file_i])
-
+    
     column_tmp = data(1,:);
+    % Delete incorrect characters
+    column_tmp = strrep(column_tmp,'?','');
+    column_tmp = strrep(column_tmp,'ï','');
+    column_tmp = strrep(column_tmp,'»','');
+    column_tmp = strrep(column_tmp,'¿','');
+    
     TABLE.MEGA_tablePlayers_fromDB{i,1} = files{i};
     TABLE.MEGA_tablePlayers_fromDB{i,2} = array2table(data(2:end,:), 'VariableNames', column_tmp);
-
+            
     % Delete ""
     disp('--- Delete false characters (like ", etc.)')
     TABLE.MEGA_tablePlayers_fromDB{i,2}.name = strrep(TABLE.MEGA_tablePlayers_fromDB{i,2}.name,'"','');
