@@ -81,8 +81,8 @@ disp('- Ask the number of rounds')
 answer = askNbRounds();
 option.no_maxRound = str2num(answer);
 
-disp('- Get IP and Mac Adress')
-[option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
+% disp('- Get IP and Mac Adress')
+% [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
 
 disp('- Look if we start from a save file or a new tournament')
 if option.bool_Tournamentstarted == 0
@@ -1301,13 +1301,13 @@ save(filename,'TABLE','MATRICE','option')
 % Compress into a zip file
 % To be put in the future
 
-if option.UserInfo.bool_getIP == false
+% if option.UserInfo.bool_getIP == false
     [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
-else
-    MyExternalIP = option.UserInfo.MyExternalIP;
-    linkIPLocation = option.UserInfo.linkIPLocation;
-    mac = option.UserInfo.mac;
-end
+% else
+%     MyExternalIP = option.UserInfo.MyExternalIP;
+%     linkIPLocation = option.UserInfo.linkIPLocation;
+%     mac = option.UserInfo.mac;
+% end
 
 disp('- Configure the mail adress to send :')
 recipients = answer{4};
