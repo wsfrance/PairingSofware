@@ -1,7 +1,36 @@
-Select
-Parkage
-Games From Japan
-Avignon
-Dijon
-Toulouse
-Other
+idloc;country;locname
+1;Italy;"Angeli e Draghi"
+2;Italy;"Game Over Terni"
+3;Italy;"Dark Angel 1999"
+9;Italy;Alfacomics
+10;Italy;"Accademia del Duellante"
+12;Italy;"Casa del Gioco UESM"
+15;Italy;"Fumetteria Carta Viva"
+16;Italy;"La Forgia del Tempo"
+18;Italy;"Games Kingdom"
+20;Italy;"La Taverna del Gargoyle"
+21;Italy;"Games Academy Firenze"
+23;Italy;"Gamestime Napoli"
+26;France;"Comic Book"
+27;Spain;"Akiba Store"
+28;Austria;"Siren Games"
+29;Portugal;"Gargula Templo de Jogos"
+30;Portugal;"TCG Empire"
+31;"United Kingdom";"Geek Retreat"
+32;"United Kingdom";"Games Hub Edinburgh"
+33;France;"Fantasy Sphere"
+34;France;"Manga Evasion"
+35;France;Parkage
+36;France;Epitanime
+37;"United Kingdom";"Patriot Games Sheffield"
+38;"United Kingdom";"Wargames Workshop"
+39;"United Kingdom";Chimera
+40;Spain;"La Màquina del Temps"
+41;Italy;"Wonderland Bologna"
+42;Germany;Auenland
+43;Germany;Hiveworld
+44;Switzerland;"Le Maitre de Jeux"
+45;Switzerland;"L'Arène de Duel"
+46;Italy;Otakustore
+47;Spain;"Only Cards"
+0;"No coutry";Other

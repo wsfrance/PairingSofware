@@ -24,7 +24,7 @@ fid         = fopen( fileName, 'wt' );
 tableIn     = TABLE.tablePlayers_FINAL; % TABLE.HistoryTABLE.standing{nb_endRound};
 
 % Write standings
-header = ['Standings - Neo Standard - ' option.tournamentInfo.location ' - ' option.tournamentInfo.date ':'];
+header = ['Standings - Neo Standard - ' option.tournamentInfo.locationInfo.locname{1} ' (' option.tournamentInfo.locationInfo.country{1} ') - ' option.tournamentInfo.date ':'];
 fprintf( fid, '%s\n\n', header);
 for i = 1:size(tableIn,1)
     fprintf( fid, '%d. %s,%s - %s (%s)\n', tableIn.Ranking(i), tableIn.name{i}, tableIn.familyName{i}, tableIn.Series{i}, tableIn.Language{i});

@@ -74,7 +74,16 @@ option.list.pairingMethod   = csvimport(default_pairingMethod,'delimiter',';');
 default_tournamentType      = [path '/import/TournamentType.csv'];
 option.list.tournamentType  = csvimport(default_tournamentType,'delimiter',';');
 
-set(handles.POP_location, 'String', option.list.locations);
+% Transform to table
+data = option.list.locations;
+column_tmp = data(1,:);
+data = array2table(data(2:end,:), 'VariableNames', column_tmp);
+data.locname = strrep(data.locname,'"','');
+option.list.locations = data;
+
+% Set in GUI
+data_location = ['Select'; option.list.locations.locname];
+set(handles.POP_location, 'String', data_location);
 set(handles.POP_pairingMethod, 'String', option.list.pairingMethod)
 set(handles.POP_tournamentType, 'String', option.list.tournamentType)
 
@@ -94,7 +103,7 @@ global option
 set(handles.BUT_date, 'String', option.tournamentInfo.date)
 set(handles.EDIT_tournamentName, 'String', option.tournamentInfo.name)
 set(handles.EDIT_tournamentDescription, 'String', option.tournamentInfo.description)
-id = strfind_idx(option.list.locations, option.tournamentInfo.location);
+id = strfind_idx(option.list.locations.locname, option.tournamentInfo.location) + 1;
 set(handles.POP_location, 'Value', id)
 id = strfind_idx(option.list.pairingMethod, option.tournamentInfo.pairingMethod);
 set(handles.POP_pairingMethod, 'Value', id)
@@ -268,7 +277,8 @@ global option
 
 contents= cellstr(get(hObject,'String'));
 option.tournamentInfo.location = contents{get(hObject,'Value')};
-
+id = strfind_idx(option.list.locations.locname, option.tournamentInfo.location);
+option.tournamentInfo.locationInfo = option.list.locations(id,:);
 
 % --- Executes during object creation, after setting all properties.
 function POP_location_CreateFcn(hObject, eventdata, handles)
@@ -299,6 +309,9 @@ option.tournamentInfo.description = 'No description';
 option.tournamentInfo.tournamentType = 'Local';
 option.tournamentInfo.pairingMethod = 'Swiss Round';
 option.tournamentInfo.location = 'Other';
+
+id = strfind_idx(option.list.locations.locname, option.tournamentInfo.location);
+option.tournamentInfo.locationInfo = option.list.locations(id,:);
 
 displayTournamentInfo(hObject, eventdata, handles);
 

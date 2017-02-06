@@ -81,6 +81,8 @@ disp('- Ask the number of rounds')
 answer = askNbRounds();
 option.no_maxRound = str2num(answer);
 
+disp('- Get IP and Mac Adress')
+[option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
 
 disp('- Look if we start from a save file or a new tournament')
 if option.bool_Tournamentstarted == 0
@@ -1274,6 +1276,9 @@ disp('Sending the report')
 disp('- Save the report')
 [fileNameStanding fileNameCSV] = writeStanding();
 
+header = [option.tournamentInfo.locationInfo.locname{1} ' (' option.tournamentInfo.locationInfo.country{1} ') - ' option.tournamentInfo.date];
+id_location = num2str(option.tournamentInfo.locationInfo.idloc{1});
+
 prompt      = {'Enter your name:', 'Enter your email address', 'Enter additionnal informations (if you want)', 'Enter email addresses to send (put a comma between each email)'};
 dlg_title   = 'Send the report';
 num_lines   = 1;
@@ -1296,25 +1301,13 @@ save(filename,'TABLE','MATRICE','option')
 % Compress into a zip file
 % To be put in the future
 
-disp('- Get IP Adress')
-try
-    MyExternalIP = regexp(urlread('http://checkip.dyndns.org'),'(\d+)(\.\d+){3}','match');
-    linkIPLocation = ['http://www.infosniper.net/index.php?ip_address=' ...
-                      MyExternalIP ...
-                      '&map_source=1&overview_map=1&lang=1&map_type=1&zoom_level=7'];
-    linkIPLocation = strjoin(linkIPLocation,'');
-              
-catch
-    warning('No internet connection !')
-    MyExternalIP = {'NoIP'};
-    linkIPLocation = 'NoIP';
+if option.UserInfo.bool_getIP == false
+    [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
+else
+    MyExternalIP = option.UserInfo.MyExternalIP;
+    linkIPLocation = option.UserInfo.linkIPLocation;
+    mac = option.UserInfo.mac;
 end
-
-
-
-disp('- Get Mac Adress of the Machine')
-[status,result] = dos('getmac');
-mac = result(160:176);
 
 disp('- Configure the mail adress to send :')
 recipients = answer{4};
@@ -1329,6 +1322,8 @@ message     = ['Dear Admin,' 10 10 ...
                 'Here is the report' 10 ...
                 'Author: ' answer{1} 10 ...
                 'Contact: ' answer{2} 10 ...
+                'Location Information: ' header 10 ...
+                'ID Location: ' id_location 10 10 ...
                 'IP Adress: ' MyExternalIP{1} 10 ....
                 'MAC Address: ' mac 10 10 ...
                 'Additionnal informations: ' 10 answer{3} 10 10 10 ...
