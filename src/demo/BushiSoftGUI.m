@@ -120,7 +120,7 @@ option.tmp.bool_createTournament = false;
 option.delimiter = ';';
 option.default_DBOnline = 'fileforsw.csv';
 option.default_DBLocal = 'NewPlayers_local.csv';
-option.additionnalTournamentVariable = {'Series' 'Language'};
+option.additionnalTournamentVariable = {'Series' 'Language' 'email'};
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
