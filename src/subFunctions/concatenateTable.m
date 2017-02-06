@@ -7,20 +7,20 @@ function output = concatenateTable(globalTable, subtable)
     commonVariables = intersect(variableGlobal,variableLocal);
     
     % Final variable
-    finalvarialbe = union(variableGlobal,variableLocal);
+    finalvarialbe = union(variableGlobal,variableLocal, 'stable');
     
     % Find variable not present in variableGlobal
-    notIn_variableGlobal = setdiff(variableLocal, variableGlobal)
+    notIn_variableGlobal = setdiff(variableLocal, variableGlobal);
     
     % Find variable not present in variableLocal
-    notIn_variableLocal = setdiff(variableGlobal, variableLocal)
+    notIn_variableLocal = setdiff(variableGlobal, variableLocal);
     
     % Fill each table
     globalTable2 = copyTable(globalTable, notIn_variableGlobal, finalvarialbe);
     subtable2    = copyTable(subtable, notIn_variableLocal, finalvarialbe);
     
     output = [globalTable2; subtable2];
-    disp('Finish')
+    % disp('Finish')
 end
 
 
