@@ -152,7 +152,7 @@ function deployPcodeRecurse(sourceDir,destDir,options)
     if ~isempty(options.copyDirectStrings)
         for i=find(copyFileMask)
             fprintf('Copying:  %s ... ', files(i).name)
-            copyfile(fullfile(sourceDir, files(i).name), destDir)
+            copyfile(fullfile(sourceDir, files(i).name), destDir, 'f')
             fprintf('done.\n')
         end
     end
