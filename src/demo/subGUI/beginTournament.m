@@ -320,9 +320,7 @@ global TABLE MATRICE option
 disp('--------------------------------------------------------------------')
 disp('Start the function to pair players')
 
-% Incremente number of rounds
-disp('- Incremente number of rounds')
-option.no_round = option.no_round + 1;
+
 
 % Pairing of players
 switch option.typeRound
@@ -330,7 +328,10 @@ switch option.typeRound
     case 'Round'
         disp('Save the actual Table of tournament for replay')
         % saveHistoryTABLE([]);
-        if option.no_round <= option.no_maxRound
+        if option.no_round+1 <= option.no_maxRound
+            % Incremente number of rounds
+            disp('- Incremente number of rounds')
+            option.no_round = option.no_round + 1;
             if option.boolean_Round
                 
                 disp('- Visibility ON')
@@ -392,6 +393,9 @@ switch option.typeRound
             
             % Pairing or not of the players
             if size(TABLE.tablePlayers_forTournament) > 1
+                % Incremente number of rounds
+                disp('- Incremente number of rounds')
+                option.no_round = option.no_round + 1;
                 % If there is more players, continue to make a pairing
                 disp('- Pair the players by Single elimination')
                 % TABLE.tablePlayers_forTournament.Points = zeros(size(TABLE.tablePlayers_forTournament,1),1);
@@ -412,7 +416,7 @@ switch option.typeRound
                 prefix = '- ';
                 displayErrorMsg( msg, handles_i, prefix )
                 % Delete the last save
-                TABLE.HistoryTABLE(end,:) = [];
+                % TABLE.HistoryTABLE(end,:) = [];
                 option.boolean_Round = true;
                 disp('- Visibility Off')
                 mode = 'Off';
