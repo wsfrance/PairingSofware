@@ -1377,11 +1377,21 @@ futureFunctionalityMsg(handles)
 % 
 % thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
 % thingSpeakWriteURL = thingSpeakURL;
-% writeApiKey = '1870359846540179';
+% writeApiKey = '362799644106668';
 % fieldName = 'field1';
 % fieldValue = 42;
 % response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+% % 
 % 
+% 
+% thingSpeakURL = 'https://www.facebook.com/dialog/feed?';
+% thingSpeakWriteURL = thingSpeakURL;
+% writeApiKey = '362799644106668';
+% fieldName = 'field1';
+% fieldValue = 42;
+% response = webwrite(thingSpeakWriteURL,'api_key',writeApiKey,fieldName,fieldValue)
+
+
 % % test for matlab online
 % thingSpeakURL = 'http://api.thingspeak.com/';
 % thingSpeakWriteURL = [thingSpeakURL 'update'];

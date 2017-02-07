@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 05-Feb-2017 21:33:02
+% Last Modified by GUIDE v2.5 07-Feb-2017 14:42:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1134,14 +1134,36 @@ disp('--------------------------------------------------------------------')
 disp('Doing some statistics')
 
 global TABLE
+
+% Retrieve localizations
 path = pwd;
 DB_Town_filename = [path '/import/Localization.xls'];
 [~,~,data] = xlsread(DB_Town_filename);
 column_tmp = data(1,:);
 TABLE.LocalizationReference = array2table(data(2:end,:), 'VariableNames', column_tmp);
 
+% Define the database. Ask the user
+% Construct a questdlg with three options
+choice = questdlg('Do the map on which database?', ...
+    'Question?', ...
+	'Player Database', ...
+	'Database of the tournament','Player Database');
+% Handle response
+switch choice
+    case 'Player Database'
+        disp([choice ' coming right up.'])
+        subtable = TABLE.tablePlayers_fromDB;
+    case 'Database of the tournament'
+        disp([choice ' coming right up.'])
+        subtable = TABLE.tablePlayers_forTournament;
+    otherwise
+        disp('Case not known')
+end
+
+
 % Look for the data in the reference
-bool_country = ismember(TABLE.LocalizationReference.country, TABLE.tablePlayers_fromDB.country);
+% bool_country = ismember(TABLE.LocalizationReference.country, TABLE.tablePlayers_fromDB.country);
+bool_country = ismember(TABLE.LocalizationReference.country, subtable.country);
 
 list_coordinate = TABLE.LocalizationReference(bool_country,:);
 lat = cell2mat(list_coordinate.latitude);
@@ -1162,7 +1184,8 @@ if bool_internetConnection
     MAT_nbplayersCountry = zeros(length(nb_country),1) + inf;
     for i =1:length(lon)
         country_i = country_list{i};
-        id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        % id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        id = find(strcmp(subtable.country, country_i)==1);
         MAT_nbplayersCountry(i) = length(id);
     end
     mini = min(MAT_nbplayersCountry);
@@ -1172,7 +1195,8 @@ if bool_internetConnection
     for i = 1:length(lon)
         hold on
         country_i = country_list{i};
-        id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        % id = find(strcmp(TABLE.tablePlayers_fromDB.country, country_i)==1);
+        id = find(strcmp(subtable.country, country_i)==1);
         plot(lon(i),lat(i),'.r','MarkerSize',length(id)*maxi_size/100)
     end
     disp('- Retrieve map from Google database')
@@ -1184,10 +1208,14 @@ if bool_internetConnection
     % Convert to categorical
     disp('- Make a summary of the data in the database')
     try
-        tmp         = TABLE.tablePlayers_fromDB;
-        tmp.country = categorical(TABLE.tablePlayers_fromDB.country);
-        tmp.town    = categorical(TABLE.tablePlayers_fromDB.town);
-        tmp.serie   = categorical(TABLE.tablePlayers_fromDB.serie);
+        % tmp         = TABLE.tablePlayers_fromDB;
+        % tmp.country = categorical(TABLE.tablePlayers_fromDB.country);
+        % tmp.town    = categorical(TABLE.tablePlayers_fromDB.town);
+        % tmp.serie   = categorical(TABLE.tablePlayers_fromDB.serie);
+        tmp         = subtable;
+        tmp.country = categorical(tmp.country);
+        tmp.town    = categorical(tmp.town);
+        tmp.serie   = categorical(tmp.serie);
         summary(tmp)
     catch
         warning ('-- There is some errors in the loading. Has to be checked in the future versions.')
@@ -1306,3 +1334,10 @@ defaultans  = existing_answer; % option.additionnalTournamentVariable;
 answer      = inputdlg(prompt,dlg_title, [num_lines, length(dlg_title)+N], defaultans);
 
 
+% --------------------------------------------------------------------
+function MENU_addNewPlayerOnlineDB_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_addNewPlayerOnlineDB (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+url = 'http://www.wseleague.com/register.php';
+web(url,'-browser')
