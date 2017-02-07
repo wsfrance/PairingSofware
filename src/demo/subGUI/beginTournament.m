@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 05-Feb-2017 18:16:59
+% Last Modified by GUIDE v2.5 07-Feb-2017 21:36:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,7 +67,7 @@ disp('Tournament Run')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-global TABLE MATRICE option
+global TABLE MATRICE option timer
 
 disp('--------------------------------------------------------------------')
 disp('Start the Tournament Core')
@@ -153,6 +153,11 @@ if option.bool_Tournamentstarted == 0
     disp('- Visibility Off')
     mode = 'Off';
     visibilityOnOff(handles, mode)
+    
+    % Save state automatically
+    disp('- Save state automatically of the GUI')
+    timer.c = saveState(option.periodOfSave);
+    
     
 end
 
@@ -1399,3 +1404,15 @@ futureFunctionalityMsg(handles)
 % data = num2str(data);
 % data = ['api_key=',writeApiKey,'&field1=',data];
 % response = webwrite(thingSpeakWriteURL,data)
+
+
+% --- Executes when user attempts to close beginTournament.
+function beginTournament_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to beginTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: delete(hObject) closes the figure
+global timer
+stop(timer.c)
+delete(hObject);

@@ -83,7 +83,7 @@ disp('- Change automatically the directory')
 currentpath = fileparts(mfilename('fullpath'));
 cd(currentpath)
 
-global TABLE option
+global TABLE option timer
 
 % User Define
 column                  = {'name', 'familyName', 'pseudo'};
@@ -121,6 +121,8 @@ option.delimiter = ';';
 option.default_DBOnline = 'fileforsw.csv';
 option.default_DBLocal = 'NewPlayers_local.csv';
 option.additionnalTournamentVariable = {'Series' 'Language' 'email'};
+option.timeForARound = 1800; % sec (30 min)
+option.periodOfSave = 1;
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -174,6 +176,12 @@ addPath_bushisoft( option.verbose );
     delete('export/*.xlsx')
     delete('export/*.pdf')
     delete('export/*.html')
+    
+    % Save state automatically
+    disp('- Save state automatically of the GUI')
+    timer.b = saveState(option.periodOfSave);
+    
+    
 % else
 %     disp('Wrong password of username')
 %     % close
@@ -299,6 +307,8 @@ function BUT_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global timer
+stop(timer.b)
 MENU_beginTournament_Callback(hObject, eventdata, handles)
 
 
@@ -1248,10 +1258,16 @@ function BushiSoftGUI_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 
+global timer
 answer = dlboxQuit( );
 
 if answer
     disp('Going to close the application')
+    try
+        stop(timer.b)
+    catch
+        warning('could not stop the timer timer.b')
+    end
     delete(hObject);
     close
 else

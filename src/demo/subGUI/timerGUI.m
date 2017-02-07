@@ -176,5 +176,5 @@ function timerGUI_CloseRequestFcn(hObject, eventdata, handles)
 % Hint: delete(hObject) closes the figure
 global a
 stop(a);
-StopTimer(handles);
+% StopTimer(handles);
 delete(hObject);
