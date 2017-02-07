@@ -493,6 +493,8 @@ if size(TABLE.tablePlayers_forTournament,1)>1
     end
     close
     beginTournament
+    % parpool(2)
+    % j = batch('beginTournament', 'Profile', 'local', 'pool', 1);
 else
     msg = 'There is not enough players in the tournament. Add some players first (at least 2)';
     handles_i = handles.TXT_error;
@@ -685,7 +687,7 @@ function MENU_preferences_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_preferences (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+preferencesGUI
 
 % --------------------------------------------------------------------
 function MENU_manageDB_Callback(hObject, eventdata, handles)
