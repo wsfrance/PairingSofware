@@ -22,7 +22,7 @@ function varargout = preferencesGUI(varargin)
 
 % Edit the above text to modify the response to help preferencesGUI
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 11:22:25
+% Last Modified by GUIDE v2.5 08-Feb-2017 13:07:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -160,6 +160,7 @@ function LIST_tieBreaker_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from LIST_tieBreaker
 
 
+
 % --- Executes during object creation, after setting all properties.
 function LIST_tieBreaker_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to LIST_tieBreaker (see GCBO)
@@ -283,17 +284,26 @@ function BUT_up_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global option
+idx      = get(handles.LIST_tieBreaker,'Value');
+option.column2sort = [option.column2sort(1:idx-2) option.column2sort(idx) option.column2sort(idx-1) option.column2sort(idx+1:end)];
+option.sortType    = [option.sortType(1:idx-2) option.sortType(idx) option.sortType(idx-1) option.sortType(idx+1:end)];
+set(handles.LIST_tieBreaker, 'String', option.column2sort, 'Value', idx-1)
 
 % --- Executes on button press in BUT_down.
 function BUT_down_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_down (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global option
+idx      = get(handles.LIST_tieBreaker,'Value');
+option.column2sort = [option.column2sort(1:idx-1) option.column2sort(idx+1) option.column2sort(idx) option.column2sort(idx+2:end)];
+option.sortType    = [option.sortType(1:idx-1) option.sortType(idx+1) option.sortType(idx) option.sortType(idx+2:end)];
+set(handles.LIST_tieBreaker, 'String', option.column2sort, 'Value', idx+1)
 
-
-% --- Executes on button press in pushbutton9.
-function pushbutton9_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton9 (see GCBO)
+% --- Executes on button press in BUT_deleteToBreaker.
+function BUT_deleteToBreaker_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_deleteToBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -303,7 +313,9 @@ function BUT_Reset2Default_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_Reset2Default (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+disp('Reset to default config')
+defaultConfig
+preferencesGUI
 
 % --- Executes on button press in BUT_deleteAdditionnalPlayerInfo.
 function BUT_deleteAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
