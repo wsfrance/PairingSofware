@@ -156,7 +156,8 @@ function send_msg(recipients, subject, message, carrier)
     
     %% Send the email
     % Send the email
-    sendmail(recipients,subject,message);
+    % sendmail(recipients,subject,message);
+    sendGmail( recipients,subject,message )
     
     if strcmp(mail,'matlabsendtextmessage@gmail.com')
         disp('Please provide your own gmail for security reasons.');
