@@ -1128,7 +1128,7 @@ function MENU_mapOfPlayers_Callback(hObject, eventdata, handles)
 disp('--------------------------------------------------------------------')
 disp('Doing some statistics')
 
-global TABLE
+global TABLE option
 
 
 if option.tmp.bool_createTournament
@@ -1362,6 +1362,8 @@ function MENU_statiticsWindow_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statiticsWindow (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global option
 
 if option.tmp.bool_createTournament
     disp('- Accorded')
