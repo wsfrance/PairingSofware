@@ -25,6 +25,11 @@ option.periodOfSave = 1;
 option.fileNameSaveState = [pwd '\config\tmp_variable.mat'];
 option.nameConfig = 'Default';
 
+% User info
+option.userInfo.name  = 'my_name';
+option.userInfo.email ='my_adress@adress.com';
+
+
 
 column                  = {'name', 'familyName', 'pseudo'};
 option.columnTableDB    = ['WSCode', column];

@@ -22,7 +22,7 @@ function varargout = preferencesGUI(varargin)
 
 % Edit the above text to modify the response to help preferencesGUI
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 13:07:29
+% Last Modified by GUIDE v2.5 08-Feb-2017 13:18:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -142,12 +142,31 @@ function BUT_loadConfiguration_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global option
+[filename, pathname] = uigetfile('*.mat','Select the configuration', 'config\');
+if isequal(filename,0) || isequal(pathname,0)
+   disp('User selected Cancel')
+else
+   disp(['User selected ',fullfile(pathname,filename)])
+   load(fullfile(pathname,filename))
+   preferencesGUI
+end
 
 % --- Executes on button press in BUT_saveAsConfiguration.
 function BUT_saveAsConfiguration_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_saveAsConfiguration (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+[filename, pathname] = uiputfile({'*.mat';'*.*'}, 'Save as the configuration', 'config\myconfig.mat');
+if isequal(filename,0) || isequal(pathname,0)
+   disp('User selected Cancel')
+else
+   disp(['User selected ',fullfile(pathname,filename)])
+   save([pathname filename], 'option')
+end
 
 
 % --- Executes on selection change in LIST_tieBreaker.
@@ -202,13 +221,6 @@ function LIST_additionnalPlayerInfo_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-% --- Executes on button press in BUT_addAdditionnalPlayerInfo.
-function BUT_addAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_addAdditionnalPlayerInfo (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 
@@ -317,8 +329,39 @@ disp('Reset to default config')
 defaultConfig
 preferencesGUI
 
+
+% --- Executes on button press in BUT_addAdditionnalPlayerInfo.
+function BUT_addAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addAdditionnalPlayerInfo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
 % --- Executes on button press in BUT_deleteAdditionnalPlayerInfo.
 function BUT_deleteAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_deleteAdditionnalPlayerInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_userConfig.
+function BUT_userConfig_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_userConfig (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+prompt      = {'Enter your name:','Enter your email address'};
+dlg_title   = 'User Configuration';
+num_lines   = 1;
+defaultans  = {option.userInfo.name, option.userInfo.email};
+answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
+if isempty(answer)
+    disp('Box is cancelled')
+else
+    option.userInfo.name  = answer{1}; 
+    option.userInfo.email = answer{1}; 
+end

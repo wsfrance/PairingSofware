@@ -2,12 +2,15 @@ function [ answer, msg ] = contactUs(  )
 %CONTACTUS Summary of this function goes here
 %   Detailed explanation goes here
 
+global option
 
 prompt      = {'Enter your name:','Enter your email address', 'Enter your problem'};
 dlg_title   = 'Contact us';
 num_lines   = 1;
-defaultans  = {'my_name','my_adress@adress.com', 'my problem'};
+defaultans  = {option.userInfo.name, option.userInfo.email, 'my problem'};
 answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
+
 
 
 if isempty(answer) == 0

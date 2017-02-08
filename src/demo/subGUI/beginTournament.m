@@ -1286,7 +1286,7 @@ id_location = num2str(option.tournamentInfo.locationInfo.idloc{1});
 prompt      = {'Enter your name:', 'Enter your email address', 'Enter additionnal informations (if you want)', 'Enter email addresses to send (put a comma between each email)'};
 dlg_title   = 'Send the report';
 num_lines   = 1;
-defaultans  = {'my_name','my_adress@adress.com', 'my additionnal information', 'pairing.software@gmail.com; '};
+defaultans  = {option.userInfo.name, option.userInfo.email, 'my additionnal information', 'pairing.software@gmail.com; '};
 answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
 h = waitbar(0.50,'Sending the report. Please wait ...');
