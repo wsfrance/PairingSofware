@@ -3,7 +3,7 @@ target_dir = 'E:\Cloud\Google Drive\WS\WS Sud France\2_Projet\H_Recode Pairing S
 
 
 extension = {'\.txt$', '\.log$', '\.png$', '\.exe$', '\.html$', '\.ico$', '\.csv', '\.fig$', '\.zip$', '\.pdf$', ...
-             '\.class$', '\.java$', '\.jpg$', '\.c$', '\.p$'};
+             '\.class$', '\.java$', '\.jpg$', '\.c$', '\.p$', '\.mat$'};
 
 ignoreList = {'^\.git$'};       
          

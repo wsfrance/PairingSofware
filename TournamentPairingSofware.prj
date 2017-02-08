@@ -8,7 +8,7 @@
       <file>${PROJECT_ROOT}\TournamentPairingSofware_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\TournamentPairingSofware_resources\icon_16.png</file>
     </param.icons>
-    <param.version>2.1</param.version>
+    <param.version>2.3</param.version>
     <param.authnamewatermark>malganis35</param.authnamewatermark>
     <param.email>caotri.do88@gmail.com</param.email>
     <param.company>WS France Table Ronde - WS Italia</param.company>
