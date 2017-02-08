@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 07-Feb-2017 14:42:50
+% Last Modified by GUIDE v2.5 08-Feb-2017 14:23:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1252,7 +1252,7 @@ if answer
         warning('could not stop the timer timer.b')
     end
     delete(hObject);
-    close
+    % close
 else
     disp('Application is not closed')
 end
@@ -1342,3 +1342,11 @@ function MENU_addNewPlayerOnlineDB_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 url = 'http://www.wseleague.com/register.php';
 web(url,'-browser')
+
+
+% --------------------------------------------------------------------
+function MENU_statiticsWindow_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_statiticsWindow (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+statisticsGUI
