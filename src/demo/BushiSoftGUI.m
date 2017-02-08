@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 14:23:06
+% Last Modified by GUIDE v2.5 08-Feb-2017 15:26:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1130,30 +1130,43 @@ disp('Doing some statistics')
 
 global TABLE
 
-% Retrieve localizations
-path = pwd;
-DB_Town_filename = [path '/import/Localization.xls'];
-[~,~,data] = xlsread(DB_Town_filename);
-column_tmp = data(1,:);
-TABLE.LocalizationReference = array2table(data(2:end,:), 'VariableNames', column_tmp);
 
-% Define the database. Ask the user
-% Construct a questdlg with three options
-choice = questdlg('Do the map on which database?', ...
-    'Question?', ...
-	'Player Database', ...
-	'Database of the tournament','Player Database');
-% Handle response
-switch choice
-    case 'Player Database'
-        disp([choice ' coming right up.'])
-        subtable = TABLE.tablePlayers_fromDB;
-    case 'Database of the tournament'
-        disp([choice ' coming right up.'])
-        subtable = TABLE.tablePlayers_forTournament;
-    otherwise
-        disp('Case not known')
+if option.tmp.bool_createTournament
+    disp('- Accorded')
+    % Retrieve localizations
+    path = pwd;
+    DB_Town_filename = [path '/import/Localization.xls'];
+    [~,~,data] = xlsread(DB_Town_filename);
+    column_tmp = data(1,:);
+    TABLE.LocalizationReference = array2table(data(2:end,:), 'VariableNames', column_tmp);
+    
+    % Define the database. Ask the user
+    % Construct a questdlg with three options
+    choice = questdlg('Do the map on which database?', ...
+        'Question?', ...
+        'Player Database', ...
+        'Database of the tournament','Player Database');
+    % Handle response
+    switch choice
+        case 'Player Database'
+            disp([choice ' coming right up.'])
+            subtable = TABLE.tablePlayers_fromDB;
+        case 'Database of the tournament'
+            disp([choice ' coming right up.'])
+            subtable = TABLE.tablePlayers_forTournament;
+        otherwise
+            disp('Case not known')
+    end
+else
+    msg = 'Before editing a tournament, you have a create one first !';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
 end
+
+
+
+
 
 
 % Look for the data in the reference
@@ -1349,4 +1362,13 @@ function MENU_statiticsWindow_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statiticsWindow (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-statisticsGUI
+
+if option.tmp.bool_createTournament
+    disp('- Accorded')
+    statisticsGUI
+else
+    msg = 'Before editing a tournament, you have a create one first !';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+end
