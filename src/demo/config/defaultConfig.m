@@ -17,6 +17,7 @@ option.tiePoint         = 0.5;
 option.column2sort  = {'Points' , 'Opp_MW' , 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
 option.sortType     = {'descend', 'descend', 'descend'        , 'descend', 'descend'         , 'descend'};
 option.swissRoundType = 'Monrad';
+option.swissRoundGroup = 'Points';
 
 option.delimiter = ';';
 option.additionnalTournamentVariable = {'Series' 'Language' 'email'};

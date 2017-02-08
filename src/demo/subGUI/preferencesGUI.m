@@ -67,8 +67,15 @@ disp('- Set handles')
 set(handles.EDIT_csvFileDelimiter, 'String', option.delimiter)
 set(handles.LIST_tieBreaker, 'String', option.column2sort')
 set(handles.LIST_additionnalPlayerInfo, 'String', option.additionnalTournamentVariable')
+
+set(handles.POP_VariablesFor_swissRoundType, 'String', option.column2sort')
+contents = cellstr(get(handles.POP_VariablesFor_swissRoundType,'String'));
+idx = strfind_idx(contents, option.swissRoundGroup);
+set(handles.POP_VariablesFor_swissRoundType, 'Value', idx)
+
 contents = cellstr(get(handles.POP_swissRoundType,'String'));
 idx = strfind_idx(contents, option.swissRoundType);
+
 set(handles.POP_swissRoundType, 'Value', idx)
 set(handles.EDIT_configurationName, 'String', option.nameConfig)
 
@@ -165,7 +172,9 @@ if isequal(filename,0) || isequal(pathname,0)
    disp('User selected Cancel')
 else
    disp(['User selected ',fullfile(pathname,filename)])
+   option.nameConfig = filename;
    save([pathname filename], 'option')
+   set(handles.EDIT_configurationName, 'String', option.nameConfig)
 end
 
 
@@ -198,7 +207,7 @@ function BUT_addToBreaker_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_addToBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg(handles)
 
 % --- Executes on selection change in LIST_additionnalPlayerInfo.
 function LIST_additionnalPlayerInfo_Callback(hObject, eventdata, handles)
@@ -255,6 +264,10 @@ function POP_VariablesFor_swissRoundType_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns POP_VariablesFor_swissRoundType contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from POP_VariablesFor_swissRoundType
 
+global option
+
+contents = cellstr(get(hObject,'String'));
+option.swissRoundGroup = contents{get(hObject,'Value')};
 
 % --- Executes during object creation, after setting all properties.
 function POP_VariablesFor_swissRoundType_CreateFcn(hObject, eventdata, handles)
@@ -285,10 +298,11 @@ stringData  = strread(num2str(data),'%s');
 defaultans  = stringData;
 answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
 
-option.winningPoint     = str2double(answer{1});
-option.losePoint        = str2double(answer{3});
-option.tiePoint         = str2double(answer{2});
-
+if isempty(answer) == 0
+    option.winningPoint     = str2double(answer{1});
+    option.losePoint        = str2double(answer{3});
+    option.tiePoint         = str2double(answer{2});
+end
 
 % --- Executes on button press in BUT_up.
 function BUT_up_Callback(hObject, eventdata, handles)
@@ -318,7 +332,7 @@ function BUT_deleteToBreaker_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_deleteToBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+futureFunctionalityMsg(handles)
 
 % --- Executes on button press in BUT_Reset2Default.
 function BUT_Reset2Default_Callback(hObject, eventdata, handles)
@@ -336,6 +350,26 @@ function BUT_addAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global option
+
+prompt      = {'Enter new variable'};
+dlg_title   = 'New Player Info';
+num_lines   = 1;
+defaultans  = {'Info'};
+answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+answer      = answer{1};
+
+if isempty(answer) == 0
+    idx = strfind_idx(option.additionnalTournamentVariable, answer);
+    if isempty(idx) == 0
+        msg = 'Variable already exists';
+        disp(msg)
+        msgbox(msg, 'Error', 'error')
+    else
+        option.additionnalTournamentVariable = [option.additionnalTournamentVariable answer];
+        set(handles.LIST_additionnalPlayerInfo, 'String', option.additionnalTournamentVariable')
+    end
+end
 
 
 % --- Executes on button press in BUT_deleteAdditionnalPlayerInfo.
@@ -344,6 +378,20 @@ function BUT_deleteAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+global option
+
+idx = get(handles.LIST_additionnalPlayerInfo,'Value');
+if idx <= 3
+    msg = 'Series, Language and email cannot be deleted';
+    disp(msg)
+    msgbox(msg, 'Error', 'error')
+else
+    option.additionnalTournamentVariable(idx) = [];
+    if idx > size(option.additionnalTournamentVariable,2)
+        idx = size(option.additionnalTournamentVariable,2);
+    end
+    set(handles.LIST_additionnalPlayerInfo, 'String', option.additionnalTournamentVariable', 'Value', idx)
+end
 
 % --- Executes on button press in BUT_userConfig.
 function BUT_userConfig_Callback(hObject, eventdata, handles)
