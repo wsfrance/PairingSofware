@@ -23,7 +23,7 @@ option.delimiter = ';';
 option.additionnalTournamentVariable = {'Series' 'Language' 'email'};
 option.timeForARound = 1800; % sec (30 min)
 option.periodOfSave = 1;
-option.fileNameSaveState = [pwd '\config\tmp_variable.mat'];
+option.fileNameSaveState = [pwd '\tournamentSave\0_automaticSaveTournament.mat'];
 option.nameConfig = 'Default';
 
 % User info

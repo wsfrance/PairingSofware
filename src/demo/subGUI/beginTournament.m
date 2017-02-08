@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 07-Feb-2017 21:36:45
+% Last Modified by GUIDE v2.5 08-Feb-2017 21:11:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -76,16 +76,17 @@ disp('Start the Tournament Core')
 disp('- Set the title of the window')
 set(handles.beginTournament, 'Name', 'Tournament (by malganis35)');
 
-% ask the number of rounds
-disp('- Ask the number of rounds')
-answer = askNbRounds();
-option.no_maxRound = str2num(answer);
-
-% disp('- Get IP and Mac Adress')
-% [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
 
 disp('- Look if we start from a save file or a new tournament')
 if option.bool_Tournamentstarted == 0
+    
+    % ask the number of rounds
+    disp('- Ask the number of rounds')
+    answer = askNbRounds();
+    option.no_maxRound = str2num(answer);
+
+    % disp('- Get IP and Mac Adress')
+    % [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
     
     disp('-- This is a new tournament. Set boolean to 1 and typeRound = Round')
     option.bool_Tournamentstarted = 1;
@@ -94,10 +95,6 @@ if option.bool_Tournamentstarted == 0
     % Check the numbers of players
     [ TABLE.tablePlayers_forTournament, option.tmp.bool_byePlayer ] = createByePlayer( TABLE.tablePlayers_forTournament );
     
-    % Update the list of players in handles.LIST_listPlayer
-    disp('-- Update the list of Players in the handles.LIST_listPlayer')
-    updateListPlayers(hObject, eventdata, handles);
-
     % Make a cross-table of already done match (such that a match cannot be 'redone')
     disp('-- Initialize the subTables and a Matrice to store already done match (such that a match cannot be re-done)')
     nb_players               = size(TABLE.tablePlayers_forTournament,1);
@@ -136,30 +133,48 @@ if option.bool_Tournamentstarted == 0
     TABLE.HistoryTABLE.typeOfRound{1,1}   = option.typeRound;
     TABLE.HistoryTABLE.standing{1,1}      = TABLE.tablePlayers_forTournament;
     
-    % Set functions for Table
-    disp('-- Set the callbacks of the tables')
-    set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles)); 
-    % set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect); 
-    % set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback); 
-
-    % % Center alignment
-    % Table = findjobj(handles.TAB_pairing); %findjobj is in the file exchange
-    % table1 = get(Table,'Viewport');
-    % jtable = get(table1,'View');
-    % renderer = jtable.getCellRenderer(2,2);
-    % renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    % renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+    
     
     disp('- Visibility Off')
     mode = 'Off';
     visibilityOnOff(handles, mode)
     
-    % Save state automatically
-    disp('- Save state automatically of the GUI')
-    timer.c = saveState(option.periodOfSave);
     
+    
+else
+    
+    disp('- Automatic load from save file')
+    disp('- Display the pairing table in the GUI')
+    % displayPairingTable(hObject, eventdata, handles)
+    CHECK_showPendingResult_Callback(hObject, eventdata, handles);
+    set(handles.EDIT_table, 'String', 1)
+    EDIT_table_Callback(hObject, eventdata, handles)
     
 end
+
+% Save state automatically
+disp('- Save state automatically of the GUI')
+timer.c = saveState(option.periodOfSave);
+
+% Update the list of players in handles.LIST_listPlayer
+disp('-- Update the list of Players in the handles.LIST_listPlayer')
+updateListPlayers(hObject, eventdata, handles);
+
+% Set functions for Table
+disp('-- Set the callbacks of the tables')
+set(handles.TAB_pairing, 'CellSelectionCallback',@(src, evnt)TAB_pairing_CellSelectionCallback(src, evnt, handles));
+% set(handles.TAB_pairing, 'CellSelectionCallback',@cellSelect);
+% set(handles.TAB_pairing, 'CellSelectionCallback',@TAB_pairing_CellSelectionCallback);
+
+% % Center alignment
+% Table = findjobj(handles.TAB_pairing); %findjobj is in the file exchange
+% table1 = get(Table,'Viewport');
+% jtable = get(table1,'View');
+% renderer = jtable.getCellRenderer(2,2);
+% renderer.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+% renderer.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+
+
 
 function answer = askNbRounds()
 bool_Notnumber = true;
@@ -1416,3 +1431,20 @@ function beginTournament_CloseRequestFcn(hObject, eventdata, handles)
 global timer
 stop(timer.c)
 delete(hObject);
+
+
+% --------------------------------------------------------------------
+function MENU_saveAsTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_saveAsTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global TABLE MATRICE option
+
+[filename, pathname] = uiputfile({'*.mat';'*.*'}, 'Save as the tournament configuration', [ pwd '\tournamentSave\mytournament.mat']);
+if isequal(filename,0) || isequal(pathname,0)
+   disp('User selected Cancel')
+else
+   disp(['User selected ',fullfile(pathname,filename)])
+   option.nameConfig = filename;
+   save([pathname filename], 'TABLE', 'MATRICE', 'option')
+end
