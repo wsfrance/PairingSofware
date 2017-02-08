@@ -85,13 +85,13 @@ cd(currentpath)
 
 global TABLE option timer
 
+% Add path, subfunctions, etc.
+disp('- Add paths : subfunctions, externalLibs, etc.')
+addPath_bushisoft( );
+
 % User Define
 disp('Load Default Config')
 defaultConfig; % Default config
-
-% Add path, subfunctions, etc.
-disp('- Add paths : subfunctions, externalLibs, etc.')
-addPath_bushisoft( option.verbose );
 
     
 % disp('- Ask Login and Password')
