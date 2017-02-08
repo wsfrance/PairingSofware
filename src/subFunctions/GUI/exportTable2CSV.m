@@ -1,6 +1,11 @@
-function [ output_args ] = exportTable2CSV( T, filename, order_column, option )
+function [ output_args ] = exportTable2CSV( T, filename, order_column, option, title )
 %EXPORTTABLE2CSV Summary of this function goes here
 %   Detailed explanation goes here
+
+if nargin < 5
+    title = [option.tournamentInfo.name ' - Round no.' num2str(option.no_round)];
+end
+
 
 % hWait = waitbar(0,'Please wait...');
 
@@ -18,7 +23,7 @@ if exist(filename, 'file') == 2
 end
 
 % Write Tournament name
-A = {[option.tournamentInfo.name ' - Round no.' num2str(option.no_round)]};
+A = {title};
 sheet = 1;
 xlRange = 'A1';
 xlswrite2(filename,A,sheet,xlRange)
