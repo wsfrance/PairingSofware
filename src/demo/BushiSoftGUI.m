@@ -86,26 +86,15 @@ cd(currentpath)
 global TABLE option timer
 
 % User Define
+defaultConfig; % Default config
 column                  = {'name', 'familyName', 'pseudo'};
 option.columnTableDB    = ['WSCode', column];
 option.verbose          = 1;
 option.boolean_Round    = 1;
-option.winningPoint     = 3;
-option.losePoint        = 0;
-option.tiePoint         = 0.5;
 option.no_maxRound      = 6;
 option.no_round         = 0;
 option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
 option.bool_Tournamentstarted = 0;
-% option.column2ranking = {'Points', 'Modified_Median', 'Cumulative_Score', 'Solkoff'};
-% option.column2ranking = {'Points', 'Opp_MW'};
-% option.column2sort = {'Points', 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
-% option.sortType = {'descend', 'descend', 'descend', 'descend', 'descend'};
-% option.column2sort = {'Points', 'Opp_MW'};
-% option.sortType = {'descend', 'descend'};
-option.column2sort  = {'Points' , 'Opp_MW' , 'Modified_Median', 'Solkoff', 'Cumulative_Score', 'first_Loss'};
-option.sortType     = {'descend', 'descend', 'descend'        , 'descend', 'descend'         , 'descend'};
-option.swissRoundType = 'Monrad';
 option.caseInsensitiveOption = true;
 option.searchPlayer = [];
 option.imageLogo = 'wsi_logo.jpg';
@@ -117,12 +106,9 @@ option.sortOrderTournament = 'ascend';
 option.column2sortDB = 'Sort By';
 option.column2sortTournament = 'Sort By';
 option.tmp.bool_createTournament = false;
-option.delimiter = ';';
 option.default_DBOnline = 'fileforsw.csv';
 option.default_DBLocal = 'NewPlayers_local.csv';
-option.additionnalTournamentVariable = {'Series' 'Language' 'email'};
-option.timeForARound = 1800; % sec (30 min)
-option.periodOfSave = 1;
+
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -444,35 +430,58 @@ function MENU_printPlayerList_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
+global option TABLE
+disp('Printing Player list')
 
-% disp('Printing Player list')
+h = waitbar(0.50,'Export the pairing in .XLS and .PDF. Please wait ...');
 
-% global TABLE option
+disp('--------------------------------------------------------------------')
+disp('Export the pairing in .XLS and .PDF')
+
+path        = pwd;
+filenamehtml= [path '/export/List_Players' '.html'];
+filename    = [path '/export/List_Players' '.xls'];
+filename2   = [path '/export/List_Players' '.pdf'];
+T           = TABLE.tablePlayers_forTournament;
+column      = TABLE.tablePlayers_forTournament.Properties.VariableNames;
+title       = ['List of players'];
 
 
-% handlesFigure = handles.BushiSoftGUI;
-% [ InterfaceObj, oldpointer ] = turnOffGUI( handlesFigure, option );
+disp('- Quit the Application')
+quitApplication ();
 
-% disp('- Quit the Application')
-% quitApplication ();
-% 
-% % Export to XLS
-% path = pwd;
-% filename = [path '/export/PlayerList.xls'];
-% filename2 = [path '/export/PlayerList.pdf'];
-% T = TABLE.tablePlayers_forTournament;
-% column = option.columnTableDB;
-% 
-% disp('- Delete files if they exist')
-% delete(filename, filename2)
-% 
-% 
-% exportTable2CSV( T, filename, column, option)
-% 
-% export_XLS2PDF(filename, filename2, option)
+disp('- Delete files if they exist')
+if exist(filename, 'file') == 2
+    delete(filename)
+end
+
+if exist(filename2, 'file') == 2
+    delete(filename2)
+end
+
+try
+    % Export to XLS
+    disp('- Export the Tables in .xls')
+    exportTable2CSV( T, filename, column, option, title);
+
+    % Export to PDF
+    disp('- Export the Tables in .pdf')
+    export_XLS2PDF(filename, filename2, option);
+       
+catch
+    % Export in HTML
+    disp('- Export the Tables in .html')
+    exportTable2html( T, filenamehtml, column, option, title);
+    
+    % Open in Internet explorer
+    % url = 'http://www.ws-france.fr';
+    web(filenamehtml,'-browser')
+    
+end
 
 % turnOnGUI( handlesFigure, InterfaceObj, oldpointer, option );
+close(h)
 
 
 
