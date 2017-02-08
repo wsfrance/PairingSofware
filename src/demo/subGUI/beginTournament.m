@@ -1308,9 +1308,9 @@ save(filename,'TABLE','MATRICE','option')
 % if option.UserInfo.bool_getIP == false
     [option.UserInfo.MyExternalIP, option.UserInfo.linkIPLocation, option.UserInfo.mac, option.UserInfo.bool_getIP] = getIPandMAC();
 % else
-%     MyExternalIP = option.UserInfo.MyExternalIP;
-%     linkIPLocation = option.UserInfo.linkIPLocation;
-%     mac = option.UserInfo.mac;
+    MyExternalIP = option.UserInfo.MyExternalIP;
+    linkIPLocation = option.UserInfo.linkIPLocation;
+    mac = option.UserInfo.mac;
 % end
 
 disp('- Configure the mail adress to send :')
@@ -1348,7 +1348,7 @@ try
 catch
     msg = ['FAIL : Report cannot be sent to: ' recipients '. Maybe you have to configure your '...
            'antivirus to allow mail to be sent outside (Problem known with Avast: ' ...
-           'paramètres, protection active, agent mail, tu cliques sur la roue dentée et tu décoches la case " analyser le courrier sortant"'];
+           'paramètres, protection active, agent mail, tu cliques sur la roue dentée et tu décoches la case " analyser le courrier sortant" + desactivate SSL analysis'];
 end
 handles_i = handles.TXT_error;
 prefix = '';
