@@ -25,5 +25,29 @@ option.periodOfSave = 1;
 option.fileNameSaveState = [pwd '\config\tmp_variable.mat'];
 option.nameConfig = 'Default';
 
+
+column                  = {'name', 'familyName', 'pseudo'};
+option.columnTableDB    = ['WSCode', column];
+option.verbose          = 1;
+option.boolean_Round    = 1;
+option.no_maxRound      = 6;
+option.no_round         = 0;
+option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
+option.bool_Tournamentstarted = 0;
+option.caseInsensitiveOption = true;
+option.searchPlayer = [];
+option.imageLogo = 'wsi_logo.jpg';
+option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};
+option.turnOnOffGUI = true;
+option.tmp.createTournamentBool = false;
+option.sortOrderDB              = 'ascend';
+option.sortOrderTournament      = 'ascend';
+option.column2sortDB            = 'Sort By';
+option.column2sortTournament    = 'Sort By';
+option.tmp.bool_createTournament = false;
+option.default_DBOnline         = 'fileforsw.csv';
+option.default_DBLocal          = 'NewPlayers_local.csv';
+
+
 end
 

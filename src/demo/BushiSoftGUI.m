@@ -86,29 +86,8 @@ cd(currentpath)
 global TABLE option timer
 
 % User Define
+disp('Load Default Config')
 defaultConfig; % Default config
-column                  = {'name', 'familyName', 'pseudo'};
-option.columnTableDB    = ['WSCode', column];
-option.verbose          = 1;
-option.boolean_Round    = 1;
-option.no_maxRound      = 6;
-option.no_round         = 0;
-option.columnTablePairing = {'Flt', 'Round', 'Table', 'Player1', 'Points_P1', 'Player2', 'Points_P2', 'Result'};
-option.bool_Tournamentstarted = 0;
-option.caseInsensitiveOption = true;
-option.searchPlayer = [];
-option.imageLogo = 'wsi_logo.jpg';
-option.columnCapitalLetters = {'name', 'familyName', 'pseudo'};
-option.turnOnOffGUI = true;
-option.tmp.createTournamentBool = false;
-option.sortOrderDB = 'ascend';
-option.sortOrderTournament = 'ascend';
-option.column2sortDB = 'Sort By';
-option.column2sortTournament = 'Sort By';
-option.tmp.bool_createTournament = false;
-option.default_DBOnline = 'fileforsw.csv';
-option.default_DBLocal = 'NewPlayers_local.csv';
-
 
 % Add path, subfunctions, etc.
 disp('- Add paths : subfunctions, externalLibs, etc.')
@@ -136,14 +115,10 @@ addPath_bushisoft( option.verbose );
     BUT_refreshLocalDB_Callback(hObject, eventdata, handles)
     warning('on','all')
     
-    
-    
-
     % Remove spaces at the begining and at the end
     % tablePlayers_fromDB_tmp = table2cell(tablePlayers_fromDB);
     % tablePlayers_fromDB_tmp = strtrim(tablePlayers_fromDB_tmp);
     % tablePlayers_fromDB = tablePlayers_fromDB_tmp;
-
 
     % Initialize functions to Tables
     disp('- Initialize functions (@cellSelect) to Tables')
@@ -166,8 +141,7 @@ addPath_bushisoft( option.verbose );
     % Save state automatically
     disp('- Save state automatically of the GUI')
     timer.b = saveState(option.periodOfSave);
-    
-    
+      
 % else
 %     disp('Wrong password of username')
 %     % close
