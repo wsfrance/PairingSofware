@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 15:26:07
+% Last Modified by GUIDE v2.5 08-Feb-2017 21:11:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -139,8 +139,8 @@ defaultConfig; % Default config
     delete('export/*.html')
     
     % Save state automatically
-    disp('- Save state automatically of the GUI')
-    timer.b = saveState(option.periodOfSave);
+    % disp('- Save state automatically of the GUI')
+    % timer.b = saveState(option.periodOfSave);
       
 % else
 %     disp('Wrong password of username')
@@ -267,8 +267,8 @@ function BUT_beginTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_beginTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global timer
-stop(timer.b)
+% global timer
+% stop(timer.b)
 MENU_beginTournament_Callback(hObject, eventdata, handles)
 
 
@@ -369,7 +369,32 @@ function MENU_openTournament_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_openTournament (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg(handles)
+% futureFunctionalityMsg(handles)
+
+[filename, pathname] = uigetfile('*.mat','Select the tournament configuration', 'tournamentSave\');
+if isequal(filename,0) || isequal(pathname,0)
+   disp('User selected Cancel')
+else
+   disp(['User selected ',fullfile(pathname,filename)])
+   load(fullfile(pathname,filename))
+   close
+   beginTournament
+end
+
+
+
+% --------------------------------------------------------------------
+function MENU_openLastSaveTournament_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_openLastSaveTournament (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE MATRICE option
+
+load(option.fileNameSaveState)
+close
+beginTournament
+
 
 % --------------------------------------------------------------------
 function MENU_createNewTournament_Callback(hObject, eventdata, handles)
@@ -1254,13 +1279,13 @@ function BushiSoftGUI_CloseRequestFcn(hObject, eventdata, handles)
 
 % Hint: delete(hObject) closes the figure
 
-global timer
+% global timer
 answer = dlboxQuit( );
 
 if answer
     disp('Going to close the application')
     try
-        stop(timer.b)
+        % stop(timer.b)
     catch
         warning('could not stop the timer timer.b')
     end
