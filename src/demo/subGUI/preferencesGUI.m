@@ -22,7 +22,7 @@ function varargout = preferencesGUI(varargin)
 
 % Edit the above text to modify the response to help preferencesGUI
 
-% Last Modified by GUIDE v2.5 07-Feb-2017 14:22:28
+% Last Modified by GUIDE v2.5 08-Feb-2017 11:22:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,7 +59,21 @@ handles.output = hObject;
 guidata(hObject, handles);
 
 % UIWAIT makes preferencesGUI wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.preferencesGUI);
+
+global option
+
+disp('- Set handles')
+set(handles.EDIT_csvFileDelimiter, 'String', option.delimiter)
+set(handles.LIST_tieBreaker, 'String', option.column2sort')
+set(handles.LIST_additionnalPlayerInfo, 'String', option.additionnalTournamentVariable')
+contents = cellstr(get(handles.POP_swissRoundType,'String'));
+idx = strfind_idx(contents, option.swissRoundType);
+set(handles.POP_swissRoundType, 'Value', idx)
+set(handles.EDIT_configurationName, 'String', option.nameConfig)
+
+disp('- Set title')
+set(handles.preferencesGUI, 'Name', 'Preferences of Software (by malganis35)');
 
 
 % --- Outputs from this function are returned to the command line.
@@ -73,27 +87,7 @@ function varargout = preferencesGUI_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on selection change in POP_systemPoints.
-function POP_systemPoints_Callback(hObject, eventdata, handles)
-% hObject    handle to POP_systemPoints (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns POP_systemPoints contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from POP_systemPoints
-
-
-% --- Executes during object creation, after setting all properties.
-function POP_systemPoints_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to POP_systemPoints (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --- Executes on selection change in POP_swissRoundType.
@@ -156,19 +150,19 @@ function BUT_saveAsConfiguration_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on selection change in LIT_tieBreaker.
-function LIT_tieBreaker_Callback(hObject, eventdata, handles)
-% hObject    handle to LIT_tieBreaker (see GCBO)
+% --- Executes on selection change in LIST_tieBreaker.
+function LIST_tieBreaker_Callback(hObject, eventdata, handles)
+% hObject    handle to LIST_tieBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns LIT_tieBreaker contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from LIT_tieBreaker
+% Hints: contents = cellstr(get(hObject,'String')) returns LIST_tieBreaker contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from LIST_tieBreaker
 
 
 % --- Executes during object creation, after setting all properties.
-function LIT_tieBreaker_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to LIT_tieBreaker (see GCBO)
+function LIST_tieBreaker_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LIST_tieBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -179,9 +173,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in BUT_tieBreaker.
-function BUT_tieBreaker_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_tieBreaker (see GCBO)
+% --- Executes on button press in BUT_addToBreaker.
+function BUT_addToBreaker_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addToBreaker (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -209,9 +203,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in BUT_additionnalPlayerInfo.
-function BUT_additionnalPlayerInfo_Callback(hObject, eventdata, handles)
-% hObject    handle to BUT_additionnalPlayerInfo (see GCBO)
+% --- Executes on button press in BUT_addAdditionnalPlayerInfo.
+function BUT_addAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addAdditionnalPlayerInfo (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -260,3 +254,59 @@ function POP_VariablesFor_swissRoundType_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in BUT_systemPoints.
+function BUT_systemPoints_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_systemPoints (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+prompt      = {'Points for winner:','Points for draw', 'Points for loss'};
+dlg_title   = 'System Points';
+num_lines   = 1;
+data        = [option.winningPoint; option.tiePoint; option.losePoint]';
+stringData  = strread(num2str(data),'%s');
+defaultans  = stringData;
+answer      = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
+option.winningPoint     = str2double(answer{1});
+option.losePoint        = str2double(answer{3});
+option.tiePoint         = str2double(answer{2});
+
+
+% --- Executes on button press in BUT_up.
+function BUT_up_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_up (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_down.
+function BUT_down_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_down (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton9.
+function pushbutton9_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton9 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_Reset2Default.
+function BUT_Reset2Default_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_Reset2Default (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in BUT_deleteAdditionnalPlayerInfo.
+function BUT_deleteAdditionnalPlayerInfo_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_deleteAdditionnalPlayerInfo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
