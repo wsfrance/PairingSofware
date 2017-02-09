@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 09-Feb-2017 11:36:08
+% Last Modified by GUIDE v2.5 09-Feb-2017 12:32:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1052,6 +1052,13 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function MENU_statisticsWindow_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_statisticsWindow (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 global option
 
 if option.tmp.bool_createTournament
@@ -1063,8 +1070,6 @@ else
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
 end
-
-
 
 
 function computeScore(hObject, eventdata, handles)
@@ -1470,3 +1475,6 @@ global TABLE option
 h = waitbar(0.50,'Generating the player slips. Please wait ...');
 printPlayerSlips(TABLE,option)
 close(h)
+
+
+
