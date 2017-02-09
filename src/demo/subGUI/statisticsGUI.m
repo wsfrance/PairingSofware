@@ -102,6 +102,7 @@ function pieChart(hObject, eventdata, handles, subtable, variable2Analyze)
 % x = [1,2,3];
 % txt = {'Item A: ';'Item B: ';'Item C: '}; % strings
 idx = strfind_idx(subtable.Properties.VariableNames', variable2Analyze);
+idx = idx(1);
 data = table2cell(subtable(:,idx));
 % Replace all void cells
 id = find(cellfun('isempty', data)==true);
@@ -113,8 +114,14 @@ data(id) = {txt_default};
 %     id = strfind_idx(data, txt_i);
 %     x(i) = length(id);
 % end
+try
+    txt=unique(data,'stable');
+catch
+    c = cell2mat(data);
+    data = cellstr(num2str(c(:)));
+    txt=unique(data,'stable');
+end
 xx = data; % {'computer', 'car', 'computer', 'bus', 'tree', 'car'}
-txt=unique(data,'stable');
 b=cellfun(@(x) sum(ismember(xx,x)),txt,'un',0);
 x= cell2mat(b);
 

@@ -1052,7 +1052,17 @@ function MENU_statistics_Callback(hObject, eventdata, handles)
 % hObject    handle to MENU_statistics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( handles )
+global option
+
+if option.tmp.bool_createTournament
+    disp('- Accorded')
+    statisticsGUI
+else
+    msg = 'Before editing a tournament, you have a create one first !';
+    handles_i = handles.TXT_error;
+    prefix = '';
+    displayErrorMsg( msg, handles_i, prefix )
+end
 
 
 
