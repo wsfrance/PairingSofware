@@ -7,4 +7,4 @@ extension = {'\.txt$', '\.log$', '\.png$', '\.exe$', '\.html$', '\.ico$', '\.csv
 
 ignoreList = {'^\.git$'};       
          
-deploypcode(source_dir,target_dir,'updateOnly',true, 'flattenFileTree', false, 'copyDirectStrings', extension, 'ignoreStrings', ignoreList)
+deploypcode(source_dir,target_dir,'updateOnly',false, 'flattenFileTree', false, 'copyDirectStrings', extension, 'ignoreStrings', ignoreList)

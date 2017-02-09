@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 21:11:33
+% Last Modified by GUIDE v2.5 09-Feb-2017 11:36:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1448,3 +1448,15 @@ else
    option.nameConfig = filename;
    save([pathname filename], 'TABLE', 'MATRICE', 'option')
 end
+
+
+% --- Executes on button press in BUT_printPlayerSlips.
+function BUT_printPlayerSlips_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_printPlayerSlips (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global TABLE option
+h = waitbar(0.50,'Generating the player slips. Please wait ...');
+printPlayerSlips(TABLE,option)
+close(h)

@@ -137,6 +137,7 @@ defaultConfig; % Default config
     delete('export/*.xlsx')
     delete('export/*.pdf')
     delete('export/*.html')
+    delete('export/*.csv')
     
     % Save state automatically
     % disp('- Save state automatically of the GUI')
@@ -1188,10 +1189,6 @@ else
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
 end
-
-
-
-
 
 
 % Look for the data in the reference
