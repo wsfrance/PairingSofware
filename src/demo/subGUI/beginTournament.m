@@ -22,7 +22,7 @@ function varargout = beginTournament(varargin)
 
 % Edit the above text to modify the response to help beginTournament
 
-% Last Modified by GUIDE v2.5 09-Feb-2017 12:32:41
+% Last Modified by GUIDE v2.5 09-Feb-2017 14:21:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1478,3 +1478,17 @@ close(h)
 
 
 
+
+
+% --------------------------------------------------------------------
+function MENU_changeNumberRounds_Callback(hObject, eventdata, handles)
+% hObject    handle to MENU_changeNumberRounds (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+% ask the number of rounds
+disp('- Ask the number of rounds')
+answer = askNbRounds();
+option.no_maxRound = str2num(answer);
