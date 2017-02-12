@@ -175,6 +175,7 @@ global TABLE option
 % Get the cells selected in 'TAB_players'
 UITable = 'TAB_players';
 [ data, rows] = getCellSelect( UITable );
+rows = unique(rows); % to avoid multiple selection on the same line
 
 % If the selection is not empty, transfer player from
 % TABLE.tablePlayers_fromDB to TABLE.tablePlayers_forTournament
@@ -182,30 +183,51 @@ if isempty(data)~=1
     list_data = data(rows,1);
     % Loop if multiple players are selected
     bool_msg = false;
-    for i = 1:length(rows)
-        % Rely on WSCode that is unique for players
-        WSCode_i = list_data{i,1};
-        Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
-        selected_data = TABLE.tablePlayers_fromDB(Index,:);
-        % check if player is already added
-        Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
-        if isempty(Index2)==1       
-            % add selected players to tablePlayers_forTournament
-            % TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
-            output = concatenateTable(TABLE.tablePlayers_forTournament, selected_data);
-            TABLE.tablePlayers_forTournament = output;
-            % display the data
-            refreshTables(hObject, eventdata, handles)            
-        else
-            bool_msg = true;            
-        end
+    
+    % Find index of players on the DB database based on their WSCode
+    IDX = ismember(TABLE.tablePlayers_fromDB.WSCode, list_data);
+    idx = find(IDX == true);
+    selected_data = TABLE.tablePlayers_fromDB(idx,:);
+    
+    % Delete data that are already in the DB for tournament
+    wsCodeTmp = selected_data.WSCode;
+    IDX = ismember(TABLE.tablePlayers_forTournament.WSCode, wsCodeTmp);
+    idx = find(IDX == true);
+    if isempty(idx) == false
+        bool_msg = true; 
     end
+    selected_data(idx,:) = [];
+    
+    % Add data to the table tablePlayers_forTournament
+    output = concatenateTable(TABLE.tablePlayers_forTournament, selected_data);
+    TABLE.tablePlayers_forTournament = output;
+    
+%     % Old code    
+%     for i = 1:length(rows)
+%         % Rely on WSCode that is unique for players
+%         WSCode_i = list_data{i,1};
+%         Index = strfind_idx( TABLE.tablePlayers_fromDB.WSCode, WSCode_i, option.caseInsensitiveOption );
+%         selected_data = TABLE.tablePlayers_fromDB(Index,:);
+%         % check if player is already added
+%         Index2 = strfind_idx( TABLE.tablePlayers_forTournament.WSCode, WSCode_i, option.caseInsensitiveOption );
+%         if isempty(Index2)==1       
+%             % add selected players to tablePlayers_forTournament
+%             % TABLE.tablePlayers_forTournament = [TABLE.tablePlayers_forTournament; selected_data];
+%             output = concatenateTable(TABLE.tablePlayers_forTournament, selected_data);
+%             TABLE.tablePlayers_forTournament = output;           
+%         else
+%             bool_msg = true;            
+%         end
+%     end
+
     if bool_msg
         msg = 'Selected Player(s) are already in the tournament';
         handles_i = handles.TXT_error;
         prefix = '';
         displayErrorMsg( msg, handles_i, prefix )
     end
+    % display the data
+    refreshTables(hObject, eventdata, handles) 
 else
     % If no player in the DB, it is an error
     msg = 'There is no player in the DB !!';
@@ -225,6 +247,8 @@ global TABLE
 
 UITable = 'TAB_players_Tournament';
 [ data, rows ] = getCellSelect( UITable );
+rows = unique(rows);
+
 if isempty(data)~=1
     % display the data
     TABLE.tablePlayers_forTournament (rows,:) = [];
