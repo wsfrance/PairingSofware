@@ -22,7 +22,7 @@ function varargout = timerGUI(varargin)
 
 % Edit the above text to modify the response to help timerGUI
 
-% Last Modified by GUIDE v2.5 07-Feb-2017 21:01:23
+% Last Modified by GUIDE v2.5 12-Feb-2017 19:45:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,7 +60,7 @@ guidata(hObject, handles);
 
 % UIWAIT makes timerGUI wait for user response (see UIRESUME)
 % uiwait(handles.timerGUI);
-
+refreshListRecall(handles)
 
 
 % --- Outputs from this function are returned to the command line.
@@ -112,9 +112,13 @@ set(a,'ExecutionMode','fixedRate')
 set(a,'TimerFcn', @(~,~)displayTimer);
 start(a)
 
+
+
+
 function displayTimer()
 global handle_i option
 t1 = toc;
+% If time achieve time limit, block the counter to 0
 if t1>option.timeForARound
     t1 = option.timeForARound +1;
 end
@@ -181,3 +185,71 @@ global a
 stop(a);
 % StopTimer(handles);
 delete(hObject);
+
+
+% --- Executes on selection change in LIST_recall.
+function LIST_recall_Callback(hObject, eventdata, handles)
+% hObject    handle to LIST_recall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns LIST_recall contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from LIST_recall
+
+
+% --- Executes during object creation, after setting all properties.
+function LIST_recall_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to LIST_recall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in BUT_addRecall.
+function BUT_addRecall_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_addRecall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+prompt = {'Enter Time for a Recall'};
+dlg_title = 'Time for a recall (format HH:MM:SS)';
+num_lines = 1;
+defaultans = {'00:30:00'};
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+
+Date = answer{1};
+[Y, M, D, H, MN, S] = datevec(Date);
+Seconds = H*3600+MN*60+S;
+option.timeForRecall = [option.timeForRecall; Seconds];
+
+refreshListRecall(handles)
+
+
+
+% --- Executes on button press in BUT_deleteRecall.
+function BUT_deleteRecall_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_deleteRecall (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+global option
+
+idx = get(handles.LIST_recall,'Value');
+option.timeForRecall(idx) = [];
+refreshListRecall(handles)
+
+
+function refreshListRecall(handles)
+global option
+
+time_Rested = option.timeForRecall/(24*60*60);
+timeString = datestr(time_Rested, 'HH:MM:SS');
+
+set(handles.LIST_recall, 'String', timeString)
