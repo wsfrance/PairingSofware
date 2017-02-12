@@ -115,6 +115,9 @@ start(a)
 function displayTimer()
 global handle_i option
 t1 = toc;
+if t1>option.timeForARound
+    t1 = option.timeForARound +1;
+end
 timeElapsed = t1;
 time_Rested = (option.timeForARound - timeElapsed + 1)/(24*60*60);
 timeString = datestr(time_Rested, 'HH:MM:SS');
