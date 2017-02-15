@@ -61,11 +61,22 @@ guidata(hObject, handles);
 % UIWAIT makes barcodeScannerGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
+global TABLE
+
+TABLE.playerQR = [];
 
 camList = webcamlist;
 camList = ['Select Webcam'; camList];
 set(handles.POP_selectWebcam, 'String', camList)
 set(handles.PLOT_webcamRender, 'Visible', 'Off')
+
+% path of dynamic JAVA library
+javaaddpath('..\externalLibs\QR-code-WORKING\QRCodeGenerator1.1\qrcode_gen\jarfiles\core-3.2.0.jar');
+javaaddpath('..\externalLibs\QR-code-WORKING\QRCodeGenerator1.1\qrcode_gen\jarfiles\javase-3.2.0.jar');
+
+
+
+
 
 % --- Outputs from this function are returned to the command line.
 function varargout = barcodeScannerGUI_OutputFcn(hObject, eventdata, handles) 
@@ -84,7 +95,7 @@ function BUT_startWebcam_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-global option
+global TABLE option
 
 handles.stop_now = 0;
 
@@ -99,6 +110,7 @@ else
 
     bool = 0;
     axes(handles.PLOT_webcamRender)
+    axis off
     tic
     while ~bool
           stop_state = handles.stop_now;
@@ -109,7 +121,12 @@ else
         img = snapshot(cam);
         image(img);
         try
-            [ result ] = barcodeScanner( img );
+            % [ result ] = barcodeScanner( img );
+            % str = sprintf('%s \n\n',tnm034(image));
+            % result = unicode2native(str, 'UTF-8');
+            [ subtable, result ] = qrcode_reader_Cao( img );
+            TABLE.playerQR = [TABLE.playerQR; subtable];
+            subtable = TABLE.playerQR;
         catch
             result = [];
             disp('Recognition failed')
@@ -118,9 +135,12 @@ else
             disp(['No barcode recognize at time: ' num2str(toc)])
         else
             disp(['Code recognize at time: ' num2str(toc)])
-            set(handles.TEXT_barcode, 'String', result)
+            set(handles.TEXT_barcode, 'String', 'QR Code recognized')
             clear cam
             bool = 1;
+            data = table2cell(subtable);
+            header = subtable.Properties.VariableNames;
+            set(handles.TAB_playerQR, 'data', data, 'ColumnName', header)
         end
         % handles = guidata(hObject);  %Get the newest GUI data
     end

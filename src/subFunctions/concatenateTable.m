@@ -28,11 +28,12 @@ function subtable2 = copyTable(subtable, notIn_variableLocal, finalvarialbe)
 
 
 if isempty(notIn_variableLocal) == 0
-        void = repmat({''},size(notIn_variableLocal));
-        newtable = cell2table(void,'VariableNames',notIn_variableLocal);
-        subtable2 = [subtable newtable];
-    else
-        subtable2 = subtable;
+    void = repmat({''},size(notIn_variableLocal));
+    newtable = cell2table(void,'VariableNames',notIn_variableLocal);
+    repvoid = repmat(newtable, size(subtable,1), 1);
+    subtable2 = [subtable repvoid];
+else
+    subtable2 = subtable;
 end
 
 subtable2 = subtable2(:,finalvarialbe);

@@ -73,7 +73,7 @@ clearvars -global
 h = waitbar(0.50,'Welcome to the New Pairing Software. Please wait ...');
 
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-disp('Bushiroad Pairing Software')
+disp('Tournament Pairing Software')
 disp('Author: malganis35')
 disp('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
@@ -107,7 +107,7 @@ defaultConfig; % Default config
     showHandlesTournament(handles, mode);
 
     % Set title
-    set(handles.BushiSoftGUI, 'Name', 'New Bushiroad Tournament Software (by malganis35)');
+    set(handles.BushiSoftGUI, 'Name', 'Tournament Pairing Software (by malganis35)');
 
     % Create Data
     disp('- Generate Tables from local DB: tablePlayers_fromDB and tablePlayers_forTournament / Refresh Local DB')
@@ -875,8 +875,8 @@ function BUT_addPlayerBarcode_Callback(hObject, eventdata, handles)
 % Please download and build the core and javase parts of zxing
 % from here - http://code.google.com/p/zxing/
 
-futureFunctionalityMsg(handles)
-% barcodeScannerGUI
+% futureFunctionalityMsg(handles)
+barcodeScannerGUI
 
 
 

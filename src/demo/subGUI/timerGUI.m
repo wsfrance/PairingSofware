@@ -122,6 +122,10 @@ t1 = toc;
 if t1>option.timeForARound
     t1 = option.timeForARound +1;
 end
+% id = find(option.timeForRecall,t1);
+% if isempty(id) == 0
+%     %disp('Recall of the timer')
+% end
 timeElapsed = t1;
 time_Rested = (option.timeForARound - timeElapsed + 1)/(24*60*60);
 timeString = datestr(time_Rested, 'HH:MM:SS');
@@ -229,6 +233,8 @@ Date = answer{1};
 Seconds = H*3600+MN*60+S;
 option.timeForRecall = [option.timeForRecall; Seconds];
 
+option.timeForRecall = sort(option.timeForRecall, 'descend');
+
 refreshListRecall(handles)
 
 
@@ -242,7 +248,12 @@ function BUT_deleteRecall_Callback(hObject, eventdata, handles)
 global option
 
 idx = get(handles.LIST_recall,'Value');
+size_origin = size(option.timeForRecall,1);
 option.timeForRecall(idx) = [];
+% just to avoid error
+if idx == size_origin
+    set(handles.LIST_recall, 'Value', idx-1)
+end
 refreshListRecall(handles)
 
 
