@@ -91,6 +91,10 @@ global TABLE
 contents = cellstr(get(hObject,'String'));
 variable2Analyze = contents{get(hObject,'Value')};
 subtable = TABLE.tablePlayers_forTournament;
+id_BYE = strfind_idx(TABLE.tablePlayers_forTournament.WSCode, '**BYE**');
+if isempty(id_BYE) == 0
+    subtable(id_BYE,:) = [];
+end
 pieChart(hObject, eventdata, handles, subtable, variable2Analyze)
 
 
