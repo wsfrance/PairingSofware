@@ -14,7 +14,7 @@ verbose = 1;
 
 % Allocate/Extract informations
 % classement_init = tablePlayers.Ranking;
-winNumber       = tablePlayers.winNumber;
+% winNumber       = tablePlayers.winNumber;
 playersID       = tablePlayers.playerId;
 nb_players      = size(tablePlayers.Ranking,1);
 boolDropped     = tablePlayers.boolDropped;
@@ -31,8 +31,12 @@ else
     disp(['-- swissRoundType : ' option.swissRoundType])
     switch option.swissRoundType
         case 'Score_Group'
-            pairingID = scoreGroup(playersID, nb_players, mat_HistoryMatch, winNumber, verbose);
-            
+            % pairingID = scoreGroup(playersID, nb_players, mat_HistoryMatch, winNumber, verbose);
+            tableOut    = shufflePlayers(tablePlayers, option.swissRoundGroup);
+            playersID   = tableOut.playerId;
+            boolDropped = tableOut.boolDropped;
+            pairingID = monrad(playersID, nb_players, mat_HistoryMatch, boolDropped);
+        
         case 'Monrad'
             pairingID = monrad(playersID, nb_players, mat_HistoryMatch, boolDropped);
             
@@ -54,6 +58,23 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ADDED FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function tableOut = shufflePlayers(tablePlayers, swissRoundGroup)
+
+id_tmp = [];
+subtable = tablePlayers{:,swissRoundGroup};
+uniqueDataColumn = unique(subtable);
+uniqueDataColumn = sort(uniqueDataColumn, 'descend');
+for j = 1:size(uniqueDataColumn,1)
+    data_i = uniqueDataColumn(j,1);
+    A = find(subtable == data_i);
+    B=A(randperm(length(A)));
+    id_tmp = [id_tmp;B];
+end
+
+tableOut = tablePlayers(id_tmp,:);
+
+end
+
 
 function pairingID = firstRoundPairing(playersID, nb_players, boolDropped)
     % Divide players into 2 sub-groups
@@ -172,28 +193,35 @@ for i = 1:nb_players
             bool_opponent = false;
             % Loop to find opponent
             j = 1;
-            while bool_opponent==false
-                if boolDropped(j) == 0
-                    % Opponent has not dropped
-                    if boolPlayer(j)==0
-                        % check if the players have already played
-                        % against each other. If not paired them
-                        mini = min(mat_HistoryMatch(playersID(i),:));
-                        if mat_HistoryMatch(playersID(i), playersID(j)) == mini || j==nb_players
-                            pairingID(counter,2) = playersID(j);
-                            boolPlayer(j) = true;
-                            bool_opponent = true;
+            while bool_opponent==false 
+                if j>nb_players
+                    pairingID(counter,2) = playersID(tmp_InCase_j_max);
+                    boolPlayer(tmp_InCase_j_max) = true;
+                    bool_opponent = true;
+                else
+                    if boolDropped(j) == 0
+                        % Opponent has not dropped
+                        if boolPlayer(j)==0
+                            % check if the players have already played
+                            % against each other. If not paired them
+                            mini = min(mat_HistoryMatch(playersID(i),:));
+                            if mat_HistoryMatch(playersID(i), playersID(j)) == mini || j==nb_players
+                                pairingID(counter,2) = playersID(j);
+                                boolPlayer(j) = true;
+                                bool_opponent = true;
+                            else
+                                disp('--- le match a déjà eu lieu. Continue')
+                                tmp_InCase_j_max = j;
+                                j = j+1;
+                            end
                         else
-                            disp('--- le match a déjà eu lieu. Continue')
                             j = j+1;
                         end
                     else
+                        disp('Opponent has dropped')
                         j = j+1;
+                        % bool_opponent = true;
                     end
-                else
-                    disp('Opponent has dropped')
-                    j = j+1;
-                    % bool_opponent = true;
                 end
             end
             counter = counter+1;

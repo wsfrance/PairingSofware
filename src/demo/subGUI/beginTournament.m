@@ -250,16 +250,16 @@ global TABLE option
 % bool_check = handles.CHECK_showPendingResult.Value;
 bool_check = false;
 disp('CHECK_showPendingResult_Callback added in the future')
-if bool_check
-    % Checkbox is checked
-    disp('- Select and show pending results (Tables) only')
-    id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
-    data = table2cell(TABLE.pairingTable(id,:));
-else
+% if bool_check
+%     % Checkbox is checked
+%     disp('- Select and show pending results (Tables) only')
+%     id = strfind_idx( TABLE.pairingTable.Result, '<pending>', option.caseInsensitiveOption );
+%     data = table2cell(TABLE.pairingTable(id,:));
+% else
     % Checkbox is not checked
     disp('- Show all results (Tables)')
     data = table2cell(TABLE.pairingTable(:,:)); 
-end
+% end
 set(handles.TAB_pairing, 'data', data, 'ColumnName', option.columnTablePairing); 
 
 
@@ -973,6 +973,10 @@ function MENU_resetCurrentRound_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 futureFunctionalityMsg(handles)
+% global option
+% option.no_round = option.no_round-1;
+% BUT_pair_Callback(hObject, eventdata, handles)
+
 
 % --------------------------------------------------------------------
 function MENU_showStandings_Callback(hObject, eventdata, handles)
@@ -1121,7 +1125,9 @@ if option.tmp.compteur_computeScore > 1
     TABLE.historyMatch(end-nb_match+1:end,:) = [];
     disp('-- Reload TABLE.tablePlayers_forTournament from last round')
     id = find(TABLE.HistoryTABLE.no_Round == option.no_round-1);
+    boolDropped = TABLE.tablePlayers_forTournament.boolDropped;
     TABLE.tablePlayers_forTournament = TABLE.HistoryTABLE.standing{id};
+    TABLE.tablePlayers_forTournament.boolDropped = boolDropped;
 else
     disp('--- 1st time to compute score: Store directly the TABLE.historyMatch_tmp to TABLE.historyMatch')    
 end
