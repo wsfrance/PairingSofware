@@ -117,7 +117,8 @@ axis image;
 % In this example we want to set the quiet zone size to 20 pixels.
 
 % message = 'Hello World again with a big quiet zone';
-message = 'WSCode:ZZZZ;name:Cao Tri;familyName:DO;email:caotri.do88@gmail.com;series:AoT;language:EN';
+% message = 'WSCode:ZZZZ;name:Cao Tri;familyName:DO;email:caotri.do88@gmail.com;Series:AoT;Language:EN';
+message = 'WSCode:AAA;name:Chris;familyName:FROCHE;email:zzz.zzzgmail.com;Series:SG;Language:JP';
 qr = qrcode_gen(message,'QuietZone',20); % Returns a matrix
 
 fExample6 = figure;

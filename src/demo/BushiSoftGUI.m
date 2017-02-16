@@ -22,7 +22,7 @@ function varargout = BushiSoftGUI(varargin)
 
 % Edit the above text to modify the response to help BushiSoftGUI
 
-% Last Modified by GUIDE v2.5 08-Feb-2017 21:11:28
+% Last Modified by GUIDE v2.5 16-Feb-2017 11:06:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,7 +92,9 @@ addPath_bushisoft( );
 % User Define
 disp('Load Default Config')
 defaultConfig; % Default config
-
+    
+    disp('- Allocate table for QR codes')
+    TABLE.playerQR = [];
     
 % disp('- Ask Login and Password')
 % [login, password] = logindlg('Title','Login Title');
@@ -262,7 +264,16 @@ else
 end
 
 
+% --- Executes on button press in BUT_uniqueWSCode.
+function BUT_uniqueWSCode_Callback(hObject, eventdata, handles)
+% hObject    handle to BUT_uniqueWSCode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
+global TABLE
+[a,b,c] = unique(TABLE.tablePlayers_forTournament.WSCode);
+TABLE.tablePlayers_forTournament = TABLE.tablePlayers_forTournament(b,:);
+refreshTables(hObject, eventdata, handles)
 
 
 function EDIT_tournamentName_Callback(hObject, eventdata, handles)
@@ -1420,3 +1431,6 @@ else
     prefix = '';
     displayErrorMsg( msg, handles_i, prefix )
 end
+
+
+
