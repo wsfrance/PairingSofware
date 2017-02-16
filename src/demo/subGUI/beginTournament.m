@@ -329,9 +329,11 @@ function BUT_playerHistory_Callback(hObject, eventdata, handles)
 % hObject    handle to BUT_playerHistory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-futureFunctionalityMsg( handles )
-
-
+% futureFunctionalityMsg( handles )
+global option
+disp('Player history selected')
+option.tmp.id_selectedPlayer = get(handles.LIST_listPlayer, 'Value');
+historyGUI
 
 % --- Executes on button press in BUT_pair.
 function BUT_pair_Callback(hObject, eventdata, handles)

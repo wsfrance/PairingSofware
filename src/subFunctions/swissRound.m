@@ -23,7 +23,7 @@ boolDropped     = tablePlayers.boolDropped;
 if option.no_round == 1
     % 1st Round
     disp('-- Creating pairing for 1st round')
-    pairingID = firstRoundPairing(playersID, nb_players);
+    pairingID = firstRoundPairing(playersID, nb_players, boolDropped);
 
 else
     % other rounds
@@ -55,12 +55,16 @@ end
 % ADDED FUNCTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function pairingID = firstRoundPairing(playersID, nb_players)
+function pairingID = firstRoundPairing(playersID, nb_players, boolDropped)
     % Divide players into 2 sub-groups
     % Au début du tournoi, les n joueurs sont classés selon leur force. 
     % Pour le premier tour (appelé ronde dans les tournois d'échecs), les 
     % joueurs sont divisés en deux sous-groupes : un sous-groupe S1 composé des 
     % joueurs 1 à n/2, et un sous-groupe S2 composé des joueurs (n/2)+1 à n.    
+    
+    id = find(boolDropped==1);
+    playersID(id) = [];
+    nb_players = size(playersID,1);
     
     middle_nbPlayers = nb_players/2; % middle position of the ranking
     
