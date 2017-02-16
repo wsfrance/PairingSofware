@@ -17,6 +17,7 @@ verbose = 1;
 winNumber       = tablePlayers.winNumber;
 playersID       = tablePlayers.playerId;
 nb_players      = size(tablePlayers.Ranking,1);
+boolDropped     = tablePlayers.boolDropped;
 
 %% 1st round
 if option.no_round == 1
@@ -33,7 +34,7 @@ else
             pairingID = scoreGroup(playersID, nb_players, mat_HistoryMatch, winNumber, verbose);
             
         case 'Monrad'
-            pairingID = monrad(playersID, nb_players, mat_HistoryMatch);
+            pairingID = monrad(playersID, nb_players, mat_HistoryMatch, boolDropped);
             
         otherwise
             error('Case not known')
@@ -142,10 +143,15 @@ end
 end
 
 
-function pairingID = monrad(playersID, nb_players, mat_HistoryMatch)
+function pairingID = monrad(playersID, nb_players, mat_HistoryMatch, boolDropped)
 % Pair players according to the Monrad System
 % Players are paired with the players that is the closest to him if they do
 % not have played already againt each other
+
+if nargin < 4
+    boolDropped = zeros(nb_players,1);
+    warning('No boolDropped given')
+end
 
 % Allocate
 boolPlayer = false(nb_players,1);
@@ -154,32 +160,44 @@ pairingID = []; % Allocation to change
 
 % Loop for all players
 for i = 1:nb_players
-    if boolPlayer(i)==0
-        pairingID(counter,1) = playersID(i);
-        boolPlayer(i) = true;
-        bool_opponent = false;
-        % Loop to find opponent
-        j = 1;
-        while bool_opponent==false
-            if boolPlayer(j)==0
-                % check if the players have already played
-                % against each other. If not paired them
-                mini = min(mat_HistoryMatch(playersID(i),:));
-                if mat_HistoryMatch(playersID(i), playersID(j)) == mini || j==nb_players
-                    pairingID(counter,2) = playersID(j);
-                    boolPlayer(j) = true;
-                    bool_opponent = true;
+    if boolDropped(i) == 0
+        % Player has not dropped the tournament
+        if boolPlayer(i)==0
+            pairingID(counter,1) = playersID(i);
+            boolPlayer(i) = true;
+            bool_opponent = false;
+            % Loop to find opponent
+            j = 1;
+            while bool_opponent==false
+                if boolDropped(j) == 0
+                    % Opponent has not dropped
+                    if boolPlayer(j)==0
+                        % check if the players have already played
+                        % against each other. If not paired them
+                        mini = min(mat_HistoryMatch(playersID(i),:));
+                        if mat_HistoryMatch(playersID(i), playersID(j)) == mini || j==nb_players
+                            pairingID(counter,2) = playersID(j);
+                            boolPlayer(j) = true;
+                            bool_opponent = true;
+                        else
+                            disp('--- le match a déjà eu lieu. Continue')
+                            j = j+1;
+                        end
+                    else
+                        j = j+1;
+                    end
                 else
-                    disp('--- le match a déjà eu lieu. Continue')
+                    disp('Opponent has dropped')
                     j = j+1;
+                    % bool_opponent = true;
                 end
-            else
-                j = j+1;
             end
+            counter = counter+1;
+        else
+            disp('--- Player is already paired. Continue')
         end
-        counter = counter+1;
     else
-        disp('--- Player is already paired. Continue')
+        disp('Player has dropped tournament')
     end
 end
 

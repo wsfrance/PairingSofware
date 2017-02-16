@@ -4,7 +4,7 @@ function [ tablePlayerOut, bool_byePlayer ] = createByePlayer( tablePlayer )
 
 [nb_player, nb_variable] = size(tablePlayer);
 
-if mod(nb_player,2) == 1
+% if mod(nb_player,2) == 1
     disp('-- Odd number of Players. Adding a bye Player ...')
     
     % Allocate a matrix
@@ -21,10 +21,10 @@ if mod(nb_player,2) == 1
     % Assign to the new table
     tablePlayerOut  = [tablePlayer; byePlayer];
     bool_byePlayer  = true;
-else
-    disp('-- Even number of player. All is ok. Continue ...')
-    tablePlayerOut  = tablePlayer;
-    bool_byePlayer  = false;
+% else
+%     disp('-- Even number of player. All is ok. Continue ...')
+%     tablePlayerOut  = tablePlayer;
+%     bool_byePlayer  = false;
 
-end
+% end
 

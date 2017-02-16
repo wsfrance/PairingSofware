@@ -92,11 +92,13 @@ if option.bool_Tournamentstarted == 0
     option.bool_Tournamentstarted = 1;
     option.typeRound = 'Round';
     
-    % Check the numbers of players
+    % % Check the numbers of players
+    disp('-- Create BYE Player')
     [ TABLE.tablePlayers_forTournament, option.tmp.bool_byePlayer ] = createByePlayer( TABLE.tablePlayers_forTournament );
     
     % Make a cross-table of already done match (such that a match cannot be 'redone')
     disp('-- Initialize the subTables and a Matrice to store already done match (such that a match cannot be re-done)')
+    option.columnOfTournament= TABLE.tablePlayers_forTournament.Properties.VariableNames;
     nb_players               = size(TABLE.tablePlayers_forTournament,1);
     MATRICE.mat_HistoryMatch = zeros(nb_players,nb_players);
     [rankTable, playerIdTable, TABLE.historyMatch, TABLE.historyMatch_tmp, indexMat] = generateSubTable(nb_players, option.no_maxRound);
@@ -362,6 +364,21 @@ switch option.typeRound
 
                 disp('- Reset option.tmp.compteur_computeScore to 0')
                 option.tmp.compteur_computeScore = 0;
+                
+                % Check the numbers of players
+                disp('-- Change bool BYE Player if necessary')
+                id_BYE = strfind_idx(TABLE.tablePlayers_forTournament.WSCode, '**BYE**');
+                subtable = TABLE.tablePlayers_forTournament.boolDropped;
+                subtable(id_BYE) = []; % remove bye player from counting
+                id = find(subtable==0);                
+                if mod(length(id),2) == 1
+                    disp('-- Odd number of remaining players. Adding BYE Player')
+                    TABLE.tablePlayers_forTournament.boolDropped(id_BYE) = 0;
+                else
+                    disp('-- Even number of remaining players. Remove BYE Player')
+                    TABLE.tablePlayers_forTournament.boolDropped(id_BYE) = 1;
+                end
+                    
                 disp(['- Create Pairing for Round no.' num2str(option.no_round)])
                 [MATRICE.matchID, MATRICE.pairingWSCode, MATRICE.mat_HistoryMatch] = swissRound (TABLE.tablePlayers_forTournament, MATRICE.mat_HistoryMatch, option);
                 
@@ -787,7 +804,7 @@ displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
 
 function displayInfoMatch(hObject, eventdata, handles, no_table, data, rows)
 
-global MATRICE
+global MATRICE TABLE
 
 switch MATRICE.match_record(no_table,1)
     case 1
@@ -803,17 +820,22 @@ switch MATRICE.match_record(no_table,1)
 end    
 
 % Determine player 1, player 2 and their table
-player1 = MATRICE.pairingWSCode(rows,1);
+wsCode1 = MATRICE.pairingWSCode(rows,1);
 namePlayer1 = data{rows,4};
-player2 = MATRICE.pairingWSCode(rows,2);
+id1 = strfind_idx(TABLE.tablePlayers_forTournament.WSCode,wsCode1);
+booldrop1 = TABLE.tablePlayers_forTournament.boolDropped(id1);
+wsCode2 = MATRICE.pairingWSCode(rows,2);
 namePlayer2 = data{rows,6};
+id2 = strfind_idx(TABLE.tablePlayers_forTournament.WSCode,wsCode2);
+booldrop2 = TABLE.tablePlayers_forTournament.boolDropped(id2);
 % table = TABLE.pairingTable.Table(rows);
 table = handles.TAB_pairing.Data(rows,3);
 % Display in the TEXT boxes
 set(handles.EDIT_table, 'String', table)
 set(handles.TEXT_player1, 'String', namePlayer1)
 set(handles.TEXT_player2, 'String', namePlayer2)
-
+set(handles.CHECK_dropPlayer1, 'Value', booldrop1)
+set(handles.CHECK_dropPlayer2, 'Value', booldrop2)
 
     
 function EDIT_table_Callback(hObject, eventdata, handles)
