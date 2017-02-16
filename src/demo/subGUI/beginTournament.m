@@ -105,7 +105,7 @@ if option.bool_Tournamentstarted == 0
     % Players for Tournament
     disp('-- Initialize the table tablePlayers_forTournament')
     TABLE.tablePlayers_forTournament = [playerIdTable TABLE.tablePlayers_forTournament rankTable];
-
+    
     % Show in Standing GUI
     disp('-- Set the option of columns to display')
     columnTable = TABLE.tablePlayers_forTournament.Properties.VariableNames;
@@ -608,6 +608,17 @@ if option.boolean_Round == 0
     disp('- Display the match (if only pending result or all results)')
     CHECK_showPendingResult_Callback(hObject, eventdata, handles);
     
+    % Save if dropped players
+    disp('- Save if dropped players')
+    if handles.CHECK_dropPlayer1.Value == 1
+        TABLE.tablePlayers_forTournament.boolDropped(lin1) = 1;
+        disp('-- Player 1 has dropped tournament after this round')
+    end
+    if handles.CHECK_dropPlayer2.Value == 1
+        TABLE.tablePlayers_forTournament.boolDropped(lin2) = 1;
+        disp('-- Player 2 has dropped tournament after this round')
+    end
+    
     
     % Check if all results have been given
     if isempty(find(isinf(MATRICE.match_record)==1)) == 1
@@ -898,8 +909,8 @@ function CHECK_dropPlayer1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_dropPlayer1
-futureFunctionalityMsg(handles)
-
+% futureFunctionalityMsg(handles)
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in CHECK_dropPlayer2.
 function CHECK_dropPlayer2_Callback(hObject, eventdata, handles)
@@ -908,8 +919,8 @@ function CHECK_dropPlayer2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of CHECK_dropPlayer2
-futureFunctionalityMsg(handles)
-
+% futureFunctionalityMsg(handles)
+BUT_saveScore_Callback(hObject, eventdata, handles)
 
 % --------------------------------------------------------------------
 function MENU_tournament_Callback(hObject, eventdata, handles)
@@ -1396,6 +1407,7 @@ set(handles.BUT_startTimer, 'Visible', mode)
 set(handles.TAB_pairing, 'Visible', mode)
 set(handles.GROUP_reportScores, 'Visible', mode)
 set(handles.CHECK_showPendingResult, 'Visible', mode)
+set(handles.BUT_printPlayerSlips, 'Visible', mode)
 
 
 
